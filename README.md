@@ -14,8 +14,12 @@ When making DLL or Lua modifications, please mark any additions you make as such
  [Your addition here]
  
  // END [Name of component]
+
+If your component requires another component to be present, please add this to the required component:
+
+ // USEDBY: [Name of your component]
  
-This will make it easier for all people involved to see what you have changed, and use the component.
+If you make any changes to the component, then please mark them so they can be removed easily, should the need arise. This will make it easier for all people involved to see what you have changed, and use the component.
 
 Keep modding, and let's make the Civ5 modding scene as great as the Civ4 scene was!
 
