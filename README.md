@@ -10,7 +10,6 @@ When making an addition to the repo, make sure to add a description of the compo
 When making DLL modifications, please mark any additions you make as such:
 
  // [Name of component] - [The latest version number that changed the code segment], [Your Username]
- 
 
 Keep modding, and let's make the Civ5 modding scene as great as the Civ4 scene was!
 
