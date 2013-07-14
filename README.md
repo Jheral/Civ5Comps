@@ -10,7 +10,9 @@ When making an addition to the repo, make sure to add a description of the compo
 When making DLL or Lua modifications, please mark any additions you make as such:
 
  // [Name of component] - [The latest version number that changed the code segment], [Your Username]
+ 
  [Your addition here]
+ 
  // END [Name of component]
  
 This will make it easier for all people involved to see what you have changed, and use the component.
