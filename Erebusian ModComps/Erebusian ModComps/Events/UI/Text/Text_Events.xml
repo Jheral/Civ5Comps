@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created by ModBuddy on 8/6/2013 11:00:12 AM -->
+<GameData>
+	<Language_en_US>
+		<Row Tag="TXT_KEY_EVENTS_CHOOSE_OPTIONS_BACK">
+			<Text>Back</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTS_CHOOSE_OPTIONS_ACCEPT">
+			<Text>Accept</Text>
+		</Row>
+	</Language_en_US>
+</GameData>

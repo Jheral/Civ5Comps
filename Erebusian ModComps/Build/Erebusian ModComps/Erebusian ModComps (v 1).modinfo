@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mod id="821b75f8-4e18-481d-819e-4b96800d20a3" version="1">
+  <Properties>
+    <Name>Erebusian ModComps</Name>
+    <Stability>Alpha</Stability>
+    <Teaser>A modding framework for bigger Civilization V mods, by the #erebus community.</Teaser>
+    <Description>A modding framework for bigger Civilization V mods, made by the #erebus community of former Rise from Erebus developers.</Description>
+    <Authors>Jheral, Snarko, shoggi</Authors>
+    <HideSetupGame>0</HideSetupGame>
+    <AffectsSavedGames>1</AffectsSavedGames>
+    <MinCompatibleSaveVersion>0</MinCompatibleSaveVersion>
+    <SupportsSinglePlayer>1</SupportsSinglePlayer>
+    <SupportsMultiplayer>1</SupportsMultiplayer>
+    <SupportsHotSeat>1</SupportsHotSeat>
+    <SupportsMac>1</SupportsMac>
+    <ReloadLandmarkSystem>0</ReloadLandmarkSystem>
+    <ReloadStrategicViewSystem>0</ReloadStrategicViewSystem>
+    <ReloadUnitSystem>0</ReloadUnitSystem>
+  </Properties>
+  <Dependencies />
+  <References />
+  <Blocks />
+  <Files>
+    <File md5="C7716D81B5BF070111E4D38B7245A103" import="0">AdvancementsScreen/SQL/Vanilla_Changes.sql</File>
+    <File md5="1BC346A805E103D1529D764D51AA35AA" import="0">AdvancementsScreen/SQL/XML_Modifications.sql</File>
+    <File md5="A7E3C31C276B7C18DA7E05ECE348C313" import="0">AdvancementsScreen/Readme.txt</File>
+    <File md5="170FEA5CF482479F3EA5465EE3FACE75" import="1">AdvancementsScreen/UI/SocialPolicyPopup.lua</File>
+    <File md5="749ADB30FA3A68E676E2F62B0023C6F4" import="1">AdvancementsScreen/UI/SocialPolicyPopup.xml</File>
+    <File md5="75B6D627D0E292C92CAC8B113A523C3F" import="0">AdvancementsScreen/UI/Text/Text_Advancements.xml</File>
+    <File md5="E142502C563C864E29EC42A36D936549" import="1">CvGameCore_Expansion2.dll</File>
+    <File md5="94634A68D0C849BB61798FD4879D289A" import="0">Events/Examples/Events.xml</File>
+    <File md5="7C7516725ACDFA5003B07532C97746E9" import="0">Events/Examples/EventTypes.xml</File>
+    <File md5="3734E8A05145C8F7254B619AD688AED6" import="1">Events/Examples/Resources/testImage_290x120.dds</File>
+    <File md5="5F44F16942B999E32C3A1707477C3F7A" import="0">Events/Examples/SQL/XMLChanges.sql</File>
+    <File md5="ADCDE106B9977FC5974ACEA8B89661DE" import="0">Events/Examples/Text/Text_ExampleEvents.xml</File>
+    <File md5="F7DB4C00ADC18006AEF91059860680FC" import="0">Events/Readme.txt</File>
+    <File md5="B455B4EDCC1E427AA634C99A15F25FFC" import="0">Events/UI/EventChoicePopup.lua</File>
+    <File md5="53D973EE2FB68559EDE227E1F4B1A989" import="0">Events/UI/EventChoicePopup.xml</File>
+    <File md5="F16603BBCED7B328EB7622C0BFF08F23" import="0">Events/UI/Text/Text_Events.xml</File>
+    <File md5="C4A1E94DD418714F483CA79AAF2F3184" import="1">Events/UI/TopPanel.lua</File>
+  </Files>
+  <Actions>
+    <OnModActivated>
+      <UpdateDatabase>AdvancementsScreen/SQL/XML_Modifications.sql</UpdateDatabase>
+      <UpdateDatabase>AdvancementsScreen/SQL/Vanilla_Changes.sql</UpdateDatabase>
+      <UpdateDatabase>AdvancementsScreen/UI/Text/Text_Advancements.xml</UpdateDatabase>
+      <UpdateDatabase>Events/UI/Text/Text_Events.xml</UpdateDatabase>
+      <UpdateDatabase>Events/Examples/SQL/XMLChanges.sql</UpdateDatabase>
+      <UpdateDatabase>Events/Examples/Text/Text_ExampleEvents.xml</UpdateDatabase>
+      <UpdateDatabase>Events/Examples/Events.xml</UpdateDatabase>
+      <UpdateDatabase>Events/Examples/EventTypes.xml</UpdateDatabase>
+    </OnModActivated>
+  </Actions>
+  <EntryPoints>
+    <EntryPoint type="InGameUIAddin" file="Events/UI/EventChoicePopup.xml">
+      <Name>Event Choice Popup</Name>
+      <Description>Popup for choosing between Event options</Description>
+    </EntryPoint>
+  </EntryPoints>
+</Mod>

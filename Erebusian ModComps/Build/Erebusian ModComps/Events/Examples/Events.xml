@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created by ModBuddy on 8/3/2013 4:15:30 PM -->
+<GameData>
+	<!-- Table definition -->
+	<Table name="Events">
+		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
+		<Column name="Type" type="text" notnull="true" unique="true"/>
+		<Column name="Description" type="text" reference="Language_en_US(Tag)"/>
+		<Column name="Text" type="text" reference="Language_en_US(Tag)"/>
+		<Column name="Civilopedia" type="text" default="NULL"/>
+		<Column name="CivilopediaTag" type="text"/>
+		<Column name="Strategy" type="text" reference="Language_en_US(Tag)"/>
+		<Column name="EventType" type="text" default="EVENT_PLAYER"/>
+		<Column name="MeanTimeToHappen" type="integer" default="-1"/>
+	</Table>
+	<Table name="Event_Requirements">
+		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
+		<Column name="ID_Scope" type="integer" default="9999"/>
+		<Column name="Type" type="text" notnull="true" unique="true"/>
+		<Column name="EventType" type="text" reference="Events(Type)"/>
+		<Column name="EventModifierType" type="text" notnull="true"/>
+		<Column name="EventCompareType" type="text"/>
+		<Column name="CompareItem" type="text" default="NULL"/>
+		<Column name="iNumberToCompare" type="integer" default="-1"/>
+		<!-- <Column name="fFactor" type="float" default="0"/> -->
+		<Column name="sScope" type="text" default="default"/>
+	</Table>
+	<Table name="Event_Modifiers">
+		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
+		<Column name="ID_Scope" type="integer" default="9999"/>
+		<Column name="Type" type="text" notnull="true" unique="true"/>
+		<Column name="EventType" type="text" reference="Events(Type)"/>
+		<Column name="EventModifierType" type="text" notnull="true"/>
+		<Column name="EventCompareType" type="text"/>
+		<Column name="CompareItem" type="text"/>
+		<Column name="iNumberToCompare" type="integer" default="-1"/>
+		<Column name="fFactor" type="float" default="0"/>
+		<Column name="sScope" type="text" default="default"/>
+	</Table>
+	<Table name="Event_Options">
+		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
+		<Column name="ID_Scope" type="integer" default="9999"/>
+		<Column name="Type" type="text" notnull="true" unique="true"/>
+		<Column name="EventType" type="text" reference="Events(Type)"/>
+		<Column name="Description" type="text" reference="Language_en_US(Tag)"/>
+		<Column name="Help" type="text" reference="Language_en_US(Tag)"/>
+	</Table>
+	<Table name="Event_Actions">
+		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
+		<Column name="ID_Scope" type="integer" default="9999"/>
+		<Column name="Type" type="text" notnull="true" unique="true"/>
+		<Column name="EventOptionType" type="text" reference="Event_Options(Type)"/>
+		<Column name="EventActionType" type="integer" notnull="true"/>
+		<Column name="iTurns" type="integer" default="-1"/>
+		<Column name="iChance" type="integer" default="-1"/>
+		<Column name="ActionItem" type="text" default=""/>
+		<Column name="AIWeight" type="integer" default="0"/>
+		<Column name="iValue" type="integer" default="0"/>
+		<Column name="iValue2" type="integer" default="0"/>
+		<Column name="bBool" type="boolean" default="false"/>
+		<Column name="sString" type="text" default=" "/>
+	</Table>
+	<Events>
+		<Row>
+			<ID>0</ID>
+			<Type>Test_Event</Type>
+			<Description>TXT_KEY_TEST_EVENT_DESC</Description>
+			<Civilopedia>TXT_KEY_TEST_EVENT</Civilopedia>
+		</Row>
+		<Row>
+			<Type>EventTest</Type>
+			<Description>TXT_KEY_EVENTTEST_DESC</Description>
+			<Civilopedia>TXT_KEY_EVENTTEST</Civilopedia>
+			<MeanTimeToHappen>50</MeanTimeToHappen>
+		</Row>
+		<Row>
+			<Type>EVENT_TESTING_JHERAL</Type>
+			<Description>TXT_KEY_EVENT_TESTING_JHERAL_DESC</Description>
+			<Civilopedia>TXT_KEY_EVENT_TESTING_JHERAL_PEDIA</Civilopedia>
+		</Row>
+	</Events>
+	<Event_Requirements>
+		<Row>
+			<ID>0</ID>
+			<Type>Test_Event_Req1</Type>
+			<EventType>Test_Event</EventType>
+			<EventModifierType>EVENTMOD_HAPPINESS</EventModifierType>
+			<EventCompareType>COMPARE_MORETHAN</EventCompareType>
+			<iNumberToCompare>1</iNumberToCompare>
+		</Row>
+		<Row>
+			<Type>EventTestReq1</Type>
+			<EventType>EventTest</EventType>
+			<EventModifierType>EVENTMOD_RESOURCE_AVAILABLE</EventModifierType>
+			<EventCompareType>COMPARE_LESSTHAN</EventCompareType>
+			<iNumberToCompare>3</iNumberToCompare>
+			<sScope>Scope_EventTest_1</sScope>
+		</Row>
+		<Row>
+			<ID_Scope>0</ID_Scope>
+			<Type>EventTestReq2</Type>
+			<EventType>EventTest</EventType>
+			<EventModifierType>EVENTMOD_RESOURCE_CLASS</EventModifierType>
+			<EventCompareType>COMPARE_MORETHAN</EventCompareType>
+			<iNumberToCompare>3</iNumberToCompare>
+			<CompareItem>RESOURCECLASS_RUSH</CompareItem>
+			<sScope>Scope_EventTest_1</sScope>
+		</Row>
+	</Event_Requirements>
+	<Event_Modifiers>
+		<Row>
+			<ID>0</ID>
+			<Type>EventTestMod1</Type>
+			<EventType>EventTest</EventType>
+			<EventModifierType>EVENTMOD_RESOURCE_AVAILABLE</EventModifierType>
+			<EventCompareType>COMPARE_LESSTHAN</EventCompareType>
+			<iNumberToCompare>1</iNumberToCompare>
+			<fFactor>0.1</fFactor>
+			<sScope>Scope_EventTest_1</sScope>
+		</Row>
+	</Event_Modifiers>
+	<Event_Options>
+		<Row>
+			<ID>0</ID>
+			<Type>Test_Event_Option1</Type>
+			<EventType>Test_Event</EventType>
+			<Description>TXT_KEY_TEST_EVENT_OPTION1</Description>
+		</Row>
+		<Row>
+			<Type>EventTestOption1</Type>
+			<EventType>EventTest</EventType>
+			<Description>TXT_KEY_EVENTTESTOPTION1</Description>
+		</Row>
+		<Row>
+			<Type>EVENT_TESTING_JHERAL_OPTION1</Type>
+			<EventType>EVENT_TESTING_JHERAL</EventType>
+			<Description>TXT_KEY_TEST_EVENT_1_DESC</Description>
+			<Help>TXT_KEY_TEST_EVENT_1_HELP</Help>
+		</Row>
+		<Row>
+			<Type>EVENT_TESTING_JHERAL_OPTION2</Type>
+			<EventType>EVENT_TESTING_JHERAL</EventType>
+			<Description>TXT_KEY_TEST_EVENT_2_DESC</Description>
+			<Help>TXT_KEY_TEST_EVENT_2_HELP</Help>
+		</Row>
+		<Row>
+			<Type>EVENT_TESTING_JHERAL_OPTION3</Type>
+			<EventType>EVENT_TESTING_JHERAL</EventType>
+			<Description>TXT_KEY_TEST_EVENT_3_DESC</Description>
+		</Row>
+		<Row>
+			<Type>EVENT_TESTING_JHERAL_OPTION4</Type>
+			<EventType>EVENT_TESTING_JHERAL</EventType>
+			<Description>TXT_KEY_TEST_EVENT_4_DESC</Description>
+			<Help>TXT_KEY_TEST_EVENT_4_HELP</Help>
+		</Row>
+	</Event_Options>
+	<Event_Actions>
+		<Row>
+			<ID>0</ID>
+			<Type>Test_Event_Action1</Type>
+			<EventOptionType>Test_Event_Option1</EventOptionType>
+			<EventActionType>EVENTACTION_HAPPY</EventActionType>
+			<iValue>-2</iValue>
+		</Row>
+		<Row>
+			<Type>EventTestAction1</Type>
+			<EventOptionType>EventTestOption1</EventOptionType>
+			<EventActionType>EVENTACTION_HAPPY</EventActionType>
+			<iValue>20</iValue>
+		</Row>
+		<Row>
+			<Type>EventTestAction2</Type>
+			<EventOptionType>EventTestOption1</EventOptionType>
+			<EventActionType>EVENTACTION_SET_FLAG</EventActionType>
+			<iValue>2</iValue>
+			<sString>FLAG_TEST</sString>
+		</Row>
+	</Event_Actions>
+</GameData>

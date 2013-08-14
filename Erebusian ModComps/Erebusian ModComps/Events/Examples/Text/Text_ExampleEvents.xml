@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created by ModBuddy on 8/6/2013 11:00:12 AM -->
+<GameData>
+	<Language_en_US>
+		<!-- Testing tags -->
+		<Row Tag="TXT_KEY_TEST_EVENT_DESC">
+			<Text>Test event</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TEST_EVENT_OPTION1">
+			<Text>Click me!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TEST_EVENT">
+			<Text>A longer explanation for the event. Can be an entire story if you so like. Of course, if it's too long people might not even bother reading it, but something like this should work. Or a little longer if you need to.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TP_HAPPINESS_EVENTS">
+			<Text>{1_Num} from events.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTTESTOPTION1">
+			<Text>BAM!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTTEST_DESC">
+			<Text>BOOM!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTTEST">
+			<Text>This is an example event text.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENT_TESTING_JHERAL_DESC">
+			<Text>A wild Jheral has appeared!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENT_TESTING_JHERAL_PEDIA">
+			<Text>The Great Modhound of Erebus, Jheral, has arrived at your shores, and is currently in the process of unravelling reality. What will you do?</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TEST_EVENT_1_DESC">
+			<Text>Flee! I don't want to become part of his horrible fantasies!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TEST_EVENT_1_HELP">
+			<Text>You are a coward!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TEST_EVENT_2_DESC">
+			<Text>Fight! I'm sure he can't mod me out quick enough to win!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TEST_EVENT_2_HELP">
+			<Text>You will be edited out of the game!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TEST_EVENT_3_DESC">
+			<Text>Nothing. Just let him have his fun.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TEST_EVENT_3_HELP">
+			<Text>You will live. For now!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TEST_EVENT_4_DESC">
+			<Text>His Mod-Fu is weak! I can beat him at his own game!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TEST_EVENT_4_HELP">
+			<Text>This is madness! You will destroy the entire game!</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LOREM_IPSUM">
+			<Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque quis purus ut turpis aliquam egestas. Integer euismod metus quis porttitor eleifend. Vivamus eleifend at felis sed vestibulum. Vestibulum a leo pellentesque tellus mollis elementum.</Text>
+		</Row>
+	</Language_en_US>
+</GameData>

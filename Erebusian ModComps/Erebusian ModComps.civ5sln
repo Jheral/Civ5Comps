@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# ModBuddy Solution File, Format Version 11.00
+Project("{F5FC21B5-7CC2-458A-ABBA-992F515BBA20}") = "Erebusian ModComps", "Erebusian ModComps\Erebusian ModComps.civ5proj", "{2FBD7C3C-75C5-4662-B6E2-814BB4D5B1AE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Default|x86 = Default|x86
+		Deploy Only|x86 = Deploy Only|x86
+		Package Only|x86 = Package Only|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2FBD7C3C-75C5-4662-B6E2-814BB4D5B1AE}.Default|x86.ActiveCfg = Default|x86
+		{2FBD7C3C-75C5-4662-B6E2-814BB4D5B1AE}.Default|x86.Build.0 = Default|x86
+		{2FBD7C3C-75C5-4662-B6E2-814BB4D5B1AE}.Deploy Only|x86.ActiveCfg = Deploy Only|x86
+		{2FBD7C3C-75C5-4662-B6E2-814BB4D5B1AE}.Deploy Only|x86.Build.0 = Deploy Only|x86
+		{2FBD7C3C-75C5-4662-B6E2-814BB4D5B1AE}.Package Only|x86.ActiveCfg = Package Only|x86
+		{2FBD7C3C-75C5-4662-B6E2-814BB4D5B1AE}.Package Only|x86.Build.0 = Package Only|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
