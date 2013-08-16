@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created by ModBuddy on 8/11/2013 3:52:51 PM -->
+<GameData>
+	<Table name="PolicyBranch_VictoryTypes">
+		<Column name="PolicyBranchType" type="text" reference="PolicyBranchTypes(Type)"/>
+		<Column name="VictoryType" type="text" reference="Victories(Type)"/>
+	</Table>
+	<PolicyBranch_VictoryTypes>
+		<Row>
+			<PolicyBranchType>POLICY_BRANCH_AUTOCRACY</PolicyBranchType>
+			<VictoryType>VICTORY_CULTURAL</VictoryType>
+		</Row>
+		<Row>
+			<PolicyBranchType>POLICY_BRANCH_AUTOCRACY</PolicyBranchType>
+			<VictoryType>VICTORY_DIPLOMATIC</VictoryType>
+		</Row>
+		<Row>
+			<PolicyBranchType>POLICY_BRANCH_AUTOCRACY</PolicyBranchType>
+			<VictoryType>VICTORY_CULTURAL</VictoryType>
+		</Row>
+		<Row>
+			<PolicyBranchType>POLICY_BRANCH_AUTOCRACY</PolicyBranchType>
+			<VictoryType>VICTORY_DOMINATION</VictoryType>
+		</Row>
+		<Row>
+			<PolicyBranchType>POLICY_BRANCH_FREEDOM</PolicyBranchType>
+			<VictoryType>VICTORY_CULTURAL</VictoryType>
+		</Row>
+		<Row>
+			<PolicyBranchType>POLICY_BRANCH_FREEDOM</PolicyBranchType>
+			<VictoryType>VICTORY_DIPLOMATIC</VictoryType>
+		</Row>
+		<Row>
+			<PolicyBranchType>POLICY_BRANCH_FREEDOM</PolicyBranchType>
+			<VictoryType>VICTORY_SPACE_RACE</VictoryType>
+		</Row>
+		<Row>
+			<PolicyBranchType>POLICY_BRANCH_ORDER</PolicyBranchType>
+			<VictoryType>VICTORY_CULTURAL</VictoryType>
+		</Row>
+		<Row>
+			<PolicyBranchType>POLICY_BRANCH_ORDER</PolicyBranchType>
+			<VictoryType>VICTORY_DOMINATION</VictoryType>
+		</Row>
+		<Row>
+			<PolicyBranchType>POLICY_BRANCH_ORDER</PolicyBranchType>
+			<VictoryType>VICTORY_SPACE_RACE</VictoryType>
+		</Row>
+	</PolicyBranch_VictoryTypes>
+	<PolicyBranchTypes>
+		<Update>
+			<Set PolicyBranchIcon="ICON_IDEOLOGY_FREEDOM" />
+			<Where Type="POLICY_BRANCH_FREEDOM"/>
+		</Update>
+		<Update>
+			<Set PolicyBranchIcon="ICON_IDEOLOGY_AUTOCRACY" />
+			<Where Type="POLICY_BRANCH_AUTOCRACY"/>
+		</Update>
+		<Update>
+			<Set PolicyBranchIcon="ICON_IDEOLOGY_ORDER" />
+			<Where Type="POLICY_BRANCH_ORDER"/>
+		</Update>
+	</PolicyBranchTypes>
+</GameData>

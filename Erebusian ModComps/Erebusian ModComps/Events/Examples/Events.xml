@@ -12,6 +12,7 @@
 		<Column name="Strategy" type="text" reference="Language_en_US(Tag)"/>
 		<Column name="EventType" type="text" default="EVENT_PLAYER"/>
 		<Column name="MeanTimeToHappen" type="integer" default="-1"/>
+		<Column name="Image" type="text" default="NULL"/>
 	</Table>
 	<Table name="Event_Requirements">
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
@@ -44,6 +45,7 @@
 		<Column name="EventType" type="text" reference="Events(Type)"/>
 		<Column name="Description" type="text" reference="Language_en_US(Tag)"/>
 		<Column name="Help" type="text" reference="Language_en_US(Tag)"/>
+		<Column name="bOverrideTooltip" type="boolean" notnull="true" default="0"/>
 	</Table>
 	<Table name="Event_Actions">
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
@@ -59,6 +61,7 @@
 		<Column name="iValue2" type="integer" default="0"/>
 		<Column name="bBool" type="boolean" default="false"/>
 		<Column name="sString" type="text" default=" "/>
+		<Column name="sScope" type="text" default="default"/>
 	</Table>
 	<Events>
 		<Row>
@@ -77,6 +80,7 @@
 			<Type>EVENT_TESTING_JHERAL</Type>
 			<Description>TXT_KEY_EVENT_TESTING_JHERAL_DESC</Description>
 			<Civilopedia>TXT_KEY_EVENT_TESTING_JHERAL_PEDIA</Civilopedia>
+			<Image>testImage_290x120.dds</Image>
 		</Row>
 	</Events>
 	<Event_Requirements>
@@ -142,11 +146,13 @@
 			<EventType>EVENT_TESTING_JHERAL</EventType>
 			<Description>TXT_KEY_TEST_EVENT_2_DESC</Description>
 			<Help>TXT_KEY_TEST_EVENT_2_HELP</Help>
+			<bOverrideTooltip>true</bOverrideTooltip>
 		</Row>
 		<Row>
 			<Type>EVENT_TESTING_JHERAL_OPTION3</Type>
 			<EventType>EVENT_TESTING_JHERAL</EventType>
 			<Description>TXT_KEY_TEST_EVENT_3_DESC</Description>
+			<bOverrideTooltip>true</bOverrideTooltip>
 		</Row>
 		<Row>
 			<Type>EVENT_TESTING_JHERAL_OPTION4</Type>
@@ -161,7 +167,8 @@
 			<Type>Test_Event_Action1</Type>
 			<EventOptionType>Test_Event_Option1</EventOptionType>
 			<EventActionType>EVENTACTION_HAPPY</EventActionType>
-			<iValue>-2</iValue>
+			<iValue>-10</iValue>
+			<iTurns>2</iTurns>
 		</Row>
 		<Row>
 			<Type>EventTestAction1</Type>

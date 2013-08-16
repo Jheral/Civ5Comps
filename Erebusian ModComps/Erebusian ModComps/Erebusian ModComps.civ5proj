@@ -30,7 +30,7 @@
       <Action>
         <Set>OnModActivated</Set>
         <Type>UpdateDatabase</Type>
-        <FileName>Events/Examples/SQL/XMLChanges.sql</FileName>
+        <FileName>AdvancementsScreen/XML/PolicyBranchUpdates.xml</FileName>
       </Action>
       <Action>
         <Set>OnModActivated</Set>
@@ -85,13 +85,13 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="AdvancementsScreen" />
+    <Folder Include="AdvancementsScreen\XML" />
     <Folder Include="AdvancementsScreen\UI" />
     <Folder Include="AdvancementsScreen\SQL" />
     <Folder Include="AdvancementsScreen\UI\Text" />
     <Folder Include="Events" />
     <Folder Include="Events\Examples" />
     <Folder Include="Events\Examples\Resources" />
-    <Folder Include="Events\Examples\SQL" />
     <Folder Include="Events\Examples\Text" />
     <Folder Include="Events\UI" />
     <Folder Include="Events\UI\Text" />
@@ -122,7 +122,15 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
+    <Content Include="AdvancementsScreen\XML\PolicyBranchUpdates.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
     <Content Include="CvGameCore_Expansion2.dll">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="CvGameCore_Expansion2.pdb">
       <SubType>Lua</SubType>
       <ImportIntoVFS>True</ImportIntoVFS>
     </Content>
@@ -137,10 +145,6 @@
     <Content Include="Events\Examples\Resources\testImage_290x120.dds">
       <SubType>Lua</SubType>
       <ImportIntoVFS>True</ImportIntoVFS>
-    </Content>
-    <Content Include="Events\Examples\SQL\XMLChanges.sql">
-      <SubType>Lua</SubType>
-      <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
     <Content Include="Events\Examples\Text\Text_ExampleEvents.xml">
       <SubType>Lua</SubType>

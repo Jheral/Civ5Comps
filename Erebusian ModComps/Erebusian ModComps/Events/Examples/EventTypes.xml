@@ -11,11 +11,11 @@
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
 		<Column name="Name" type="text"  notnull="true" unique="true"/>
 	</Table>
-	<Table name="EventModifierTypes">
+	<Table name="EventModifierTypeTypes">
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
 		<Column name="Name" type="text" notnull="true" unique="true"/>
 	</Table>
-	<Table name="EventActionTypes">
+	<Table name="EventActionTypeTypes">
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
 		<Column name="Name" type="text" notnull="true" unique="true"/>
 	</Table>
@@ -52,7 +52,7 @@
 			<Name>COMPARE_LESSTHAN</Name>
 		</Row>
 	</CompareTypes>
-	<EventModifierTypes>
+	<EventModifierTypeTypes>
 		<!-- EVENTMOD_PLAYER_START, EVENTMOD_PLAYER_END, etc, are for internal usage only. -->
 		<Row>
 			<ID>0</ID>
@@ -298,8 +298,8 @@
 		<Row>
 			<Name>EVENTMOD_UNIT_END</Name>
 		</Row>
-	</EventModifierTypes>
-	<EventActionTypes>
+	</EventModifierTypeTypes>
+	<EventActionTypeTypes>
 		<Row>
 			<ID>0</ID>
 			<Name>EVENTACTION_EVENT</Name>
@@ -412,5 +412,5 @@
 		<Row>
 			<Name>EVENTACTION_CHANGE_IMPROVEMENT</Name>
 		</Row>
-	</EventActionTypes>
+	</EventActionTypeTypes>
 </GameData>

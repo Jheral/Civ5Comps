@@ -70,10 +70,10 @@ function OnPopupMessage(popupInfo)
 	
 	PopulateView(2);
     if( popupInfo.Data2 ~= nil ) then
-		--print(string.format("The event has a real id"));
-		--PopulateView(popupInfo.Data2);
+		print(string.format("The event has a real id"));
+		PopulateView(popupInfo.Data2);
 	else
-		--print(string.format("The event doesn't have a real id"));
+		print(string.format("The event doesn't have a real id"));
     end
 	
 	OnShow();
@@ -101,7 +101,6 @@ ContextPtr:SetShowHideHandler( ShowHideHandler );
 -- On Show
 -------------------------------------------------------------------------------
 function OnShow()
-	PopulateView(2); -- testing only - this should be removed
 	UIManager:QueuePopup( ContextPtr, PopupPriority.SocialPolicy );
 end
 
