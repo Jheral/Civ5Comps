@@ -801,10 +801,6 @@ public:
 	bool			isFighting() const;
 
 	int iScratch; // know the scope of your validity
-	// EventEngine - v0.1, Snarko
-	bool checkEventModifier(CvEventModifier& kModifier);
-	void doEvents();
-	// END EventEngine
 
 protected:
 	FAutoArchiveClassContainer<CvCity> m_syncArchive;

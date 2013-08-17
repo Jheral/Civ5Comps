@@ -24,9 +24,6 @@
 #include "CvPreGame.h"
 #include "CvAchievementUnlocker.h"
 #include "CvUnitCycler.h"
-// EventEngine - v0.1, Snarko
-#include "CvEvent.h"
-// END EventEngine
 
 class CvPlayerPolicies;
 class CvEconomicAI;
@@ -153,32 +150,6 @@ public:
 	void DoUnitReset();
 	void DoUnitAttrition();
 	void RespositionInvalidUnits();
-
-	// EventEngine - v0.1, Snarko
-	void doEvents();
-	void doEventChance(CvEventInfo& kEvent, std::map<std::string, std::vector<int> > &asziScopes, CvCity* pCity = NULL, CvUnit* pUnit = NULL);
-	bool checkEventModifier(CvEventModifier& kModifier, std::map<std::string, std::vector<int> > &asziScopes, bool bRequirement = true);
-	void processEventOption(int iID, int iOption);
-	
-	const CvEvent* firstEvent(int* pIterIdx, bool bRev) const;
-	const CvEvent* nextEvent(int* pIterIdx, bool bRev) const;
-	CvEvent* firstEvent(int* pIterIdx, bool bRev);
-	CvEvent* nextEvent(int* pIterIdx, bool bRev);
-	int getNumEvents() const;
-	CvEvent* getEvent(int iID);
-	CvEvent* addEvent();
-	void deleteEvent(int iID);
-
-	int getYieldFromEvents(YieldTypes eYield) const;
-	void changeYieldFromEvents(YieldTypes eYield, int iChange);
-	int getYieldModFromEvents(YieldTypes eYield) const;
-	void changeYieldModFromEvents(YieldTypes eYield, int iChange);
-	int getHappyFromEvents() const;
-	void changeHappyFromEvents(int iChange);
-	
-	void setFlag(std::string szFlag, int iValue);
-	int getFlag(std::string szFlag);
-	// END EventEngine
 
 	void updateYield();
 	void updateExtraSpecialistYield();
@@ -2004,17 +1975,6 @@ protected:
 	friend const CvUnit* GetPlayerUnit(const IDInfo& unit);
 
 	CvPlayerAchievements m_kPlayerAchievements;
-
-	// EventEngine - v0.1, Snarko
-	//Probably not the best way to store events, but I couldn't find a better one.
-	FFreeListTrashArray<CvEvent> m_events;
-	FAutoVariable<std::vector<int>, CvPlayer> m_aiYieldFromEvents;
-	FAutoVariable<std::vector<int>, CvPlayer> m_aiYieldModFromEvents;
-	int m_iHappyFromEvents;
-
-	std::map<std::string, int> m_asziFlags;
-	//std::vector<EventTypes> m_peActiveEvents;
-	// END EventEngine
 };
 
 extern bool CancelActivePlayerEndTurn();

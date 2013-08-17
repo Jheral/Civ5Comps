@@ -27,9 +27,6 @@
 #include "../CvInternalGameCoreUtils.h"
 #include "ICvDLLUserInterface.h"
 #include "CvDllInterfaces.h"
-// EventEngine - v0.1, Snarko
-#include "CvLuaEvent.h"
-// END EventEngine
 
 // include this last to turn warnings into errors for code analysis
 #include "LintFree.h"
@@ -974,19 +971,6 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(HasTurnTimerExpired);
 
 	Method(HasUnitOfClassType);
-	// EventEngine - v0.1, Snarko
-	Method(CheckEventModifier);
-	Method(ProcessEventOption);
-	Method(GetNumEvents);
-	Method(GetEventByID);
-	Method(AddEvent);
-	Method(DeleteEvent);
-
-	Method(GetHappyFromEvents);
-
-	Method(GetFlag);
-	Method(SetFlag);
-	// END EventEngine
 }
 //------------------------------------------------------------------------------
 void CvLuaPlayer::HandleMissingInstance(lua_State* L)
@@ -10779,120 +10763,3 @@ int CvLuaPlayer::lHasUnitOfClassType(lua_State* L)
 }
 
 //-------------------------------------------------------------------------
-// EventEngine - v0.1, Snarko
-int CvLuaPlayer::lCheckEventModifier(lua_State* L)
-{
-	CvPlayer* pkPlayer = GetInstance(L);
-	if(pkPlayer)
-	{
-		CvEventInfo* kEvent = GC.getEventInfo((EventTypes)lua_tointeger(L, 2));
-		CvEventModifier kEventModifier = kEvent->getModifier(lua_tointeger(L, 3));
-		//TODO: make this function actually return aaScopes to lua, since we might have multiple acceptable answers.
-		std::map<std::string, std::vector<int> > asziScopes;
-		bool bPass = pkPlayer->checkEventModifier(kEventModifier, asziScopes);
-		lua_pushboolean(L, bPass);
-	}
-	return 1;
-}
-
-int CvLuaPlayer::lProcessEventOption(lua_State* L)
-{
-	return BasicLuaMethod(L, &CvPlayerAI::processEventOption);
-}
-
-// Aux Method used by lEvents.
-int CvLuaPlayer::lEventsAux(lua_State* L)
-{
-	CvPlayerAI* pkPlayer = GetInstance(L);
-	CvEvent* pkEvent = NULL;
-
-	int i = -1;
-	lua_pushvalue(L, lua_upvalueindex(1));
-	int t = lua_gettop(L);
-
-	lua_rawgeti(L, t, 1);
-	if(!lua_isnil(L, -1))
-	{
-		i = lua_tointeger(L, -1);
-	}
-	lua_pop(L, 1);
-
-	pkEvent = (i == -1)? pkPlayer->firstEvent(&i, false) : pkPlayer->nextEvent(&i, false);
-
-	lua_pushinteger(L, i);
-	lua_rawseti(L, t, 1);
-
-	if(pkEvent)
-	{
-		CvLuaEvent::Push(L, pkEvent);
-		return 1;
-	}
-
-	return 0;
-}
-//------------------------------------------------------------------------------
-// Method for iterating through Events (behaves like pairs)
-int CvLuaPlayer::lEvents(lua_State* L)
-{
-	lua_createtable(L, 1, 0);
-	lua_pushcclosure(L, lEventsAux, 1);		/* generator, */
-	lua_pushvalue(L, 1);					/* state (self) */
-	return 2;
-}
-
-int CvLuaPlayer::lGetNumEvents(lua_State* L)
-{
-	return BasicLuaMethod(L, &CvPlayerAI::getNumEvents);
-}
-int CvLuaPlayer::lGetEventByID(lua_State* L)
-{
-	CvPlayerAI* pkPlayer = GetInstance(L);
-	const int id = lua_tointeger(L, 2);
-
-	CvEvent* pkEvent = pkPlayer->getEvent(id);
-	CvLuaEvent::Push(L, pkEvent);
-	return 1;
-}
-int CvLuaPlayer::lAddEvent(lua_State* L)
-{
-	CvPlayerAI* pkPlayer = GetInstance(L);
-
-	CvEvent* pkEvent = pkPlayer->addEvent();
-	CvLuaEvent::Push(L, pkEvent);
-	return 1;
-}
-int CvLuaPlayer::lDeleteEvent(lua_State* L)
-{
-	return BasicLuaMethod(L, &CvPlayerAI::deleteEvent);
-}
-
-int CvLuaPlayer::lGetHappyFromEvents(lua_State* L)
-{
-	return BasicLuaMethod(L, &CvPlayerAI::getHappyFromEvents);
-}
-
-int CvLuaPlayer::lGetFlag(lua_State* L)
-{
-	CvPlayerAI* pkPlayer = GetInstance(L);
-	if(pkPlayer)
-	{
-		std::string szString = lua_tostring(L, 2);
-		lua_pushinteger(L, pkPlayer->getFlag(szString));
-		return 1;
-	}
-	return 0;
-}
-
-int CvLuaPlayer::lSetFlag(lua_State* L)
-{
-	CvPlayerAI* pkPlayer = GetInstance(L);
-	if(pkPlayer)
-	{
-		std::string szString = lua_tostring(L, 2);
-		const int iValue = lua_tointeger(L, 3);
-		pkPlayer->setFlag(szString, iValue);
-		return 1;
-	}
-	return 0;
-}
-// END EventEngine

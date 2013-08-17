@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created by ModBuddy on 8/17/2013 12:05:20 PM -->
+<GameData>
+	<Defines>
+		<Row Name="BASE_TRADE_RANGE_SEA">
+			<Value>20</Value>
+		</Row>
+		<Row Name="BASE_TRADE_RANGE_LAND">
+			<Value>10</Value>
+		</Row>
+	</Defines>
+</GameData>

@@ -982,21 +982,7 @@ protected:
 
 	static int lHasUnitOfClassType(lua_State* L);
 
-	// EventEngine - v0.1, Snarko
-	static int lCheckEventModifier(lua_State* L);
-	static int lProcessEventOption(lua_State* L);
-	static int lEventsAux(lua_State* L);
-	static int lEvents(lua_State* L);
-	static int lGetNumEvents(lua_State* L);
-	static int lGetEventByID(lua_State* L);
-	static int lAddEvent(lua_State* L);
-	static int lDeleteEvent(lua_State* L);
 
-	static int lGetHappyFromEvents(lua_State* L);
-
-	static int lGetFlag(lua_State* L);
-	static int lSetFlag(lua_State* L);
-	// END EventEngine
 };
 
 #endif //CVLUAPLAYER_H

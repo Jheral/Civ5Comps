@@ -1225,11 +1225,6 @@ public:
 	static void dispatchingNetMessage(bool dispatching);
 	static bool dispatchingNetMessage();
 
-	// EventEngine - v0.1, Snarko
-	bool checkEventModifier(CvEventModifier& kModifier);
-	void doEvents();
-	// END EventEngine
-
 	std::string debugDump(const FAutoVariableBase&) const;
 	std::string stackTraceRemark(const FAutoVariableBase&) const;
 

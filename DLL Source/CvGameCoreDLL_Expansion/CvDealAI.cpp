@@ -1177,13 +1177,6 @@ int CvDealAI::GetResourceValue(ResourceTypes eResource, int iResourceQuantity, i
 		{
 			int iHappinessFromResource = pkResourceInfo->getHappiness();
 			iItemValue += (iResourceQuantity * iHappinessFromResource * iNumTurns * 2);	// Ex: 1 Silk for 4 Happiness * 30 turns * 2 = 240
-			//Snarko AIMod Start 02-11-2012
-			//Modify luxury value by how happy we are.
-			//Because we do this modification both as receiver and giver we will still accept fair luxury-luxury deals.
-			int iHappyModifier = max(80, GetPlayer()->GetExcessHappiness() * 3 / 2);
-			iItemValue *= (100 - iHappyModifier);
-			iItemValue /= 100;
-			//Snarko AIMod End
 
 			// If we only have 1 of a Luxury then we value it much more
 			if(bFromMe)

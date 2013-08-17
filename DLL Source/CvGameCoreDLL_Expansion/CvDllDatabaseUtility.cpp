@@ -367,16 +367,6 @@ bool CvDllDatabaseUtility::PrefetchGameData()
 	PrefetchCollection(GC.getLeagueProjectInfo(), "LeagueProjects");
 	PrefetchCollection(GC.getLeagueProjectRewardInfo(), "LeagueProjectRewards");
 	PrefetchCollection(GC.getResolutionInfo(), "Resolutions");
-	// EventEngine - v0.1, Snarko
-	// Needs to be before we load events, so we can set requirements, modifiers etc properly.
-	loadEventTypes(GC.getEventTypeTypes(), "EventTypeTypes");
-	loadEventTypes(GC.getCompareTypes(), "CompareTypes");
-	loadEventTypes(GC.getEventModifierTypes(), "EventModifierTypes");
-	loadEventTypes(GC.getEventActionTypes(), "EventActionTypes");
-
-	PrefetchCollection(GC.getEventInfo(), "Events");
-	// END EventEngine
-
 
 	//Copy flavors into string array
 	{
@@ -718,32 +708,6 @@ bool CvDllDatabaseUtility::UpdatePlayableCivilizationCounts()
 
 	return true;
 }
-
-// EventEngine - v0.1, Snarko
-bool CvDllDatabaseUtility::loadEventTypes(std::map<std::string, int>& loadVariable, const char* tableName)
-{
-	CvDatabaseUtility kUtility;
-	Database::Results kResults;
-	if (DB.SelectWhere(kResults, tableName, "ID > -1 ORDER BY ID"))
-	{
-		int i = 0;
-		while(kResults.Step())
-		{
-			loadVariable[kResults.GetText("Name")] = i;
-			std::string str(kResults.GetText("Name"));
-			std::string table(tableName);
-			gDLL->netMessageDebugLog("Loading " + table + ". Node "  + str + " int is " + FSerialization::toString(i) + "\n");
-			i++;
-		}
-		return true;
-	}
-	else
-	{
-		CvAssertMsg(false, DB.ErrorMessage());
-		return false;
-	}
-}
-// END EventEngine
 
 //------------------------------------------------------------------------------------------------------
 //

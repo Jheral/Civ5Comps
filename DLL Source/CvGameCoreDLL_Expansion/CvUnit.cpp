@@ -20754,59 +20754,6 @@ bool CvUnit::canChangeVisibility() const
 {
 	return m_iMapLayer == DEFAULT_UNIT_MAP_LAYER;
 }
-//	--------------------------------------------------------------------------------
-// EventEngine - v0.1, Snarko
-void CvUnit::doEvents()
-{
-	bool bValid;
-	CvPlayer &pPlayer = GET_PLAYER(getOwner());
-	std::map<std::string, std::vector<int> > asziScopes;
-
-	for (int i = 0; i < GC.getNumEventInfos(); i++)
-	{
-		asziScopes.clear();
-		bValid = true;
-		CvEventInfo* kEvent = GC.getEventInfo((EventTypes)i);
-		if (kEvent->getEventType() != EVENT_UNIT)
-			continue;
-		
-		for (int j = 0; j < kEvent->getNumRequirements(); j++)
-		{
-			CvEventModifier kRequirement = kEvent->getRequirement(j);
-			if (kRequirement.getModifierType() > EVENTMOD_UNIT_START && kRequirement.getModifierType() < EVENTMOD_UNIT_END)
-			{
-				if (!checkEventModifier(kRequirement))
-				{
-					bValid = false;
-					break;
-				}
-			}
-			else if (kRequirement.getModifierType() > EVENTMOD_PLAYER_START && kRequirement.getModifierType() < EVENTMOD_PLAYER_END)
-			{
-				if (!pPlayer.checkEventModifier(kRequirement, asziScopes))
-				{
-					bValid = false;
-					break;
-				}
-			}
-			else //This is neither a unit requirement, nor a player requirement, so we can't possibly pass it.
-			{
-				bValid = false;
-				break;
-			}
-		}
-		if (bValid)
-		{
-			pPlayer.doEventChance(*kEvent, asziScopes, NULL, this);
-		}
-	}
-}
-bool CvUnit::checkEventModifier(CvEventModifier& kModifier)
-{
-	//TODO
-	return true;
-}
-// END EventEngine
 
 //	--------------------------------------------------------------------------------
 std::string CvUnit::debugDump(const FAutoVariableBase& /*var*/) const

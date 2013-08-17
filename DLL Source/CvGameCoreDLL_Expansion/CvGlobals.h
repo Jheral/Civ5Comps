@@ -544,27 +544,6 @@ public:
 
 	CvNotificationXMLEntries* GetNotificationEntries();
 
-	// EventEngine - v0.1, Snarko
-	int getNumEventInfos();
-	std::vector<CvEventInfo*>& getEventInfo();
-	_Ret_maybenull_ CvEventInfo* getEventInfo(EventTypes eEventNum);
-
-	std::map<std::string, int>& getEventTypeTypes();
-	EventTypeTypes getEventTypeType(std::string szEventTypeType);
-
-	std::map<std::string, int>& getCompareTypes();
-	CompareTypes getCompareType(std::string szCompareType);
-
-	std::map<std::string, int>& getEventModifierTypes();
-	EventModifierTypes getEventModifierType(std::string szEventModifierType);
-
-	std::map<std::string, int>& getEventActionTypes();
-	EventActionTypes getEventActionType(std::string szEventActionType);
-
-	bool EventBoolEval(bool bBool, CvEventModifier& kModifier);
-	bool EventIntEval(int iInt, CvEventModifier& kModifier);
-	// END EventEngine
-
 	//
 	// Global Types
 	// All type strings are upper case and are kept in this hash map for fast lookup
@@ -7505,13 +7484,6 @@ protected:
 	std::vector<CvSmallAwardInfo*> m_paSmallAwardInfo;
 	std::vector<CvEntityEventInfo*> m_paEntityEventInfo;
 	std::vector<CvDomainInfo*> m_paUnitDomainInfo;
-	// EventEngine - v0.1, Snarko
-	std::vector<CvEventInfo*> m_paEventInfo;
-	std::map<std::string, int> m_asziEventTypeTypes;
-	std::map<std::string, int> m_asziCompareTypes;
-	std::map<std::string, int> m_asziEventModifierTypes;
-	std::map<std::string, int> m_asziEventActionTypes;
-	// END EventEngine
 
 	std::vector<CvMultiUnitFormationInfo*> m_paMultiUnitFormationInfo;
 

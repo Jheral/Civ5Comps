@@ -1098,15 +1098,6 @@ void CvNotifications::Activate(Notification& notification)
 		}
 		break;
 
-	// EventEngine - v0.1, Snarko
-	case NOTIFICATION_EVENT:
-	{
-		CvPopupInfo kPopup(BUTTONPOPUP_MODDER_0, m_ePlayer);
-		GC.GetEngineUserInterface()->AddPopup(kPopup);
-	}
-	break;
-	// END EventEngine
-
 	default:	// Default behavior is to move the camera to the X,Y passed in
 	{
 		CvPlot* pPlot = GC.getMap().plot(notification.m_iX, notification.m_iY);
