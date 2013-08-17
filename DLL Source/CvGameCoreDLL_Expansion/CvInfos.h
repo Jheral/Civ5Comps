@@ -2260,4 +2260,134 @@ private:
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 typedef CvBaseInfo CvDomainInfo;
 
+
+// EventEngine - v0.1, Snarko
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//  class : CvEventModifierInfo (also used for requirements)
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+class CvEventModifierInfo : public CvBaseInfo
+{
+public:
+	CvEventModifierInfo();
+
+	bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
+
+	EventModifierTypeTypes getModifierType();
+	CompareTypes getCompareType();
+
+	std::string getScope();
+
+	//Generalist function for resourcetypes, unitclasstypes etc.
+	//Convert to the appropriate enum when needed.
+	//It's an int here to make this class more simple, instead of having one variable for each kind of type.
+	int getTypeToCompare();
+
+	int getNumberToCompare();
+
+	int getFactor();
+
+private:
+	EventModifierTypeTypes m_eModifier;
+	CompareTypes m_eCompare;
+
+	int m_iTypeToCompare;
+	int m_iNumberToCompare;
+	int m_iFactor;
+	std::string m_szScope;
+};
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//  class : CvEventActionInfo
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+class CvEventActionInfo : public CvBaseInfo
+{
+public:
+	CvEventActionInfo();
+
+	bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
+
+	EventActionTypeTypes getActionType();
+	//ints
+	int getTurns();
+	int getChance();
+	int getTypeToAction();
+	int getAIWeight();
+	int getValue1();
+	int getValue2();
+	//bools
+	bool getBool1();
+	//strings
+	std::string getString1();
+	std::string getScope();
+
+private:
+
+	EventActionTypeTypes m_eAction;
+
+	//ints
+	int m_iTurns;
+	int m_iChance;
+	int m_iTypeToAction;
+	int m_AIWeight;
+	int m_iValue1; //For example X coord for reveal tile events, amount of happiness, etc
+	int m_iValue2; //For example Y coord for reveal tile events
+	//Bools
+	bool m_bBool1; //For example if a player should get, or lose, a tech
+	//Strings
+	std::string m_szString1;
+	std::string m_szScope;
+};
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//  class : CvEventOptionInfo
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+class CvEventOptionInfo : public CvBaseInfo
+{
+public:
+	CvEventOptionInfo();
+
+	bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
+
+	int getNumActions();
+	EventActionTypes getAction(int i);
+
+private:
+
+	bool bOverrideTooltip;
+	std::vector<EventActionTypes> m_aeEventActions;
+};
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//  class : CvEventInfo
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+class CvEventInfo : public CvBaseInfo
+{
+public:
+	CvEventInfo();
+
+	bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
+
+	int getMTTH();
+
+	EventTypeTypes getEventType();
+
+	int getNumRequirements();
+	EventRequirementTypes getRequirement(int i);
+	int getNumModifiers();
+	EventModifierTypes getModifier(int i);
+
+	int getNumOptions();
+	EventOptionTypes getOption(int i);
+
+
+private:
+	int m_iMeanTimeToHappen;
+	EventTypeTypes m_eEventType;
+	const char* m_szImage;
+
+	std::vector<EventModifierTypes> m_aeEventModifiers;
+	std::vector<EventRequirementTypes> m_aeEventRequirements;
+	std::vector<EventOptionTypes> m_aeEventOptions;
+	
+};
+// END EventEngine
+
 #endif

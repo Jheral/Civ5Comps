@@ -69,7 +69,12 @@ class CvGameOptionInfo;
 class CvMPOptionInfo;
 class CvPlayerOptionInfo;
 class CvEventTriggerInfo;
+// EventEngine - v0.1, Snarko
 class CvEventInfo;
+class CvEventModifierInfo;
+class CvEventOptionInfo;
+class CvEventActionInfo;
+// END EventEngine
 class CvVoteSourceInfo;
 class CvMultiUnitFormationInfo;
 class CvEconomicAIStrategyXMLEntries;
@@ -87,6 +92,9 @@ class CvAICityStrategyEntry;
 class CvPolicyXMLEntries;
 class CvPolicyEntry;
 class CvPolicyBranchEntry;
+// AdvancementScreen - v1.0, Snarko
+class CvPolicyBranchClassEntry;
+// END AdvancementScreen
 class CvTechXMLEntries;
 class CvTechEntry;
 class CvBuildingEntry;
@@ -476,6 +484,12 @@ public:
 	std::vector<CvPolicyBranchEntry*>& getPolicyBranchInfo();
 	_Ret_maybenull_ CvPolicyBranchEntry* getPolicyBranchInfo(PolicyBranchTypes ePolicyBranchNum);
 
+	// AdvancementScreen - v1.0, Snarko
+	int getNumPolicyBranchClassInfos();
+	std::vector<CvPolicyBranchClassEntry*>& getPolicyBranchClassInfo();
+	_Ret_maybenull_ CvPolicyBranchClassEntry* getPolicyBranchClassInfo(PolicyBranchClassTypes ePolicyBranchClassNum);
+	// END AdvancementScreen
+
 	int getNumEmphasisInfos();
 	std::vector<CvEmphasisEntry*>& getEmphasisInfo();
 	_Ret_maybenull_ CvEmphasisEntry* getEmphasisInfo(EmphasizeTypes eEmphasisNum);
@@ -543,6 +557,43 @@ public:
 	_Ret_maybenull_ CvSmallAwardInfo* getSmallAwardInfo(SmallAwardTypes eSmallAwardNum);
 
 	CvNotificationXMLEntries* GetNotificationEntries();
+
+	// EventEngine - v0.1, Snarko
+	int getNumEventInfos();
+	std::vector<CvEventInfo*>& getEventInfo();
+	_Ret_maybenull_ CvEventInfo* getEventInfo(EventTypes eEventNum);
+
+	int getNumEventModifierInfos();
+	std::vector<CvEventModifierInfo*>& getEventModifierInfo();
+	_Ret_maybenull_ CvEventModifierInfo* getEventModifierInfo(EventModifierTypes eEventModifierNum);
+
+	int getNumEventRequirementInfos();
+	std::vector<CvEventModifierInfo*>& getEventRequirementInfo();
+	_Ret_maybenull_ CvEventModifierInfo* getEventRequirementInfo(EventRequirementTypes eEventRequirementNum);
+
+	int getNumEventOptionInfos();
+	std::vector<CvEventOptionInfo*>& getEventOptionInfo();
+	_Ret_maybenull_ CvEventOptionInfo* getEventOptionInfo(EventOptionTypes eEventOptionNum);
+
+	int getNumEventActionInfos();
+	std::vector<CvEventActionInfo*>& getEventActionInfo();
+	_Ret_maybenull_ CvEventActionInfo* getEventActionInfo(EventActionTypes eEventActionNum);
+
+	std::map<std::string, int>& getEventTypeTypes();
+	EventTypeTypes getEventTypeType(std::string szEventTypeType);
+
+	std::map<std::string, int>& getCompareTypes();
+	CompareTypes getCompareType(std::string szCompareType);
+
+	std::map<std::string, int>& getEventModifierTypes();
+	EventModifierTypeTypes getEventModifierType(std::string szEventModifierType);
+
+	std::map<std::string, int>& getEventActionTypes();
+	EventActionTypeTypes getEventActionType(std::string szEventActionType);
+
+	bool EventBoolEval(bool bBool, CvEventModifierInfo& kModifier);
+	bool EventIntEval(int iInt, CvEventModifierInfo& kModifier);
+	// END EventEngine
 
 	//
 	// Global Types
@@ -7484,6 +7535,18 @@ protected:
 	std::vector<CvSmallAwardInfo*> m_paSmallAwardInfo;
 	std::vector<CvEntityEventInfo*> m_paEntityEventInfo;
 	std::vector<CvDomainInfo*> m_paUnitDomainInfo;
+	// EventEngine - v0.1, Snarko
+	std::vector<CvEventInfo*> m_paEventInfo;
+	std::vector<CvEventModifierInfo*> m_paEventRequirementInfo;
+	std::vector<CvEventModifierInfo*> m_paEventModifierInfo;
+	std::vector<CvEventOptionInfo*> m_paEventOptionInfo;
+	std::vector<CvEventActionInfo*> m_paEventActionInfo;
+
+	std::map<std::string, int> m_asziEventTypeTypes;
+	std::map<std::string, int> m_asziCompareTypes;
+	std::map<std::string, int> m_asziEventModifierTypes;
+	std::map<std::string, int> m_asziEventActionTypes;
+	// END EventEngine
 
 	std::vector<CvMultiUnitFormationInfo*> m_paMultiUnitFormationInfo;
 

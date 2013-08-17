@@ -3346,6 +3346,25 @@ CvPolicyBranchEntry* CvGlobals::getPolicyBranchInfo(PolicyBranchTypes ePolicyBra
 	return m_pPolicies->GetPolicyBranchEntries()[ePolicyBranchNum];
 }
 
+// AdvancementScreen - v1.0, Snarko
+int CvGlobals::getNumPolicyBranchClassInfos()
+{
+	return (int)m_pPolicies->GetPolicyBranchClassEntries().size();
+}
+
+std::vector<CvPolicyBranchClassEntry*>& CvGlobals::getPolicyBranchClassInfo()
+{
+	return m_pPolicies->GetPolicyBranchClassEntries();
+}
+
+CvPolicyBranchClassEntry* CvGlobals::getPolicyBranchClassInfo(PolicyBranchClassTypes ePolicyBranchClassNum)
+{
+	CvAssert(ePolicyBranchClassNum > -1);
+	CvAssert(ePolicyBranchClassNum < GC.getNumPolicyBranchClassInfos());
+	return m_pPolicies->GetPolicyBranchClassEntries()[ePolicyBranchClassNum];
+}
+// END AdvancementScreen
+
 int CvGlobals::getNumEmphasisInfos()
 {
 	return (int)m_pEmphases->GetEmphasisEntries().size();
@@ -3651,6 +3670,217 @@ CvDomainInfo* CvGlobals::getUnitDomainInfo(DomainTypes eDomainNum)
 	CvAssert(eDomainNum < GC.getNumUnitDomainInfos());
 	return m_paUnitDomainInfo[eDomainNum];
 }
+
+// EventEngine - v0.1, Snarko
+int CvGlobals::getNumEventInfos()
+{
+	return (int)m_paEventInfo.size();
+}
+
+std::vector<CvEventInfo*>& CvGlobals::getEventInfo()
+{
+	return m_paEventInfo;
+}
+
+CvEventInfo* CvGlobals::getEventInfo(EventTypes eEventNum)
+{
+	CvAssert(eEventNum > -1);
+	CvAssert(eEventNum < GC.getNumEventInfos());
+	if(eEventNum > -1 && eEventNum < (int)m_paEventInfo.size())
+		return m_paEventInfo[eEventNum];
+	else
+		return NULL;
+}
+
+int CvGlobals::getNumEventRequirementInfos()
+{
+	return (int)m_paEventRequirementInfo.size();
+}
+
+std::vector<CvEventModifierInfo*>& CvGlobals::getEventRequirementInfo()
+{
+	return m_paEventRequirementInfo;
+}
+
+CvEventModifierInfo* CvGlobals::getEventRequirementInfo(EventRequirementTypes eEventRequirementNum)
+{
+	CvAssert(eEventRequirementNum > -1);
+	CvAssert(eEventRequirementNum < GC.getNumEventRequirementInfos());
+	if(eEventRequirementNum > -1 && eEventRequirementNum < (int)m_paEventRequirementInfo.size())
+		return m_paEventRequirementInfo[eEventRequirementNum];
+	else
+		return NULL;
+}
+
+int CvGlobals::getNumEventModifierInfos()
+{
+	return (int)m_paEventModifierInfo.size();
+}
+
+std::vector<CvEventModifierInfo*>& CvGlobals::getEventModifierInfo()
+{
+	return m_paEventModifierInfo;
+}
+
+CvEventModifierInfo* CvGlobals::getEventModifierInfo(EventModifierTypes eEventModifierNum)
+{
+	CvAssert(eEventModifierNum > -1);
+	CvAssert(eEventModifierNum < GC.getNumEventModifierInfos());
+	if(eEventModifierNum > -1 && eEventModifierNum < (int)m_paEventModifierInfo.size())
+		return m_paEventModifierInfo[eEventModifierNum];
+	else
+		return NULL;
+}
+
+int CvGlobals::getNumEventOptionInfos()
+{
+	return (int)m_paEventOptionInfo.size();
+}
+
+std::vector<CvEventOptionInfo*>& CvGlobals::getEventOptionInfo()
+{
+	return m_paEventOptionInfo;
+}
+
+CvEventOptionInfo* CvGlobals::getEventOptionInfo(EventOptionTypes eEventOptionNum)
+{
+	CvAssert(eEventOptionNum > -1);
+	CvAssert(eEventOptionNum < GC.getNumEventOptionInfos());
+	if(eEventOptionNum > -1 && eEventOptionNum < (int)m_paEventOptionInfo.size())
+		return m_paEventOptionInfo[eEventOptionNum];
+	else
+		return NULL;
+}
+
+int CvGlobals::getNumEventActionInfos()
+{
+	return (int)m_paEventActionInfo.size();
+}
+
+std::vector<CvEventActionInfo*>& CvGlobals::getEventActionInfo()
+{
+	return m_paEventActionInfo;
+}
+
+CvEventActionInfo* CvGlobals::getEventActionInfo(EventActionTypes eEventActionNum)
+{
+	CvAssert(eEventActionNum > -1);
+	CvAssert(eEventActionNum < GC.getNumEventActionInfos());
+	if(eEventActionNum > -1 && eEventActionNum < (int)m_paEventActionInfo.size())
+		return m_paEventActionInfo[eEventActionNum];
+	else
+		return NULL;
+}
+
+std::map<std::string, int>& CvGlobals::getEventTypeTypes()
+{
+	return m_asziEventTypeTypes;
+}
+
+EventTypeTypes CvGlobals::getEventTypeType(std::string szEventTypeType)
+{
+	std::map<std::string,int>::iterator it;
+	it = m_asziEventTypeTypes.find(szEventTypeType);
+	if (it != m_asziEventTypeTypes.end())
+		return (EventTypeTypes)it->second;
+	
+	return NO_EVENTTYPE;
+}
+
+std::map<std::string, int>& CvGlobals::getCompareTypes()
+{
+	return m_asziCompareTypes;
+}
+
+CompareTypes CvGlobals::getCompareType(std::string szCompareType)
+{
+	std::map<std::string,int>::iterator it;
+	it = m_asziCompareTypes.find(szCompareType);
+	if (it != m_asziCompareTypes.end())
+		return (CompareTypes)it->second;
+	
+	return NO_COMPARETYPE;
+}
+
+std::map<std::string, int>& CvGlobals::getEventModifierTypes()
+{
+	return m_asziEventModifierTypes;
+}
+
+EventModifierTypeTypes CvGlobals::getEventModifierType(std::string szEventModifierType)
+{
+	std::map<std::string,int>::iterator it;
+	it = m_asziEventModifierTypes.find(szEventModifierType);
+	if (it != m_asziEventModifierTypes.end())
+		return (EventModifierTypeTypes)it->second;
+	
+	return NO_EVENTMOD;
+}
+
+std::map<std::string, int>& CvGlobals::getEventActionTypes()
+{
+	return m_asziEventActionTypes;
+}
+
+EventActionTypeTypes CvGlobals::getEventActionType(std::string szEventActionType)
+{
+	std::map<std::string,int>::iterator it;
+	it = m_asziEventActionTypes.find(szEventActionType);
+	if (it != m_asziEventActionTypes.end())
+		return (EventActionTypeTypes)it->second;
+	
+	return NO_EVENTACTION;
+}
+
+bool CvGlobals::EventBoolEval(bool bBool, CvEventModifierInfo& kModifier)
+{
+	bool bPass = false;
+	switch(kModifier.getCompareType())
+	{
+	case COMPARE_EQUAL:
+		bPass = (bBool == (bool)kModifier.getNumberToCompare());
+		break;
+
+	case COMPARE_NOTEQUAL:
+		bPass = !(bBool == (bool)kModifier.getNumberToCompare());
+		break;
+
+	default: //Don't use COMPARE_MORETHAN or COMPARE_LESSTHAN for bools. Doesn't make sense.
+		CvAssertMsg(false, "Could not find or invalid Compare Type");
+		bPass = false;
+		break;
+	}
+	return bPass;
+}
+bool CvGlobals::EventIntEval(int iInt, CvEventModifierInfo& kModifier)
+{
+	bool bPass = false;
+		switch(kModifier.getCompareType())
+	{
+	case COMPARE_EQUAL:
+		bPass = (iInt == kModifier.getNumberToCompare());
+		break;
+
+	case COMPARE_NOTEQUAL:
+		bPass = !(iInt == kModifier.getNumberToCompare());
+		break;
+
+	case COMPARE_MORETHAN:
+		bPass = (iInt > kModifier.getNumberToCompare());
+		break;
+
+	case COMPARE_LESSTHAN:
+		bPass = (iInt < kModifier.getNumberToCompare());
+		break;
+
+	default:
+		CvAssertMsg(false, "Could not find Compare Type");
+		bPass = false;
+		break;
+	}
+	return bPass;
+}
+// END EventEngine
 
 //////////////////////////////////////////////////////////////////////////
 void CvGlobals::LogMessage(const char* szMessage)
@@ -5707,6 +5937,10 @@ void CvGlobals::deleteInfoArrays()
 	deleteInfoArray(m_paResourceClassInfo);
 	deleteInfoArray(m_paResourceInfo);
 	deleteInfoArray(m_paUnitDomainInfo);
+
+	// EventEngine - v0.1, Snarko
+	deleteInfoArray(m_paEventInfo);
+	// END EventEngine
 
 	SAFE_DELETE_ARRAY(GC.getFootstepAudioTags());
 

@@ -341,6 +341,10 @@ CvPlayer::CvPlayer() :
 	, m_aiCapitalYieldRateModifier("CvPlayer::m_aiCapitalYieldRateModifier", m_syncArchive)
 	, m_aiExtraYieldThreshold("CvPlayer::m_aiExtraYieldThreshold", m_syncArchive)
 	, m_aiSpecialistExtraYield("CvPlayer::m_aiSpecialistExtraYield", m_syncArchive)
+	// EventEngine - v0.1, Snarko
+	, m_aiYieldFromEvents("CvPlayer::m_aiYieldFromEvents", m_syncArchive)
+	, m_aiYieldModFromEvents("CvPlayer::m_aiYieldModFromEvents", m_syncArchive)
+	// END EventEngine
 	, m_aiProximityToPlayer("CvPlayer::m_aiProximityToPlayer", m_syncArchive, true)
 	, m_aiResearchAgreementCounter("CvPlayer::m_aiResearchAgreementCounter", m_syncArchive)
 	, m_aiIncomingUnitTypes("CvPlayer::m_aiIncomingUnitTypes", m_syncArchive, true)
@@ -442,6 +446,10 @@ CvPlayer::CvPlayer() :
 	m_aiGreatWorkYieldChange.clear();
 	m_aiSiphonLuxuryCount.clear();
 
+	// EventEngine - v0.1, Snarko
+	m_aEventEffects.clear();
+	// END EventEngine
+
 	reset(NO_PLAYER, true);
 }
 
@@ -507,6 +515,10 @@ void CvPlayer::init(PlayerTypes eID)
 	m_units.Init();
 
 	m_armyAIs.Init();
+
+	// EventEngine - v0.1, Snarko
+	m_events.Init();
+	// END EventEngine
 
 	m_AIOperations.clear();
 
@@ -715,6 +727,10 @@ void CvPlayer::uninit()
 	m_cities.Uninit();
 
 	m_units.Uninit();
+
+	// EventEngine - v0.1, Snarko
+	m_events.Uninit();
+	// END EventEngine
 
 	// loop through all entries freeing them up
 	std::map<int , CvAIOperation*>::iterator iter;
@@ -1022,6 +1038,15 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_aiSpecialistExtraYield.clear();
 	m_aiSpecialistExtraYield.resize(NUM_YIELD_TYPES, 0);
 
+	// EventEngine - v0.1, Snarko
+	m_aiYieldFromEvents.clear();
+	m_aiYieldFromEvents.resize(NUM_YIELD_TYPES, 0);
+
+	m_aiYieldModFromEvents.clear();
+	m_aiYieldModFromEvents.resize(NUM_YIELD_TYPES, 0);
+	// END EventEngine
+
+
 	m_aiProximityToPlayer.clear();
 	m_aiProximityToPlayer.resize(MAX_PLAYERS, 0);
 
@@ -1039,6 +1064,10 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 
 	m_aiSiphonLuxuryCount.clear();
 	m_aiSiphonLuxuryCount.resize(MAX_PLAYERS, 0);
+
+	// EventEngine - v0.1, Snarko
+	m_aEventEffects.clear();
+	// END EventEngine
 
 	m_aOptions.clear();
 
@@ -1199,6 +1228,10 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_units.RemoveAll();
 
 	m_armyAIs.RemoveAll();
+
+	// EventEngine - v0.1, Snarko
+	m_events.RemoveAll();
+	// END EventEngine
 
 	// loop through all entries freeing them up
 	std::map<int , CvAIOperation*>::iterator iter;
@@ -4108,6 +4141,13 @@ void CvPlayer::doTurn()
 	}
 
 	m_kPlayerAchievements.StartTurn();
+
+	// EventEngine - v0.1, Snarko
+	// doTempEventEffects should be before doEvents, so we do not count down an event we just triggered.
+	// Since the AI pick an option immediately.
+	doTempEventEffects(); 
+	doEvents();
+	// END EventEngine
 }
 
 //	--------------------------------------------------------------------------------
@@ -9188,6 +9228,10 @@ int CvPlayer::GetTotalJONSCulturePerTurn() const
 	// Temporary boost from bonus turns
 	iCulturePerTurn += GetCulturePerTurnFromBonusTurns();
 
+	// EventEngine - v0.1, Snarko
+	iCulturePerTurn += getYieldFromEvents(YIELD_CULTURE);
+	// END EventEngine
+
 	// Golden Age bonus
 	if (isGoldenAge() && !IsGoldenAgeCultureBonusDisabled())
 	{
@@ -9925,6 +9969,10 @@ int CvPlayer::GetTotalFaithPerTurn() const
 	// Faith per turn from Religion (Founder beliefs)
 	iFaithPerTurn += GetFaithPerTurnFromReligion();
 
+	// EventEngine - v0.1, Snarko
+	iFaithPerTurn += getYieldFromEvents(YIELD_FAITH);
+	// END EventEngine
+
 	return iFaithPerTurn;
 }
 
@@ -10107,6 +10155,10 @@ void CvPlayer::DoUpdateHappiness()
 	// Increase for each City connected to Capital with a Trade Route
 	DoUpdateCityConnectionHappiness();
 	m_iHappiness += GetHappinessFromTradeRoutes();
+
+	// EventEngine - v0.1, Snarko
+	m_iHappiness += getHappyFromEvents();
+	// END EventEngine
 
 	if(isLocalPlayer() && GetExcessHappiness() >= 100)
 	{
@@ -16477,6 +16529,87 @@ void CvPlayer::updateExtraYieldThreshold(YieldTypes eIndex)
 	}
 }
 
+// EventEngine - v0.1, Snarko
+int CvPlayer::getYieldFromEvents(YieldTypes eIndex) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+	return m_aiYieldFromEvents[eIndex];
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::changeYieldFromEvents(YieldTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if(iChange != 0)
+	{
+		m_aiYieldFromEvents.setAt(eIndex, m_aiYieldFromEvents[eIndex] + iChange);
+
+		invalidateYieldRankCache(eIndex);
+
+		if(getTeam() == GC.getGame().getActiveTeam())
+		{
+			GC.GetEngineUserInterface()->setDirty(CityInfo_DIRTY_BIT, true);
+		}
+	}
+}
+
+int CvPlayer::getYieldModifierFromEvents(YieldTypes eIndex) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+	return m_aiYieldModFromEvents[eIndex];
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::changeYieldModifierFromEvents(YieldTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if(iChange != 0)
+	{
+		m_aiYieldModFromEvents.setAt(eIndex, m_aiYieldModFromEvents[eIndex] + iChange);
+
+		invalidateYieldRankCache(eIndex);
+
+		if(getTeam() == GC.getGame().getActiveTeam())
+		{
+			GC.GetEngineUserInterface()->setDirty(CityInfo_DIRTY_BIT, true);
+		}
+	}
+}
+
+int CvPlayer::getHappyFromEvents() const
+{
+	return m_iHappyFromEvents;
+}
+
+void CvPlayer::changeHappyFromEvents(int iChange)
+{
+	m_iHappyFromEvents += iChange;
+	DoUpdateHappiness();
+}
+
+void CvPlayer::setFlag(std::string szFlag, int iValue)
+{
+	m_asziFlags[szFlag] = iValue;
+}
+
+int CvPlayer::getFlag(std::string szFlag)
+{
+	std::map<std::string, int>::const_iterator it = m_asziFlags.find(szFlag);
+	if (it == m_asziFlags.end())
+		return NULL;
+	else
+		return it->second;
+}
+// END EventEngine
+
 //	--------------------------------------------------------------------------------
 int CvPlayer::GetScience() const
 {
@@ -16506,6 +16639,10 @@ int CvPlayer::GetScienceTimes100() const
 
 	// If we have a negative Treasury + GPT then it gets removed from Science
 	iValue += GetScienceFromBudgetDeficitTimes100();
+
+	// EventEngine - v0.1, Snarko
+	iValue += getYieldFromEvents(YIELD_SCIENCE) * 100;
+	// END EventEngine
 
 	return max(iValue, 0);
 }
@@ -21532,6 +21669,13 @@ void CvPlayer::Read(FDataStream& kStream)
 	// Version number to maintain backwards compatibility
 	uint uiVersion;
 	kStream >> uiVersion;
+	// modVersion - v1, Snarko
+	//We are using our own value here, for this modcomp and others to follow, to keep backwards compatibility.
+	//While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem! Well, except mod versions created before using our modcomp(s)...
+	// USEDBY: EventEngine
+	uint modVersion;
+	kStream >> modVersion;
+	// END modVersion
 
 	kStream >> m_iStartingX;
 	kStream >> m_iStartingY;
@@ -21864,6 +22008,16 @@ void CvPlayer::Read(FDataStream& kStream)
 	}
 	kStream >> m_aiExtraYieldThreshold;
 	kStream >> m_aiSpecialistExtraYield;
+	// EventEngine - v0.1, Snarko
+	if (modVersion >= 1)
+	{
+		kStream >> m_aiYieldFromEvents;
+		kStream >> m_aiYieldModFromEvents;
+		//TODO
+		//kStream >> m_aEventEffects;
+	}
+	//No need for an else for the first modVersion, because adding modVersion in the first place breaks saves.
+	// END EventEngine
 	kStream >> m_aiProximityToPlayer;
 	kStream >> m_aiResearchAgreementCounter;
 	if (uiVersion >= 5)
@@ -22093,6 +22247,13 @@ void CvPlayer::Write(FDataStream& kStream) const
 {
 	//Save version number.  THIS MUST BE FIRST!!
 	kStream << g_CurrentCvPlayerVersion;
+	// modVersion - v1, Snarko
+	//We are using our own value here, for this modcomp and others to follow, to keep backwards compatibility.
+	//While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem!
+	// USEDBY: EventEngine
+	uint modVersion = 1;
+	kStream << modVersion;
+	// END modVersion
 
 	kStream << m_iStartingX;
 	kStream << m_iStartingY;
@@ -22336,6 +22497,15 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_aiGreatWorkYieldChange;
 	kStream << m_aiExtraYieldThreshold;
 	kStream << m_aiSpecialistExtraYield;
+	// EventEngine - v0.1, Snarko
+	if (modVersion >= 1)
+	{
+		kStream << m_aiYieldFromEvents;
+		kStream << m_aiYieldModFromEvents;
+		//TODO
+		//kStream << m_aEventEffects;
+	}
+	// END EventEngine
 	kStream << m_aiProximityToPlayer;
 	kStream << m_aiResearchAgreementCounter;   // Added in Version 2
 	kStream << m_aiIncomingUnitTypes;
@@ -24617,3 +24787,761 @@ bool CancelActivePlayerEndTurn()
 	}
 	return true;
 }
+
+// EventEngine - v0.1, Snarko
+void CvPlayer::doEvents()
+{
+	gDLL->netMessageDebugLog("We got to 0");
+	bool bValid;
+	//A scope can have multiple valid results, so we need a vector inside the map. 
+	//For example if we're testing against resource class luxury and both silk and citrus meet the first requirement.
+	//We have to keep checking against both, because later on we might realize only silk meet some other requirement we also have to pass. 
+	//Or it might be citrus that meets it. We don't know when we set the scope at first.
+	std::map<std::string, std::vector<int> > asziScopes;
+	gDLL->netMessageDebugLog("We got to 1");
+
+	for (int i = 0; i < GC.getNumEventInfos(); i++)
+	{
+		gDLL->netMessageDebugLog("We got to 1.2");
+		asziScopes.clear();
+		gDLL->netMessageDebugLog("We got to 1.4");
+		bValid = true;
+		gDLL->netMessageDebugLog("We got to 1.6");
+		CvEventInfo* kEvent = GC.getEventInfo((EventTypes)i);
+		gDLL->netMessageDebugLog("We got to 1.8. i is " + FSerialization::toString(i) + "\n");
+		gDLL->netMessageDebugLog("kEvent.getType is " + FSerialization::toString((int)kEvent->getEventType()) + "\n" );
+		if (kEvent->getEventType() != EVENT_PLAYER)
+		{
+			gDLL->netMessageDebugLog("We got to 1.9");
+			continue;
+		}
+		gDLL->netMessageDebugLog("We got to 2");
+		for (int j = 0; j < kEvent->getNumRequirements(); j++)
+		{
+			gDLL->netMessageDebugLog("We got to 2.1 j is " + FSerialization::toString(j) + "\n");
+			CvEventModifierInfo kRequirement = *GC.getEventRequirementInfo(kEvent->getRequirement(j));
+			if (kRequirement.getModifierType() > EVENTMOD_PLAYER_START && kRequirement.getModifierType() < EVENTMOD_PLAYER_END)
+			{
+				gDLL->netMessageDebugLog("We got to 2.2");
+				if (!checkEventModifier(kRequirement, asziScopes))
+				{
+					gDLL->netMessageDebugLog("We got to 2.3");
+					bValid = false;
+					break;
+				}
+				gDLL->netMessageDebugLog("We got to 2.4");
+			}
+			else //This is not a player requirement, so we can't possibly pass it.
+			{
+				gDLL->netMessageDebugLog("We got to 2.5");
+				bValid = false;
+				break;
+			}
+			gDLL->netMessageDebugLog("We got to 2.6");
+		}
+		gDLL->netMessageDebugLog("We got to 3");
+		if (bValid)
+		{
+			doEventChance(*kEvent, asziScopes);
+		}
+	}
+}
+
+void CvPlayer::doEventChance(CvEventInfo& kEvent, std::map<std::string, std::vector<int> > &asziScopes, CvCity* pCity, CvUnit* pUnit)
+{
+	int iChance = kEvent.getMTTH();
+	gDLL->netMessageDebugLog("We got to 4");
+	for (int j = 0; j < kEvent.getNumModifiers(); j++)
+	{
+		if (checkEventModifier(*GC.getEventModifierInfo(kEvent.getModifier(j)), asziScopes, false))
+		{
+			iChance *= GC.getEventModifierInfo(kEvent.getModifier(j))->getFactor();
+			iChance /= 100; //We multiplied factor with 100 earlier, to avoid floats and rounding problems. Now time to divide it back.
+		}
+	}
+	gDLL->netMessageDebugLog("We got to 5");
+
+	if (iChance == -1 || GC.getGame().getJonRandNum(iChance, "Triggering player events") == 0)
+	{
+		std::map<std::string, std::vector<int> >::iterator it;
+		for (it = asziScopes.begin(); it != asziScopes.end(); ++it)
+		{
+			if (it->second.empty())
+			{
+				FAssertMsg(false, "A scope was unexpectantly empty in doEventChance");
+			}
+			else if (it->second.size() > 1)
+			{
+				std::vector<int> newVector;
+				newVector.push_back(it->second[GC.getGame().getJonRandNum(it->second.size(), "Choosing which type in scope to perform action on")]);
+				it->second = newVector;
+			}
+		}
+
+		CvEvent* Event = addEvent();
+		gDLL->netMessageDebugLog("We got to 6 and ID is " + FSerialization::toString(Event->GetID()));
+		Event->init(Event->GetID(), (EventTypes)kEvent.GetID(), &asziScopes, this);
+		Event->trigger();
+	}
+	gDLL->netMessageDebugLog("We got to 10");
+}
+
+bool CvPlayer::checkEventModifier(CvEventModifierInfo& kModifier, std::map<std::string, std::vector<int> > &asziScopes, bool bRequirement)
+{
+	int iValue = 0;
+	gDLL->netMessageDebugLog("CheckEventModifier1");
+
+	switch(kModifier.getModifierType())
+	{
+	case EVENTMOD_GOLD:
+		iValue = GetTreasury()->GetGold();
+		break;
+
+	case EVENTMOD_GOLDPERTURN:
+		iValue = calculateGoldRate();
+		break;
+
+	case EVENTMOD_CULTUREPERTURN:
+		iValue = GetTotalJONSCulturePerTurn();
+		break;
+
+	case EVENTMOD_CULTURE:
+		iValue = getJONSCulture();
+		break;
+
+	case EVENTMOD_CULTURETOTAL:
+		iValue = GetJONSCultureEverGenerated();
+		break;
+
+	case EVENTMOD_FAITHPERTURN:
+		iValue = GetTotalFaithPerTurn();
+		break;
+
+	case EVENTMOD_FAITH:
+		iValue = GetFaith();
+		break;
+
+	case EVENTMOD_FAITHTOTAL:
+		iValue = GetFaithEverGenerated();
+		break;
+
+	case EVENTMOD_SCIENCEPERTURN:
+		iValue = GetScience();
+		break;
+
+	case EVENTMOD_HAPPINESS:
+		iValue = GetHappiness();
+		break;
+
+	case EVENTMOD_EXCESSHAPPINESS:
+		iValue = GetExcessHappiness();
+		break;
+
+	case EVENTMOD_UNHAPPY:
+		return GC.EventBoolEval(IsEmpireUnhappy(), kModifier);
+
+	case EVENTMOD_VERYUNHAPPY:
+		return GC.EventBoolEval(IsEmpireVeryUnhappy(), kModifier);
+
+	case EVENTMOD_SUPERUNHAPPY:
+		return GC.EventBoolEval(IsEmpireSuperUnhappy(), kModifier);
+
+	case EVENTMOD_RESOURCE:
+		{
+			gDLL->netMessageDebugLog("CheckEventModifier 2");
+			//Set resource
+			if ((ResourceTypes)kModifier.getTypeToCompare() != NO_RESOURCE)
+			{
+				gDLL->netMessageDebugLog("CheckEventModifier 3");
+				iValue = getNumResourceTotal((ResourceTypes)kModifier.getTypeToCompare(), true);
+			}
+			//Any resource which matches scope test
+			else if (kModifier.getScope() != "default")
+			{
+				gDLL->netMessageDebugLog("CheckEventModifier 4");
+				std::vector<int> aScopes = asziScopes[kModifier.getScope()];
+				//If it's not empty it means we have set it before
+				//Just remove the ones that don't pass this requirement
+				if (!aScopes.empty())
+				{
+					gDLL->netMessageDebugLog("CheckEventModifier 5");
+					std::vector<int>::iterator iter = aScopes.begin();
+					while (iter != aScopes.end())
+					{
+						gDLL->netMessageDebugLog("CheckEventModifier 6");
+						iValue = getNumResourceTotal((ResourceTypes)(*iter), true);
+						if (GC.EventIntEval(iValue, kModifier))
+							++iter;
+						else
+							iter = aScopes.erase(iter);
+					}
+				}
+				//It is empty. Set it. 
+				//We should never get here with it being empty, but having already been checked.
+				//If it has been checked and nothing met the requirements we should have already returned false when checking that requirement.
+				else
+				{
+					gDLL->netMessageDebugLog("CheckEventModifier 7");
+					for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
+					{
+						gDLL->netMessageDebugLog("CheckEventModifier 8");
+						iValue = getNumResourceTotal((ResourceTypes)iI, true);
+						if (GC.EventIntEval(iValue, kModifier))
+						{
+							gDLL->netMessageDebugLog("CheckEventModifier 9");
+							aScopes.push_back(iI);
+						}
+					}
+				}
+				if (aScopes.empty())
+				{
+					gDLL->netMessageDebugLog("CheckEventModifier 10");
+					return false;
+				}
+				else
+				{
+					gDLL->netMessageDebugLog("CheckEventModifier 11");
+					if (bRequirement)
+					{
+						gDLL->netMessageDebugLog("CheckEventModifier 12");
+						asziScopes[kModifier.getScope()] = aScopes;
+					}
+					return true;
+				}
+			}
+			//Scope set to -1 and no specific type to check. So anything goes.
+			//I don't think this will be used but you never know.
+			else 
+			{
+				gDLL->netMessageDebugLog("CheckEventModifier 13");
+				for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
+				{
+					iValue = getNumResourceTotal((ResourceTypes)iI, true);
+					if (GC.EventIntEval(iValue, kModifier))
+					{
+						gDLL->netMessageDebugLog("CheckEventModifier 14");
+						return true;
+					}
+				}
+			}
+		}
+
+		break;
+
+	case EVENTMOD_RESOURCE_AVAILABLE:
+		{
+			gDLL->netMessageDebugLog("CheckEventModifier 15");
+			if ((ResourceTypes)kModifier.getTypeToCompare() != NO_RESOURCE)
+			{
+				gDLL->netMessageDebugLog("CheckEventModifier 16");
+				iValue = getNumResourceAvailable((ResourceTypes)kModifier.getTypeToCompare(), true);
+			}
+			//Any resource which matches scope test
+			else if (kModifier.getScope() != "default")
+			{
+				gDLL->netMessageDebugLog("CheckEventModifier 17");
+				std::vector<int> aScopes = asziScopes[kModifier.getScope()];
+				//If it's not empty it means we have set it before
+				//Just remove the ones that don't pass this requirement
+				if (!aScopes.empty())
+				{
+					gDLL->netMessageDebugLog("CheckEventModifier 18");
+					std::vector<int>::iterator iter = aScopes.begin();
+					while (iter != aScopes.end())
+					{
+						gDLL->netMessageDebugLog("CheckEventModifier 19");
+						iValue = getNumResourceAvailable((ResourceTypes)(*iter), true);
+						if (GC.EventIntEval(iValue, kModifier))
+							++iter;
+						else
+							iter = aScopes.erase(iter);
+					}
+				}
+				//It is empty. Set it. 
+				//We should never get here with it being empty, but having already been checked.
+				//If it has been checked and nothing met the requirements we should have already returned false when checking that requirement.
+				else
+				{
+					gDLL->netMessageDebugLog("CheckEventModifier 20");
+					for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
+					{
+						iValue = getNumResourceAvailable((ResourceTypes)iI, true);
+						if (GC.EventIntEval(iValue, kModifier))
+						{
+							gDLL->netMessageDebugLog("CheckEventModifier 21");
+							aScopes.push_back(iI);
+						}
+					}
+				}
+				if (aScopes.empty())
+				{
+					gDLL->netMessageDebugLog("CheckEventModifier 22");
+					return false;
+				}
+				else
+				{
+					gDLL->netMessageDebugLog("CheckEventModifier 23");
+					if (bRequirement)
+					{
+						gDLL->netMessageDebugLog("CheckEventModifier 24");
+						asziScopes[kModifier.getScope()] = aScopes;
+					}
+					return true;
+				}
+			}
+			//Scope set to -1 and no specific type to check. So anything goes.
+			//I don't think this will be used but you never know.
+			else 
+			{
+				gDLL->netMessageDebugLog("CheckEventModifier 25");
+				for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
+				{
+					gDLL->netMessageDebugLog("CheckEventModifier 26");
+					iValue = getNumResourceAvailable((ResourceTypes)iI, true);
+					if (GC.EventIntEval(iValue, kModifier))
+					{
+						gDLL->netMessageDebugLog("CheckEventModifier 27");
+						return true;
+					}
+				}
+			}
+		}
+		break;
+
+	case EVENTMOD_RESOURCE_CLASS:
+		{
+			gDLL->netMessageDebugLog("CheckEventModifier 28");
+			//Any resource which matches resource class, don't use scope.
+			if ((ResourceClassTypes)kModifier.getTypeToCompare() != NO_RESOURCECLASS && kModifier.getScope() == "default")
+			{
+				gDLL->netMessageDebugLog("CheckEventModifier 29");
+				for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
+				{
+					if (GC.getResourceInfo((ResourceTypes)iI)->getResourceClassType() == kModifier.getTypeToCompare())
+					{
+						gDLL->netMessageDebugLog("CheckEventModifier 30");
+						int iNumResource = getNumResourceTotal((ResourceTypes)iI, true);
+						if (GC.EventIntEval(iNumResource, kModifier))
+						{
+							gDLL->netMessageDebugLog("CheckEventModifier 31");
+							return true;
+						}
+					}
+				}
+			}
+			//Any resource which matches scope test. Must match resource class if set.
+			else if (kModifier.getScope() != "default")
+			{
+				gDLL->netMessageDebugLog("CheckEventModifier 32");
+				std::vector<int> aScopes = asziScopes[kModifier.getScope()];
+				//If it's not empty it means we have set it before
+				//Just remove the ones that don't pass this requirement
+				if (!aScopes.empty())
+				{
+					gDLL->netMessageDebugLog("CheckEventModifier 33");
+					std::vector<int>::iterator iter = aScopes.begin();
+					bool bValid;
+					while (iter != aScopes.end())
+					{
+						gDLL->netMessageDebugLog("CheckEventModifier 34");
+						bValid = true;
+						if ((ResourceClassTypes)kModifier.getTypeToCompare() == NO_RESOURCECLASS || GC.getResourceInfo((ResourceTypes)(*iter))->getResourceClassType() == kModifier.getTypeToCompare())
+						{
+							gDLL->netMessageDebugLog("CheckEventModifier 35");
+							iValue = getNumResourceTotal((ResourceTypes)(*iter), true);
+							if (GC.EventIntEval(iValue, kModifier))
+								++iter;
+							else
+								iter = aScopes.erase(iter);
+						}
+						else
+							iter = aScopes.erase(iter);
+					}
+				}
+				//It is empty. Set it. 
+				//We should never get here with it being empty, but having already been checked.
+				//If it has been checked and nothing met the requirements we should have already returned false when checking that requirement.
+				else
+				{
+					gDLL->netMessageDebugLog("CheckEventModifier 36");
+					for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
+					{
+						if ((ResourceClassTypes)kModifier.getTypeToCompare() == NO_RESOURCECLASS || GC.getResourceInfo((ResourceTypes)iI)->getResourceClassType() == kModifier.getTypeToCompare())
+						{
+							gDLL->netMessageDebugLog("CheckEventModifier 37");
+							iValue = getNumResourceTotal((ResourceTypes)iI, true);
+							if (GC.EventIntEval(iValue, kModifier))
+							{
+								gDLL->netMessageDebugLog("CheckEventModifier 38");
+								aScopes.push_back(iI);
+							}
+						}
+					}
+				}
+				if (aScopes.empty())
+				{
+					gDLL->netMessageDebugLog("CheckEventModifier 39");
+					return false;
+				}
+				else
+				{
+					gDLL->netMessageDebugLog("CheckEventModifier 40");
+					if (bRequirement)
+					{
+						gDLL->netMessageDebugLog("CheckEventModifier 41");
+						asziScopes[kModifier.getScope()] = aScopes;
+					}
+					return true;
+				}
+			}
+			//Scope set to -1 and no specific type to check. So anything goes.
+			//This should not be used. If you actually want this functionality, use EVENTMOD_RESOURCE. It makes no sense to have this here, this is for checking classes.
+			else 
+				return false;
+		}
+		break;
+
+	case EVENTMOD_RESOURCE_CLASS_AVAILABLE:
+		{
+			//Any resource which matches resource class, don't use scope.
+			if ((ResourceTypes)kModifier.getTypeToCompare() != NO_RESOURCE && kModifier.getScope() == "default")
+			{
+				for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
+				{
+					if (GC.getResourceInfo((ResourceTypes)iI)->getResourceClassType() == kModifier.getTypeToCompare())
+					{
+						int iNumResource = getNumResourceAvailable((ResourceTypes)iI, true);
+						if (GC.EventIntEval(iNumResource, kModifier))
+						{
+							return true;
+						}
+					}
+				}
+			}
+			//Any resource which matches scope test. Must match resource class if set.
+			else if (kModifier.getScope() != "default")
+			{
+				std::vector<int> aScopes = asziScopes[kModifier.getScope()];
+				//If it's not empty it means we have set it before
+				//Just remove the ones that don't pass this requirement
+				if (!aScopes.empty())
+				{
+					std::vector<int>::iterator iter = aScopes.begin();
+					bool bValid;
+					while (iter != aScopes.end())
+					{
+						bValid = true;
+						if (kModifier.getTypeToCompare() == -1 || GC.getResourceInfo((ResourceTypes)(*iter))->getResourceClassType() == kModifier.getTypeToCompare())
+						{
+							iValue = getNumResourceAvailable((ResourceTypes)(*iter), true);
+							if (GC.EventIntEval(iValue, kModifier))
+								++iter;
+							else
+								iter = aScopes.erase(iter);
+						}
+						else
+							iter = aScopes.erase(iter);
+					}
+				}
+				//It is empty. Set it. 
+				//We should never get here with it being empty, but having already been checked.
+				//If it has been checked and nothing met the requirements we should have already returned false when checking that requirement.
+				else
+				{
+					for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
+					{
+						if (kModifier.getTypeToCompare() == -1 || GC.getResourceInfo((ResourceTypes)iI)->getResourceClassType() == kModifier.getTypeToCompare())
+						{
+							iValue = getNumResourceAvailable((ResourceTypes)iI, true);
+							if (GC.EventIntEval(iValue, kModifier))
+								aScopes.push_back(iI);
+						}
+					}
+				}
+				if (aScopes.empty())
+					return false;
+				else
+				{
+					if (bRequirement)
+						asziScopes[kModifier.getScope()] = aScopes;
+					return true;
+				}
+			}
+			//Scope set to -1 and no specific type to check. So anything goes.
+			//This should not be used. If you actually want this functionality, use EVENTMOD_RESOURCE. It makes no sense to have this here, this is for checking classes.
+			else 
+				return false;
+		}
+		break;
+
+	case EVENTMOD_NUMUNITS:
+		iValue = getNumUnits();
+		break;
+
+	case EVENTMOD_NUMDOMAINUNITS:
+		iValue = GetNumUnitsWithDomain((DomainTypes)kModifier.getTypeToCompare(), false);
+		break;
+
+	case EVENTMOD_HIGHESTUNITLEVEL:
+		iValue = getHighestUnitLevel();
+		break;
+
+	case EVENTMOD_UNITCLASS:
+		iValue = getUnitClassCount((UnitClassTypes)kModifier.getTypeToCompare());
+		break;
+
+	case EVENTMOD_NUMCITIES:
+		iValue = getNumCities();
+		break;
+
+	case EVENTMOD_LOSTCAPITAL:
+		return GC.EventBoolEval(IsHasLostCapital(), kModifier);
+
+	case EVENTMOD_CITIESLOST:
+		iValue = getCitiesLost();
+		break;
+
+	case EVENTMOD_PUPPETCITIES:
+		iValue = GetNumPuppetCities();
+		break;
+
+	case EVENTMOD_BUILDINGCLASS:
+		iValue = getBuildingClassCount((BuildingClassTypes)kModifier.getTypeToCompare());
+		break;
+
+	case EVENTMOD_NUMWONDERS:
+		iValue = GetNumWonders();
+		break;
+
+	case EVENTMOD_HUMAN:
+		return GC.EventBoolEval(isHuman(), kModifier);
+
+	case EVENTMOD_BARBARIAN:
+		return GC.EventBoolEval(isBarbarian(), kModifier);
+
+	case EVENTMOD_HANDICAP:
+		iValue = (int)getHandicapType();
+		break;
+
+	case EVENTMOD_CIVILIZATION:
+		return GC.EventBoolEval((int)getCivilizationType() == kModifier.getTypeToCompare(), kModifier);
+
+	case EVENTMOD_LEADER:
+		return GC.EventBoolEval((int)getLeaderType() == kModifier.getTypeToCompare(), kModifier);
+
+	case EVENTMOD_PERSONALITY:
+		return GC.EventBoolEval((int)getPersonalityType() == kModifier.getTypeToCompare(), kModifier);
+
+	case EVENTMOD_MINORCIV:
+		return GC.EventBoolEval(isMinorCiv(), kModifier);
+
+	case EVENTMOD_MAJORCIV:
+		return GC.EventBoolEval(!isMinorCiv(), kModifier);
+
+	//case EVENTMOD_STATERELIGION:
+	//	return GC.EventBoolEval(IsHasAdoptedStateReligion(), kModifier);
+
+	case EVENTMOD_POPULATION:
+		iValue = getTotalPopulation();
+		break;
+
+	case EVENTMOD_AVERAGEPOPULATION:
+		iValue = getAveragePopulation();
+		break;
+
+	case EVENTMOD_LAND:
+		iValue = getTotalLand();
+		break;
+
+	case EVENTMOD_POLICY:
+		return GC.EventBoolEval(GetPlayerPolicies()->HasPolicy((PolicyTypes)kModifier.getTypeToCompare()), kModifier);
+
+	case EVENTMOD_POLICIESTOTAL:
+		iValue = GetNumPolicies();
+		break;
+
+	case EVENTMOD_POLICYBRANCH:
+		return GC.EventBoolEval(GetPlayerPolicies()->IsPolicyBranchUnlocked((PolicyBranchTypes)kModifier.getTypeToCompare()), kModifier);
+		
+	case EVENTMOD_ANARCHY:
+		return GC.EventBoolEval(IsAnarchy(), kModifier);
+
+	case EVENTMOD_GOLDENAGE:
+		return GC.EventBoolEval(isGoldenAge(), kModifier);
+
+	case EVENTMOD_POWER:
+		iValue = getPower();
+		break;
+
+	case EVENTMOD_MILITARYMIGHT:
+		iValue = GetMilitaryMight();
+		break;
+
+	case EVENTMOD_ECONOMICMIGHT:
+		iValue = GetEconomicMight();
+		break;
+
+	case EVENTMOD_ERA:
+		iValue = (int)GetCurrentEra();
+		break;
+
+	case EVENTMOD_GREATPEOPLECREATED:
+		iValue = GetNumGreatPeople();
+		break;
+	default:
+		CvAssertMsg(false, "Could not find EventModifierType");
+		return false; //Return here. iValue was not properly set.
+	}
+	
+	return GC.EventIntEval(iValue, kModifier);
+}
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::processEventOption(int iID, int iOption)
+{
+	CvEvent* pEvent = getEvent(iID);
+	pEvent->processEventOption(iOption);
+	deleteEvent(iID);
+}
+
+//	--------------------------------------------------------------------------------
+bool CvPlayer::processEventOptionByID(int iID, int iOptionID)
+{
+	CvEvent* pEvent = getEvent(iID);
+	for (int i = 0; i < pEvent->getNumOptions(); i++)
+	{
+		if (pEvent->getOption(i) == iOptionID)
+		{
+			pEvent->processEventOption(i);
+			deleteEvent(iID);
+			return true;
+		}
+	}
+	return false;
+}
+
+//	--------------------------------------------------------------------------------
+const CvEvent* CvPlayer::firstEvent(int* pIterIdx, bool bRev) const
+{
+	return !bRev ? m_events.BeginIter(pIterIdx) : m_events.EndIter(pIterIdx);
+}
+
+//	--------------------------------------------------------------------------------
+const CvEvent* CvPlayer::nextEvent(int* pIterIdx, bool bRev) const
+{
+	return !bRev ? m_events.NextIter(pIterIdx) : m_events.PrevIter(pIterIdx);
+}
+
+//	--------------------------------------------------------------------------------
+CvEvent* CvPlayer::firstEvent(int* pIterIdx, bool bRev)
+{
+	return !bRev ? m_events.BeginIter(pIterIdx) : m_events.EndIter(pIterIdx);
+}
+
+//	--------------------------------------------------------------------------------
+CvEvent* CvPlayer::nextEvent(int* pIterIdx, bool bRev)
+{
+	return !bRev ? m_events.NextIter(pIterIdx) : m_events.PrevIter(pIterIdx);
+}
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::getNumEvents() const
+{
+	return m_events.GetCount();
+}
+
+//	--------------------------------------------------------------------------------
+CvEvent* CvPlayer::getEvent(int iID)
+{
+	return (m_events.GetAt(iID));
+}
+
+//	--------------------------------------------------------------------------------
+CvEvent* CvPlayer::addEvent()
+{
+	return (m_events.Add());
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::deleteEvent(int iID)
+{
+	m_events.RemoveAt(iID);
+}
+
+
+void CvPlayer::addTempEventEffect(EventTypes eEvent, EventOptionTypes eOption, EventActionTypeTypes eEventAction, int iNumTurns, int iType, int iValue)
+{
+	CvEventEffects kEventEffect;
+	kEventEffect.init(eEvent, eOption, eEventAction, iNumTurns, iType, iValue);
+	m_aEventEffects.push_back(kEventEffect);
+}
+
+int CvPlayer::getNumTempEventEffects() const
+{
+	return m_aEventEffects.size();
+}
+
+CvEventEffects& CvPlayer::getTempEventEffect(int index)
+{
+	return m_aEventEffects[index];
+}
+
+void CvPlayer::doTempEventEffects()
+{
+	int i = 0;
+	while (i != m_aEventEffects.size())
+	{
+		m_aEventEffects[i].changeNumTurns(-1);
+		if (m_aEventEffects[i].getNumTurns() <= 0)
+		{
+			unprocessTempEventEffect(i);
+			m_aEventEffects.erase(m_aEventEffects.begin() + i);
+		}
+		else
+		{
+			i++;
+		}
+	}
+}
+
+void CvPlayer::unprocessTempEventEffect(int i)
+{
+	CvEventEffects &kEventEffects = m_aEventEffects[i];
+	switch(kEventEffects.getAction())
+	{
+	case EVENTACTION_EVENT:
+	case EVENTACTION_PLAYER_START:
+	case EVENTACTION_EVENT_FOR_CAPITAL:
+	case EVENTACTION_EVENT_FOR_ALL_CITIES:
+	case EVENTACTION_EVENT_FOR_ALL_UNITS:
+	case EVENTACTION_PLAYER_END:
+	case EVENTACTION_CITY_START:
+	case EVENTACTION_CITY_END:
+	case EVENTACTION_UNIT_START:
+	case EVENTACTION_UNIT_END:
+	case EVENTACTION_EVENT_FOR_ALL_PLAYERS:
+	case EVENTACTION_CHANGE_ROUTE:
+	case EVENTACTION_CHANGE_FEATURE:
+	case EVENTACTION_CHANGE_RESOURCE:
+	case EVENTACTION_CHANGE_IMPROVEMENT:
+		break;
+
+	case EVENTACTION_YIELD:
+		changeYieldFromEvents((YieldTypes)kEventEffects.getType(), kEventEffects.getValue());
+		break;
+
+	case EVENTACTION_YIELDMOD:
+		changeYieldModifierFromEvents((YieldTypes)kEventEffects.getType(), kEventEffects.getValue());
+		break;
+
+	case EVENTACTION_HAPPY:
+		changeHappyFromEvents(kEventEffects.getValue());
+		break;
+
+	default:
+		FAssertMsg(false, "Unknown EventActionTypeTypes in CvPlayer::unprocessTempEventEffect");
+		break;
+	}
+}
+// END EventEngine

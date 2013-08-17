@@ -73,6 +73,9 @@ private:
 
 	template<class T>
 	bool PrefetchCollection(std::vector<T*>& kCollection, const char* tableName);
+	// EventEngine - v0.1, Snarko
+	bool loadEventTypes(std::map<std::string, int>& loadVariable, const char* tableName);
+	// END EventEngine
 
 	//
 	// special cases of set class info which don't use the template because of extra code they have

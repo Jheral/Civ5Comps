@@ -272,6 +272,218 @@ int CvPolicyAI::ChooseNextPolicy(CvPlayer* pPlayer)
 
 void CvPolicyAI::DoChooseIdeology(CvPlayer *pPlayer)
 {
+	// AdvancementScreen - v1.0, Snarko
+	// TODO: check if we *can* adopt the ideology. Awaiting custom LUA screen for the player.
+	std::map<int,int> aiiIdeologies;
+	std::map<int,int>::iterator itIdeology;
+
+	CvPolicyBranchEntry* entry;
+	for (int i = 0; i < GC.getNumPolicyBranchInfos(); i++)
+	{
+		if (GC.getPolicyBranchInfo((PolicyBranchTypes) i)->IsPurchaseByLevel())
+			aiiIdeologies[i] = 0;
+	}
+	// First consideration is our victory type
+	// So who wants to softcode the AI victory part? ;)
+	int iConquestPriority = max(0, pPlayer->GetGrandStrategyAI()->GetConquestPriority());
+	int iDiploPriority = max(0, pPlayer->GetGrandStrategyAI()->GetUnitedNationsPriority());
+	int iTechPriority = max(0, pPlayer->GetGrandStrategyAI()->GetSpaceshipPriority());
+	int iCulturePriority = max(0, pPlayer->GetGrandStrategyAI()->GetCulturePriority());
+
+	int iClearPrefPercent = GC.getIDEOLOGY_PERCENT_CLEAR_VICTORY_PREF();
+
+	bool bConquestDominating = (iConquestPriority > (iDiploPriority   * (100 + iClearPrefPercent) / 100) &&
+		iConquestPriority > (iTechPriority    * (100 + iClearPrefPercent) / 100) &&
+		iConquestPriority > (iCulturePriority * (100 + iClearPrefPercent) / 100));
+
+	bool bDiploDominating = (iDiploPriority > (iConquestPriority * (100 + iClearPrefPercent) / 100) &&
+		iDiploPriority > (iTechPriority     * (100 + iClearPrefPercent) / 100) &&
+		iDiploPriority > (iCulturePriority  * (100 + iClearPrefPercent) / 100));
+
+	bool bTechDominating = (iTechPriority > (iConquestPriority * (100 + iClearPrefPercent) / 100) &&
+		iTechPriority > (iDiploPriority    * (100 + iClearPrefPercent) / 100) &&
+		iTechPriority > (iCulturePriority  * (100 + iClearPrefPercent) / 100));
+
+	bool bCultureDominating = (iCulturePriority > (iConquestPriority * (100 + iClearPrefPercent) / 100) &&
+		iCulturePriority > (iDiploPriority    * (100 + iClearPrefPercent) / 100) &&
+		iCulturePriority > (iTechPriority  * (100 + iClearPrefPercent) / 100));
+
+	int iPolicyBranch;
+	int iValue;
+	int iTotal = 0;
+	//Victories.
+	//TODO: add a new logging function
+	itIdeology = aiiIdeologies.begin();
+	bool bDelete;
+	while (itIdeology != aiiIdeologies.end())
+	{
+		iPolicyBranch = itIdeology->first;
+		entry = m_pCurrentPolicies->GetPolicies()->GetPolicyBranchEntry(iPolicyBranch);
+		iValue = 0;
+		bDelete = false;
+
+		for (int j = 0; j < GC.getNumVictoryInfos(); j++)
+		{
+			if (GC.getGame().isVictoryValid((VictoryTypes)j))
+			{
+				if (!entry->IsVictoryType(j))
+				{
+					//If a victory type is dominating and the ideology does not support it then remove it from the map.
+					if (bConquestDominating && GC.getVictoryInfo((VictoryTypes)j)->isConquest())
+					{
+						bDelete = true;
+						break;
+					}
+					else if (bDiploDominating && GC.getVictoryInfo((VictoryTypes)j)->isDiploVote())
+					{
+						bDelete = true;
+						break;
+					}
+					else if (bCultureDominating && GC.getVictoryInfo((VictoryTypes)j)->isInfluential())
+					{
+						bDelete = true;
+						break;
+					}
+					//Sorry for this but I don't want to make a big rewrite to get which victory is spaceship, when I will have to rewrite this again anyway once I tackle the AI.
+					else if (bTechDominating && (j == GC.getInfoTypeForString("VICTORY_SPACE_RACE", true)))
+					{
+						bDelete = true;
+						break;
+					}
+				}
+				else
+				{
+					//No combo-victories for now. Wait for larger AI rewrite. ETA not a clue, so much to do before then.
+					if (GC.getVictoryInfo((VictoryTypes)j)->isConquest())
+					{
+						iValue += iConquestPriority;
+					}
+					else if (GC.getVictoryInfo((VictoryTypes)j)->isDiploVote())
+					{
+						iValue += iDiploPriority;
+					}
+					else if (GC.getVictoryInfo((VictoryTypes)j)->isInfluential())
+					{
+						iValue += iCulturePriority;
+					}
+					else if (j == GC.getInfoTypeForString("VICTORY_SPACE_RACE", true))
+					{
+						iValue += iTechPriority;
+					}
+				}
+			}
+
+			itIdeology->second = iValue;
+			iTotal += iValue;
+		}
+
+		if (bDelete)
+			aiiIdeologies.erase(itIdeology++);
+		else
+			++itIdeology;
+	}
+
+	//Modify value based on total value.
+	int iPriorityToDivide = GC.getIDEOLOGY_SCORE_GRAND_STRATS();
+	if (iTotal > 0)
+	{
+		for (itIdeology = aiiIdeologies.begin() ; itIdeology != aiiIdeologies.end(); ++itIdeology)
+		{
+			itIdeology->second = (itIdeology->second * iPriorityToDivide) / iTotal;
+		}
+	}
+
+	//Third loop, things not victory related.
+	for (itIdeology = aiiIdeologies.begin() ; itIdeology != aiiIdeologies.end(); ++itIdeology)
+	{
+		iPolicyBranch = itIdeology->first;
+		entry = m_pCurrentPolicies->GetPolicies()->GetPolicyBranchEntry(iPolicyBranch);
+
+		itIdeology->second += PolicyHelpers::GetNumFreePolicies((PolicyBranchTypes)iPolicyBranch) * GC.getIDEOLOGY_SCORE_PER_FREE_TENET();
+
+		// Look at Happiness impacts
+		int iHappinessModifier = GC.getIDEOLOGY_SCORE_HAPPINESS();
+		// -- Happiness we could add through tenets
+		int iHappinessDelta = GetBranchBuildingHappiness(pPlayer, (PolicyBranchTypes)iPolicyBranch);
+		int iHappinessPoliciesInBranch = GetNumHappinessPolicies(pPlayer, (PolicyBranchTypes)iPolicyBranch);
+		if (iHappinessPoliciesInBranch > 0)
+		{
+			itIdeology->second += iHappinessDelta * iHappinessModifier / iHappinessPoliciesInBranch;		
+		}
+
+		// -- Happiness we'd lose through Public Opinion
+		//TODO: rewrite ComputeHypotheticalPublicOpinionUnhappiness to the new system.
+		iHappinessDelta = max (0, 100 - pPlayer->GetCulture()->ComputeHypotheticalPublicOpinionUnhappiness((PolicyBranchTypes)iPolicyBranch));
+		itIdeology->second += iHappinessDelta * iHappinessModifier;
+
+		
+		// Small random add-on
+		itIdeology->second += GC.getGame().getJonRandNum(10, "Ideology random priority bump");
+	}
+
+	//Finally, a loop through players.
+	PlayerTypes eLoopPlayer;
+	for (int iPlayerLoop = 0; iPlayerLoop < MAX_MAJOR_CIVS; iPlayerLoop++)
+	{
+		eLoopPlayer = (PlayerTypes) iPlayerLoop;
+		if (eLoopPlayer != pPlayer->GetID() && pPlayer->GetDiplomacyAI()->IsPlayerValid(eLoopPlayer))
+		{
+			CvPlayer &kOtherPlayer = GET_PLAYER(eLoopPlayer);
+			PolicyBranchTypes eOtherPlayerIdeology;
+			//TODO: make multiple ideologies possible.
+			eOtherPlayerIdeology = kOtherPlayer.GetPlayerPolicies()->GetLateGamePolicyTree();
+			if (aiiIdeologies.find((int)eOtherPlayerIdeology) == aiiIdeologies.end())
+			{
+				//It's not in the map, so we aren't choosing it anyway
+				continue;
+			}
+
+			//Bugfix: base something as important as this on our real feeling towards players.
+			switch(pPlayer->GetDiplomacyAI()->GetMajorCivApproach(eLoopPlayer, /*bHideTrueFeelings*/ false))
+			{
+			case MAJOR_CIV_APPROACH_HOSTILE:
+				aiiIdeologies[(int)eOtherPlayerIdeology] += GC.getIDEOLOGY_SCORE_HOSTILE();
+				break;
+			case MAJOR_CIV_APPROACH_GUARDED:
+				aiiIdeologies[(int)eOtherPlayerIdeology] += GC.getIDEOLOGY_SCORE_GUARDED();
+				break;
+			case MAJOR_CIV_APPROACH_AFRAID:
+				aiiIdeologies[(int)eOtherPlayerIdeology] += GC.getIDEOLOGY_SCORE_AFRAID();
+				break;
+			case MAJOR_CIV_APPROACH_FRIENDLY:
+				aiiIdeologies[(int)eOtherPlayerIdeology] += GC.getIDEOLOGY_SCORE_FRIENDLY();
+				break;
+			case MAJOR_CIV_APPROACH_NEUTRAL:
+				// No changes
+				break;
+			}
+		}
+	}
+
+	// Pick the ideology
+	PolicyBranchTypes eChosenBranch = NO_POLICY_BRANCH_TYPE;
+	int iMaxValue = -(MAX_INT);
+	for (itIdeology = aiiIdeologies.begin() ; itIdeology != aiiIdeologies.end(); ++itIdeology)
+	{
+		if (itIdeology->second > iMaxValue)
+		{
+			eChosenBranch = (PolicyBranchTypes)itIdeology->first;
+			iMaxValue = itIdeology->second;
+		}
+	}
+
+	if (eChosenBranch != NO_POLICY_BRANCH_TYPE)
+	{
+		pPlayer->GetPlayerPolicies()->SetPolicyBranchUnlocked(eChosenBranch, true, false);
+		LogBranchChoice(eChosenBranch);
+	}
+	else
+	{
+		gDLL->netMessageDebugLog("We may have a problem. Did not pick a valid ideology for an AI, played ID " + FSerialization::toString(pPlayer->GetID()));
+	}
+	// END AdvancementScreen
+
+	/*Original code
 	int iFreedomPriority = 0;
 	int iAutocracyPriority = 0;
 	int iOrderPriority = 0;
@@ -348,7 +560,7 @@ void CvPolicyAI::DoChooseIdeology(CvPlayer *pPlayer)
 			PolicyBranchTypes eOtherPlayerIdeology;
 			eOtherPlayerIdeology = kOtherPlayer.GetPlayerPolicies()->GetLateGamePolicyTree();
 
-			switch(pPlayer->GetDiplomacyAI()->GetMajorCivApproach(eLoopPlayer, /*bHideTrueFeelings*/ true))
+			switch(pPlayer->GetDiplomacyAI()->GetMajorCivApproach(eLoopPlayer, /*bHideTrueFeelings*//*Original code true))
 			{
 			case MAJOR_CIV_APPROACH_HOSTILE:
 				if (eOtherPlayerIdeology == eFreedomBranch)
@@ -493,6 +705,7 @@ void CvPolicyAI::DoChooseIdeology(CvPlayer *pPlayer)
 	}
 	pPlayer->GetPlayerPolicies()->SetPolicyBranchUnlocked(eChosenBranch, true, false);
 	LogBranchChoice(eChosenBranch);
+	*/
 }
 
 /// Should the AI look at switching ideology branches?
@@ -513,6 +726,85 @@ void CvPolicyAI::DoConsiderIdeologySwitch(CvPlayer* pPlayer)
 		int iHappinessPreferredIdeology = GetBranchBuildingHappiness(pPlayer, ePreferredIdeology);
 
 		// Does the switch fight against our clearly preferred victory path?
+		// AdvancementScreen - v1.0, Snarko
+		int iTotalHappinessImprovement = iPublicOpinionUnhappiness + iHappinessPreferredIdeology - iHappinessCurrentIdeology;
+		if (iTotalHappinessImprovement >= 10)
+		{
+			int iConquestPriority = max(0, pPlayer->GetGrandStrategyAI()->GetConquestPriority());
+			int iDiploPriority = max(0, pPlayer->GetGrandStrategyAI()->GetUnitedNationsPriority());
+			int iTechPriority = max(0, pPlayer->GetGrandStrategyAI()->GetSpaceshipPriority());
+			int iCulturePriority = max(0, pPlayer->GetGrandStrategyAI()->GetCulturePriority());
+
+			int iClearPrefPercent = GC.getIDEOLOGY_PERCENT_CLEAR_VICTORY_PREF();
+
+			bool bConquestDominating = (iConquestPriority > (iDiploPriority   * (100 + iClearPrefPercent) / 100) &&
+				iConquestPriority > (iTechPriority    * (100 + iClearPrefPercent) / 100) &&
+				iConquestPriority > (iCulturePriority * (100 + iClearPrefPercent) / 100));
+
+			bool bDiploDominating = (iDiploPriority > (iConquestPriority * (100 + iClearPrefPercent) / 100) &&
+				iDiploPriority > (iTechPriority     * (100 + iClearPrefPercent) / 100) &&
+				iDiploPriority > (iCulturePriority  * (100 + iClearPrefPercent) / 100));
+
+			bool bTechDominating = (iTechPriority > (iConquestPriority * (100 + iClearPrefPercent) / 100) &&
+				iTechPriority > (iDiploPriority    * (100 + iClearPrefPercent) / 100) &&
+				iTechPriority > (iCulturePriority  * (100 + iClearPrefPercent) / 100));
+
+			bool bCultureDominating = (iCulturePriority > (iConquestPriority * (100 + iClearPrefPercent) / 100) &&
+				iCulturePriority > (iDiploPriority    * (100 + iClearPrefPercent) / 100) &&
+				iCulturePriority > (iTechPriority  * (100 + iClearPrefPercent) / 100));
+
+			bool bValid = true;
+			if (bConquestDominating || bDiploDominating || bTechDominating || bCultureDominating)
+			{
+				bValid = false;
+				CvPolicyBranchEntry* entry = m_pCurrentPolicies->GetPolicies()->GetPolicyBranchEntry((int)ePreferredIdeology);
+				for (int j = 0; j < GC.getNumVictoryInfos(); j++)
+				{
+					if (GC.getGame().isVictoryValid((VictoryTypes)j))
+					{
+						if (entry->IsVictoryType(j))
+						{
+							//If a victory type is dominating and the ideology does not support it then remove it from the map.
+							if (bConquestDominating && GC.getVictoryInfo((VictoryTypes)j)->isConquest())
+							{
+								bValid = true;
+								break;
+							}
+							else if (bDiploDominating && GC.getVictoryInfo((VictoryTypes)j)->isDiploVote())
+							{
+								bValid = true;
+								break;
+							}
+							else if (bCultureDominating && GC.getVictoryInfo((VictoryTypes)j)->isInfluential())
+							{
+								bValid = true;
+								break;
+							}
+							//Sorry for this but I don't want to make a big rewrite to get which victory is spaceship, when I will have to rewrite this again anyway once I tackle the AI.
+							else if (bTechDominating && (j == GC.getInfoTypeForString("VICTORY_SPACE_RACE", true)))
+							{
+								bValid = true;
+								break;
+							}
+						}
+					}
+				}
+			}
+
+			// Cleared all obstacles -- REVOLUTION!
+			pPlayer->SetAnarchyNumTurns(GC.getSWITCH_POLICY_BRANCHES_ANARCHY_TURNS());
+			pPlayer->GetPlayerPolicies()->DoSwitchIdeologies(ePreferredIdeology);	
+
+			if (ePreferredIdeology == GC.getPOLICY_BRANCH_FREEDOM() && eCurrentIdeology == GC.getPOLICY_BRANCH_ORDER())
+			{
+				if (GET_PLAYER(eMostPressure).GetID() == GC.getGame().getActivePlayer())
+				{
+					gDLL->UnlockAchievement(ACHIEVEMENT_XP2_39);
+				}
+			}
+		}
+		// END AdvancementScreen
+		/* Original code
 		bool bDontSwitchFreedom = false;
 		bool bDontSwitchOrder = false;
 		bool bDontSwitchAutocracy = false;
@@ -568,6 +860,7 @@ void CvPolicyAI::DoConsiderIdeologySwitch(CvPlayer* pPlayer)
 				}
 			}
 		}
+		*/
 	}
 }
 

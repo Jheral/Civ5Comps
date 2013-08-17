@@ -310,6 +310,10 @@ bool CvDllDatabaseUtility::PrefetchGameData()
 	PrefetchCollection(GC.getMPOptionInfo(), "MultiplayerOptions");
 	PrefetchCollection(GC.getPlayerOptionInfo(), "PlayerOptions");
 	PrefetchCollection(GC.getPolicyInfo(), "Policies");
+	// AdvancementScreen - v1.0, Snarko
+	//PolicyBranchTypes refer to this one, so we will load classes first.
+	PrefetchCollection(GC.getPolicyBranchClassInfo(), "PolicyBranchClassTypes");
+	// END AdvancementScreen
 	PrefetchCollection(GC.getPolicyBranchInfo(), "PolicyBranchTypes");
 	PrefetchCollection(GC.getProcessInfo(), "Processes");
 	PrefetchCollection(GC.getProjectInfo(), "Projects");
@@ -367,6 +371,19 @@ bool CvDllDatabaseUtility::PrefetchGameData()
 	PrefetchCollection(GC.getLeagueProjectInfo(), "LeagueProjects");
 	PrefetchCollection(GC.getLeagueProjectRewardInfo(), "LeagueProjectRewards");
 	PrefetchCollection(GC.getResolutionInfo(), "Resolutions");
+	// EventEngine - v0.1, Snarko
+	loadEventTypes(GC.getEventTypeTypes(), "EventTypeTypes");
+	loadEventTypes(GC.getCompareTypes(), "CompareTypes");
+	loadEventTypes(GC.getEventModifierTypes(), "EventModifierTypeTypes");
+	loadEventTypes(GC.getEventActionTypes(), "EventActionTypeTypes");
+
+	PrefetchCollection(GC.getEventActionInfo(), "Event_Actions");
+	PrefetchCollection(GC.getEventOptionInfo(), "Event_Options");
+	PrefetchCollection(GC.getEventRequirementInfo(), "Event_Requirements");
+	PrefetchCollection(GC.getEventModifierInfo(), "Event_Modifiers");
+	PrefetchCollection(GC.getEventInfo(), "Events");
+	// END EventEngine
+
 
 	//Copy flavors into string array
 	{
@@ -708,6 +725,32 @@ bool CvDllDatabaseUtility::UpdatePlayableCivilizationCounts()
 
 	return true;
 }
+
+// EventEngine - v0.1, Snarko
+bool CvDllDatabaseUtility::loadEventTypes(std::map<std::string, int>& loadVariable, const char* tableName)
+{
+	CvDatabaseUtility kUtility;
+	Database::Results kResults;
+	if (DB.SelectWhere(kResults, tableName, "ID > -1 ORDER BY ID"))
+	{
+		int i = 0;
+		while(kResults.Step())
+		{
+			loadVariable[kResults.GetText("Name")] = i;
+			std::string str(kResults.GetText("Name"));
+			std::string table(tableName);
+			gDLL->netMessageDebugLog("Loading " + table + ". Node "  + str + " int is " + FSerialization::toString(i) + "\n");
+			i++;
+		}
+		return true;
+	}
+	else
+	{
+		CvAssertMsg(false, DB.ErrorMessage());
+		return false;
+	}
+}
+// END EventEngine
 
 //------------------------------------------------------------------------------------------------------
 //

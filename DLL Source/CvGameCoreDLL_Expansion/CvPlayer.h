@@ -24,6 +24,9 @@
 #include "CvPreGame.h"
 #include "CvAchievementUnlocker.h"
 #include "CvUnitCycler.h"
+// EventEngine - v0.1, Snarko
+#include "CvEvent.h"
+// END EventEngine
 
 class CvPlayerPolicies;
 class CvEconomicAI;
@@ -150,6 +153,39 @@ public:
 	void DoUnitReset();
 	void DoUnitAttrition();
 	void RespositionInvalidUnits();
+
+	// EventEngine - v0.1, Snarko
+	void doEvents();
+	void doEventChance(CvEventInfo& kEvent, std::map<std::string, std::vector<int> > &asziScopes, CvCity* pCity = NULL, CvUnit* pUnit = NULL);
+	bool checkEventModifier(CvEventModifierInfo& kModifier, std::map<std::string, std::vector<int> > &asziScopes, bool bRequirement = true);
+	void processEventOption(int iID, int iOption);
+	bool processEventOptionByID(int iID, int iOptionID);
+	
+	const CvEvent* firstEvent(int* pIterIdx, bool bRev) const;
+	const CvEvent* nextEvent(int* pIterIdx, bool bRev) const;
+	CvEvent* firstEvent(int* pIterIdx, bool bRev);
+	CvEvent* nextEvent(int* pIterIdx, bool bRev);
+	int getNumEvents() const;
+	CvEvent* getEvent(int iID);
+	CvEvent* addEvent();
+	void deleteEvent(int iID);
+
+	void addTempEventEffect(EventTypes eEvent, EventOptionTypes eOption, EventActionTypeTypes eEventAction = NO_EVENTACTION, int iNumTurns = 1, int iType = -1, int iValue = 0); //Returns the EventEffect just added.
+	int getNumTempEventEffects() const;
+	CvEventEffects& getTempEventEffect(int index);
+	void doTempEventEffects();
+	void unprocessTempEventEffect(int i);
+
+	int getYieldFromEvents(YieldTypes eYield) const;
+	void changeYieldFromEvents(YieldTypes eYield, int iChange);
+	int getYieldModifierFromEvents(YieldTypes eYield) const;
+	void changeYieldModifierFromEvents(YieldTypes eYield, int iChange);
+	int getHappyFromEvents() const;
+	void changeHappyFromEvents(int iChange);
+	
+	void setFlag(std::string szFlag, int iValue);
+	int getFlag(std::string szFlag);
+	// END EventEngine
 
 	void updateYield();
 	void updateExtraSpecialistYield();
@@ -1975,6 +2011,17 @@ protected:
 	friend const CvUnit* GetPlayerUnit(const IDInfo& unit);
 
 	CvPlayerAchievements m_kPlayerAchievements;
+
+	// EventEngine - v0.1, Snarko
+	//Probably not the best way to store events, but I couldn't find a better one.
+	FFreeListTrashArray<CvEvent> m_events;
+	std::vector<CvEventEffects> m_aEventEffects;
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiYieldFromEvents;
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiYieldModFromEvents;
+	int m_iHappyFromEvents;
+
+	std::map<std::string, int> m_asziFlags;
+	// END EventEngine
 };
 
 extern bool CancelActivePlayerEndTurn();

@@ -467,6 +467,13 @@ int CvTreasury::CalculateGrossGoldTimes100()
 	// International trade
 	iNetGold += GetGoldPerTurnFromTraits() * 100;
 
+	// EventEngine - v0.1, Snarko
+	if (m_pPlayer->getYieldFromEvents(YIELD_GOLD) > 0)
+	{
+		iNetGold += m_pPlayer->getYieldFromEvents(YIELD_GOLD) * 100;
+	}
+	// END EventEngine
+
 	return iNetGold;
 }
 
@@ -665,6 +672,12 @@ int CvTreasury::CalculatePreInflatedCosts()
 	iTotalCosts += m_iExpensePerTurnUnitSupply;
 	iTotalCosts += GetBuildingGoldMaintenance();
 	iTotalCosts += GetImprovementGoldMaintenance();
+	// EventEngine - v0.1, Snarko
+	if (m_pPlayer->getYieldFromEvents(YIELD_GOLD) < 0)
+	{
+		iTotalCosts += m_pPlayer->getYieldFromEvents(YIELD_GOLD);
+	}
+	// END EventEngine
 
 	return iTotalCosts;
 }

@@ -1706,6 +1706,9 @@ BuildingTypes CvPolicyEntry::GetFreeBuildingOnConquest() const
 
 /// Constructor
 CvPolicyBranchEntry::CvPolicyBranchEntry(void):
+	// AdvancementScreen - v1.0, Snarko
+	m_ePolicyBranchClass(NO_POLICY_BRANCH_CLASS_TYPE),
+	// END AdvancementScreen
 	m_iEraPrereq(NO_ERA),
 	m_iFreePolicy(NO_POLICY),
 	m_iFreeFinishingPolicy(NO_POLICY),
@@ -1751,6 +1754,13 @@ bool CvPolicyBranchEntry::CacheResults(Database::Results& kResults, CvDatabaseUt
 	m_bDelayWhenNoCityStates = kResults.GetBool("AIDelayNoCityStates");
 	m_bDelayWhenNoScience = kResults.GetBool("AIDelayNoScience");
 
+	// AdvancementScreen - v1.0, Snarko
+	const char* szPolicyBranchClass = kResults.GetText("PolicyBranchClass");
+	m_ePolicyBranchClass = (PolicyBranchClassTypes)GC.getInfoTypeForString(szPolicyBranchClass);
+
+	m_strPolicyBranchIcon = kResults.GetText("PolicyBranchIcon");
+	// END AdvancementScreen
+
 	//PolicyBranch_Disables
 	{
 		kUtility.InitializeArray(m_piPolicyBranchDisables, "PolicyBranchTypes", (int)NO_POLICY_BRANCH_TYPE);
@@ -1774,6 +1784,9 @@ bool CvPolicyBranchEntry::CacheResults(Database::Results& kResults, CvDatabaseUt
 
 		pResults->Reset();
 	}
+
+	//PolicyBranch_VictoryTypes
+	kUtility.PopulateArrayByExistence(m_pbVictoryTypes, "Victories", "PolicyBranch_VictoryTypes", "VictoryType", "PolicyBranchType", GetType());
 
 	return true;
 }
@@ -1856,6 +1869,66 @@ bool CvPolicyBranchEntry::IsDelayWhenNoScience() const
 	return m_bDelayWhenNoScience;
 }
 
+// AdvancementScreen - v1.0, Snarko
+PolicyBranchClassTypes CvPolicyBranchEntry::GetPolicyBranchClass() const
+{
+	return m_ePolicyBranchClass;
+}
+
+bool CvPolicyBranchEntry::IsVictoryType(int iVictory) const
+{
+	CvAssertMsg(i < GC.getNumVictoryInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_pbVictoryTypes ? m_pbVictoryTypes[iVictory] : false;
+}
+
+CvString CvPolicyBranchEntry::GetPolicyBranchIcon() const
+{
+	return m_strPolicyBranchIcon;
+}
+//=====================================
+// CvPolicyBranchClassEntry
+//=====================================
+
+/// Constructor
+CvPolicyBranchClassEntry::CvPolicyBranchClassEntry(void):
+	m_iMaxBranches(0),
+	m_szStyle("")
+{
+}
+
+/// Destructor
+CvPolicyBranchClassEntry::~CvPolicyBranchClassEntry(void)
+{
+}
+
+/// Read from XML file (pass 1)
+bool CvPolicyBranchClassEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
+{
+	if(!CvBaseInfo::CacheResults(kResults, kUtility))
+		return false;
+
+
+	m_iMaxBranches = kResults.GetInt("iMaxBranches");
+	m_szStyle = kResults.GetText("Style");
+
+	return true;
+}
+
+int CvPolicyBranchClassEntry::GetMaxBranches()
+{
+	return m_iMaxBranches;
+}
+
+std::string CvPolicyBranchClassEntry::GetStyle()
+{
+	return m_szStyle;
+}
+
+
+// END AdvancementScreen
+
+
 //=====================================
 // CvPolicyXMLEntries
 //=====================================
@@ -1870,6 +1943,9 @@ CvPolicyXMLEntries::~CvPolicyXMLEntries(void)
 {
 	DeletePoliciesArray();
 	DeletePolicyBranchesArray();
+	// AdvancementScreen - v1.0, Snarko
+	DeletePolicyBranchClassesArray();
+	// END AdvancementScreen
 }
 
 /// Returns vector of policy entries
@@ -1929,6 +2005,37 @@ CvPolicyBranchEntry* CvPolicyXMLEntries::GetPolicyBranchEntry(int index)
 {
 	return m_paPolicyBranchEntries[index];
 }
+
+// AdvancementScreen - v1.0, Snarko
+/// Returns vector of PolicyBranchClass entries
+std::vector<CvPolicyBranchClassEntry*>& CvPolicyXMLEntries::GetPolicyBranchClassEntries()
+{
+	return m_paPolicyBranchClassEntries;
+}
+
+/// Number of defined PolicyBranchClasses
+int CvPolicyXMLEntries::GetNumPolicyBranchClasses()
+{
+	return m_paPolicyBranchClassEntries.size();
+}
+
+/// Clear PolicyBranchClass entries
+void CvPolicyXMLEntries::DeletePolicyBranchClassesArray()
+{
+	for(std::vector<CvPolicyBranchClassEntry*>::iterator it = m_paPolicyBranchClassEntries.begin(); it != m_paPolicyBranchClassEntries.end(); ++it)
+	{
+		SAFE_DELETE(*it);
+	}
+
+	m_paPolicyBranchClassEntries.clear();
+}
+
+/// Get a specific entry
+CvPolicyBranchClassEntry* CvPolicyXMLEntries::GetPolicyBranchClassEntry(int index)
+{
+	return m_paPolicyBranchClassEntries[index];
+}
+// END AdvancementScreen
 
 //=====================================
 // CvPlayerPolicies
@@ -3035,6 +3142,33 @@ bool CvPlayerPolicies::CanUnlockPolicyBranch(PolicyBranchTypes eBranchType)
 				return false;
 			}
 		}
+
+		// AdvancementScreen - v1.0, Snarko
+		if (pkBranchEntry->GetPolicyBranchClass() != NO_POLICY_BRANCH_CLASS_TYPE)
+		{
+			CvPolicyBranchClassEntry* pkBranchClassEntry = m_pPolicies->GetPolicyBranchClassEntry(pkBranchEntry->GetPolicyBranchClass());
+			int iMax = pkBranchClassEntry->GetMaxBranches();
+			if (iMax == 0) //Classes that are granted to the player in other ways.
+			{
+				return false;
+			}
+			else if (iMax > 0)
+			{
+				int iAdopted = 0;
+				CvPolicyBranchEntry* pkBranchTestEntry;
+				for (int i = 0; i < GC.getNumPolicyBranchInfos(); i++)
+				{
+					pkBranchTestEntry = m_pPolicies->GetPolicyBranchEntry(i);
+					if (pkBranchTestEntry->GetPolicyBranchClass() == pkBranchEntry->GetPolicyBranchClass() && IsPolicyBranchUnlocked((PolicyBranchTypes)i))
+					{
+						iAdopted++;	
+						if (iAdopted >= iMax)
+							return false;
+					}
+				}
+			}
+		}
+		// END AdvancementScreen
 	}
 
 	ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();

@@ -420,6 +420,11 @@ public:
 	bool IsDelayWhenNoCulture() const;
 	bool IsDelayWhenNoCityStates() const;
 	bool IsDelayWhenNoScience() const;
+	// AdvancementScreen - v1.0, Snarko
+	PolicyBranchClassTypes GetPolicyBranchClass() const;
+	bool IsVictoryType(int iVictory) const;
+	CvString GetPolicyBranchIcon() const;
+	// END AdvancementScreen
 
 	// Accessor Functions (Arrays)
 	int GetPolicyBranchDisables(int i) const;
@@ -438,9 +443,40 @@ private:
 	bool m_bDelayWhenNoCityStates;
 	bool m_bDelayWhenNoScience;
 
+	// AdvancementScreen - v1.0, Snarko
+	PolicyBranchClassTypes m_ePolicyBranchClass;
+	int* m_pbVictoryTypes;
+	CvString m_strPolicyBranchIcon;
+	// END AdvancementScreen
+
 	// Arrays
 	int* m_piPolicyBranchDisables;
 };
+
+// AdvancementScreen - v1.0, Snarko
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//  CLASS:      CvPolicyBranchClassEntry
+//!  \brief		A class that encompasses Policybranches
+//
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+class CvPolicyBranchClassEntry: public CvBaseInfo
+{
+public:
+	CvPolicyBranchClassEntry(void);
+	~CvPolicyBranchClassEntry(void);
+
+	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
+
+	int GetMaxBranches();
+	std::string GetStyle();
+
+private:
+
+	int m_iMaxBranches;
+	std::string m_szStyle;
+
+};
+// END AdvancementScreen
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //  CLASS:      CvPolicyXMLEntries
@@ -473,9 +509,22 @@ public:
 
 	void DeletePolicyBranchesArray();
 
+	// AdvancementScreen - v1.0, Snarko
+	// Policy BranchClass functions
+	std::vector<CvPolicyBranchClassEntry*>& GetPolicyBranchClassEntries();
+	int GetNumPolicyBranchClasses();
+	_Ret_maybenull_ CvPolicyBranchClassEntry* GetPolicyBranchClassEntry(int index);
+
+	void DeletePolicyBranchClassesArray();
+	// END AdvancementScreen
+
 private:
 	std::vector<CvPolicyEntry*> m_paPolicyEntries;
 	std::vector<CvPolicyBranchEntry*> m_paPolicyBranchEntries;
+	// AdvancementScreen - v1.0, Snarko
+	// Policy BranchClass functions
+	std::vector<CvPolicyBranchClassEntry*> m_paPolicyBranchClassEntries;
+	// END AdvancementScreen
 };
 
 enum PolicyModifierType

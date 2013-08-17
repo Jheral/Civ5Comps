@@ -14,8 +14,10 @@
 // Use the Visual Studio Create GUID option in the Tools menu to create a new GUID.
 // {C3B2B6B3-439C-480b-8536-1CF39FCFC682}
 // {83F34FF0-3D60-43e7-AEDB-82C79867EE3F}
+// {6CE2AA2B-D325-4b62-8A27-75F776B3EAAE}
 static const GUID CIV5_XP2_DLL_GUID = 
-{ 0x83f34ff0, 0x3d60, 0x43e7, { 0xae, 0xdb, 0x82, 0xc7, 0x98, 0x67, 0xee, 0x3f } };
+{ 0x6ce2aa2b, 0xd325, 0x4b62, { 0x8a, 0x27, 0x75, 0xf7, 0x76, 0xb3, 0xea, 0xae } };
+
 
 static const char* CIV5_XP2_DLL_VERSION = "1.0.0";
 //------------------------------------------------------------------------------

@@ -2781,6 +2781,212 @@ void CvPlayerCulture::AddTourismAllKnownCivs(int iTourism)
 /// Once per turn calculation of public opinion data
 void CvPlayerCulture::DoPublicOpinion()
 {
+	// AdvancementScreen - v1.0, Snarko
+	m_eOpinion = NO_PUBLIC_OPINION;
+	m_ePreferredIdeology = NO_POLICY_BRANCH_TYPE;
+	m_iOpinionUnhappiness = 0;
+	m_strOpinionTooltip = "";
+	m_strOpinionUnhappinessTooltip = "";
+	m_eOpinionBiggestInfluence = NO_PLAYER;
+
+	PolicyBranchTypes eCurrentIdeology = m_pPlayer->GetPlayerPolicies()->GetLateGamePolicyTree();
+	// No point in checking if we haven't adopted an ideology yet.
+	if (eCurrentIdeology == NO_POLICY_BRANCH_TYPE)
+		return;
+
+	Localization::String locOverview = Localization::Lookup("TXT_KEY_CO_OPINION_TT_OVERVIEW");
+	m_strOpinionTooltip += locOverview.toUTF8();
+
+	CvString strWorldIdeologyPressureString = "";
+	CvString strIdeologyPressureString = "";
+
+	std::map<int,int> aiiIdeologies; //Ideology, pressure.
+	std::map<int,int>::iterator itIdeology;
+	for (int i = 0; i < GC.getNumPolicyBranchInfos(); i++)
+	{
+		if (GC.getPolicyBranchInfo((PolicyBranchTypes) i)->IsPurchaseByLevel())
+			aiiIdeologies[i] = 0;
+	}
+
+	// No point in checking if there's no ideologies or only one.
+	if (aiiIdeologies.size() <= 1)
+		return;
+
+	CvPolicyBranchEntry* entry;
+	int iPressure;
+	int iPressureTotal = 0;
+	for (itIdeology = aiiIdeologies.begin() ; itIdeology != aiiIdeologies.end(); ++itIdeology)
+	{
+		strIdeologyPressureString = "";
+		PolicyBranchTypes ePolicyBranch = (PolicyBranchTypes)itIdeology->first;
+		entry = m_pPlayer->GetPlayerPolicies()->GetPolicies()->GetPolicyBranchEntry((int)ePolicyBranch);
+		iPressure = GC.getGame().GetGameLeagues()->GetPressureForIdeology(m_pPlayer->GetID(), ePolicyBranch);
+		if (iPressure > 0)
+		{
+			Localization::String sTemp = "[NEWLINE][COLOR_POSITIVE_TEXT]";
+			sTemp << Localization::Lookup(entry->GetDescription());
+			sTemp << "[ENDCOLOR][NEWLINE]";
+			CvString sIcons = "";
+			for (int i = 0; i < iPressure; i++)
+			{
+				sIcons += entry->GetPolicyBranchIcon();
+			}
+			sTemp << sIcons;
+			strWorldIdeologyPressureString += sTemp.toUTF8();
+		}
+
+		// Look at each civ
+		for (int iLoopPlayer = 0; iLoopPlayer < MAX_MAJOR_CIVS; iLoopPlayer++)
+		{
+			CvPlayer &kPlayer = GET_PLAYER((PlayerTypes)iLoopPlayer);
+			if (iLoopPlayer != m_pPlayer->GetID() && kPlayer.isAlive() && !kPlayer.isMinorCiv())
+			{
+				PolicyBranchTypes eOtherCivIdeology = kPlayer.GetPlayerPolicies()->GetLateGamePolicyTree();
+				if (eOtherCivIdeology != NO_POLICY_BRANCH_TYPE)
+				{
+					int iCulturalDominanceOverUs = kPlayer.GetCulture()->GetInfluenceLevel(m_pPlayer->GetID()) - m_pPlayer->GetCulture()->GetInfluenceLevel((PlayerTypes)iLoopPlayer);
+					if (iCulturalDominanceOverUs > 0)
+					{
+						if (eOtherCivIdeology == ePolicyBranch)
+						{
+							iPressure += iCulturalDominanceOverUs;
+							if (strIdeologyPressureString.size() > 0)
+							{
+								strIdeologyPressureString += ", ";
+							}
+							strIdeologyPressureString += kPlayer.getCivilizationShortDescription();
+							for (int iI = 0; iI < iCulturalDominanceOverUs; iI++)
+							{
+								strIdeologyPressureString += entry->GetPolicyBranchIcon();
+							}
+						}
+					}
+				}
+			}
+		}
+		itIdeology->second = iPressure;
+		iPressureTotal += iPressure;
+	}
+
+	// Now compute satisfaction with this branch compared to the rest
+	int iDissatisfaction = 0;
+
+	FAssertMsg(aiiIdeologies.find((int)eCurrentIdeology) != aiiIdeologies.end(), "CvPlayerCulture::DoPublicOpinion, eCurrentIdeology does not appear to be a valid ideology");
+	int iOwnPressure = aiiIdeologies.find((int)eCurrentIdeology)->second;
+	if (iOwnPressure >= iPressureTotal - iOwnPressure)
+	{
+		m_eOpinion = PUBLIC_OPINION_CONTENT;
+	}
+	else
+	{
+		int iMax = 0;
+		PolicyBranchTypes ePreferedBranch = NO_POLICY_BRANCH_TYPE;
+		for (itIdeology = aiiIdeologies.begin() ; itIdeology != aiiIdeologies.end(); ++itIdeology)
+		{
+			if (itIdeology->second >= iMax)
+			{
+				ePreferedBranch = (PolicyBranchTypes)itIdeology->first;
+				iMax = itIdeology->second;
+			}
+		}
+		if (ePreferedBranch != NO_POLICY_BRANCH_TYPE)
+		{
+			m_ePreferredIdeology = ePreferedBranch;
+		}
+		iDissatisfaction = iPressureTotal - iOwnPressure;
+	}
+
+	// Compute effects of dissatisfaction
+	int iPerCityUnhappy = 1;
+	int iUnhappyPerXPop = 10;
+	if (m_eOpinion != PUBLIC_OPINION_CONTENT)
+	{
+		if (iDissatisfaction < 3)
+		{
+			m_eOpinion = PUBLIC_OPINION_DISSIDENTS;
+		}
+		else if (iDissatisfaction < 5)
+		{
+			m_eOpinion = PUBLIC_OPINION_CIVIL_RESISTANCE;
+		}
+		else
+		{
+			m_eOpinion = PUBLIC_OPINION_REVOLUTIONARY_WAVE;
+		}
+
+		m_iOpinionUnhappiness = ComputePublicOpinionUnhappiness(iDissatisfaction, iPerCityUnhappy, iUnhappyPerXPop);
+
+		// Find civ exerting greatest pressure
+		int iGreatestDominance = -1;
+		for (int iLoopPlayer = 0; iLoopPlayer < MAX_MAJOR_CIVS; iLoopPlayer++)
+		{
+			CvPlayer &kPlayer = GET_PLAYER((PlayerTypes)iLoopPlayer);
+			if (iLoopPlayer != m_pPlayer->GetID() && kPlayer.isAlive() && !kPlayer.isMinorCiv())
+			{
+				PolicyBranchTypes eOtherCivIdeology = kPlayer.GetPlayerPolicies()->GetLateGamePolicyTree();
+				if (eOtherCivIdeology == m_ePreferredIdeology)
+				{
+					int iCulturalDominanceOverUs = kPlayer.GetCulture()->GetInfluenceLevel(m_pPlayer->GetID()) - m_pPlayer->GetCulture()->GetInfluenceLevel((PlayerTypes)iLoopPlayer);
+					if (iCulturalDominanceOverUs > 0)
+					{
+						if (iCulturalDominanceOverUs > iGreatestDominance)
+						{
+							iGreatestDominance = iCulturalDominanceOverUs;
+							m_eOpinionBiggestInfluence = (PlayerTypes)iLoopPlayer;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	if (strWorldIdeologyPressureString.size() != 0)
+	{
+		Localization::String locText = Localization::Lookup("TXT_KEY_CO_OPINION_TT_INFLUENCED_WORLD_IDEOLOGY");
+		m_strOpinionTooltip += locText.toUTF8();
+		m_strOpinionTooltip += strWorldIdeologyPressureString;
+		m_strOpinionTooltip += "[NEWLINE][NEWLINE]";
+	}
+
+	if (strIdeologyPressureString.size() == 0)
+	{
+		Localization::String locText = Localization::Lookup("TXT_KEY_CO_OPINION_TT_NOT_INFLUENCED");
+		m_strOpinionTooltip += locText.toUTF8();
+	}
+	else
+	{
+		Localization::String locText = Localization::Lookup("TXT_KEY_CO_OPINION_TT_INFLUENCED_BY");
+		m_strOpinionTooltip += locText.toUTF8();
+		m_strOpinionTooltip += strIdeologyPressureString;
+	}
+
+	if (m_ePreferredIdeology != NO_POLICY_BRANCH_TYPE)
+	{
+		Localization::String locText = Localization::Lookup("TXT_KEY_CO_OPINION_TT_PREFERRED_IDEOLOGY");
+		locText << GC.getPolicyBranchInfo(m_ePreferredIdeology)->GetDescription();
+		m_strOpinionTooltip += locText.toUTF8();
+	}
+ 
+	if (m_iOpinionUnhappiness > 0)
+	{
+		Localization::String locText;
+		locText = Localization::Lookup("TXT_KEY_CO_OPINION_TT_UNHAPPINESS_LINE1");
+		locText << m_iOpinionUnhappiness;
+		m_strOpinionUnhappinessTooltip += locText.toUTF8();
+
+		locText = Localization::Lookup("TXT_KEY_CO_OPINION_TT_UNHAPPINESS_LINE2");
+		m_strOpinionUnhappinessTooltip += locText.toUTF8();
+
+		locText = Localization::Lookup("TXT_KEY_CO_OPINION_TT_UNHAPPINESS_LINE3");
+		locText << iPerCityUnhappy;
+		m_strOpinionUnhappinessTooltip += locText.toUTF8();
+
+		locText = Localization::Lookup("TXT_KEY_CO_OPINION_TT_UNHAPPINESS_LINE4");
+		locText << iUnhappyPerXPop;
+		m_strOpinionUnhappinessTooltip += locText.toUTF8();
+	}
+	// END AdvancementScreen
+	/* Original code
 	m_eOpinion = NO_PUBLIC_OPINION;
 	m_ePreferredIdeology = NO_POLICY_BRANCH_TYPE;
 	m_iOpinionUnhappiness = 0;
@@ -3077,11 +3283,80 @@ void CvPlayerCulture::DoPublicOpinion()
 			m_strOpinionUnhappinessTooltip += locText.toUTF8();
 		}
 	}
+	*/
 }
 
 /// What would the unhappiness be if we chose this Ideology?
 int CvPlayerCulture::ComputeHypotheticalPublicOpinionUnhappiness(PolicyBranchTypes eBranch)
 {
+	// AdvancementScreen - v1.0, Snarko
+	int iDissatisfaction = 0;
+
+	std::map<PolicyBranchTypes,int> aiiIdeologies;
+	for (int i = 0; i < GC.getNumPolicyBranchInfos(); i++)
+	{
+		if (GC.getPolicyBranchInfo((PolicyBranchTypes) i)->IsPurchaseByLevel())
+			aiiIdeologies[(PolicyBranchTypes)i] = GC.getGame().GetGameLeagues()->GetPressureForIdeology(m_pPlayer->GetID(), eBranch);;
+	}
+
+	CvAssertMsg(aiiIdeologies.find(eBranch) == aiiIdeologies.end(), "ComputeHypotheticalPublicOpinionUnhappiness, eBranch does not appear to be an ideology");
+
+	// Look at each civ
+	for (int iLoopPlayer = 0; iLoopPlayer < MAX_MAJOR_CIVS; iLoopPlayer++)
+	{
+		CvPlayer &kPlayer = GET_PLAYER((PlayerTypes)iLoopPlayer);
+		if (iLoopPlayer != m_pPlayer->GetID() && kPlayer.isAlive() && !kPlayer.isMinorCiv())
+		{
+			PolicyBranchTypes eOtherCivIdeology = kPlayer.GetPlayerPolicies()->GetLateGamePolicyTree();
+			if (eOtherCivIdeology != NO_POLICY_BRANCH_TYPE)
+			{
+				int iCulturalDominanceOverUs = kPlayer.GetCulture()->GetInfluenceLevel(m_pPlayer->GetID()) - m_pPlayer->GetCulture()->GetInfluenceLevel((PlayerTypes)iLoopPlayer);
+				if (iCulturalDominanceOverUs > 0)
+				{
+					aiiIdeologies[eOtherCivIdeology] += iCulturalDominanceOverUs;
+				}
+			}
+		}
+	}
+
+	int iPressureMax = 0;
+	PolicyBranchTypes eIdeologyMax = NO_POLICY_BRANCH_TYPE;
+	for (std::map<PolicyBranchTypes,int>::iterator it = aiiIdeologies.begin() ; it != aiiIdeologies.end(); ++it)
+	{
+		if (it->first != eBranch)
+		{
+			iDissatisfaction += it->second;
+		}
+		else
+		{
+			iDissatisfaction -= it->second;
+		}
+
+		if (it->second > iPressureMax)
+		{
+			eIdeologyMax = it->first;
+			iPressureMax = it->second;
+		}
+	}
+	if (eIdeologyMax != NO_POLICY_BRANCH_TYPE)
+	{
+		m_ePreferredIdeology = eIdeologyMax;
+	}
+
+	int iPerCityUnhappy = 1;
+	int iUnhappyPerXPop = 10;
+
+	if (iDissatisfaction == 0)
+	{
+		return 0;
+	}
+	else
+	{
+		return ComputePublicOpinionUnhappiness(iDissatisfaction, iPerCityUnhappy, iUnhappyPerXPop);
+	}
+	// END AdvancementScreen
+	/*Original code
+
 	int iDissatisfaction = 0;
 
 	PolicyBranchTypes eFreedomBranch = (PolicyBranchTypes)GC.getPOLICY_BRANCH_FREEDOM();
@@ -3184,6 +3459,7 @@ int CvPlayerCulture::ComputeHypotheticalPublicOpinionUnhappiness(PolicyBranchTyp
 	{
 		return ComputePublicOpinionUnhappiness(iDissatisfaction, iPerCityUnhappy, iUnhappyPerXPop);
 	}
+	*/
 }
 
 bool CvPlayerCulture::WantsDiplomatDoingPropaganda(PlayerTypes eTargetPlayer)

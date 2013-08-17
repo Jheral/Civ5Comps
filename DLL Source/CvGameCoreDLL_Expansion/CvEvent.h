@@ -33,11 +33,11 @@ public:
 
 	//These functions are for lua. We need to be certain we are checking the right options.
 	int getNumOptions() const;
-	int getOptionInfoType(int iOption) const;
+	int getOption(int iOption) const;
 
 	void trigger();
 	void processEventOption(int iOption);
-	void processEventAction(CvEventAction& kAction);
+	void processEventAction(EventActionTypes eAction, EventOptionTypes eOption);
 
 private:
 	CvPlayer* m_pPlayer;
@@ -45,7 +45,7 @@ private:
 	CvUnit* m_pUnit;
 	EventTypes m_eEventType;
 	std::map<std::string, std::vector<int> > m_asziScopes;
-	int m_iID; //Required/used by FFreeListTrashArray
+	int m_iID;
 };
 
 FDataStream& operator<<(FDataStream&, const CvEvent&);
@@ -62,16 +62,28 @@ FDataStream& operator>>(FDataStream&, CvEvent&);
 class CvEventEffects
 {
 public:
-	EventActionTypes getAction();
-	void setAction(EventActionTypes eAction);
-	int getValue();
+	CvEventEffects();
+	virtual ~CvEventEffects();
+
+	void init(EventTypes eEvent, EventOptionTypes eOption, EventActionTypeTypes eEventAction = NO_EVENTACTION, int iNumTurns = 1, int iType = -1, int iValue = 0);
+	EventTypes getEventType() const;
+	EventOptionTypes getOption() const;
+	EventActionTypeTypes getAction() const;
+	void setAction(EventActionTypeTypes eAction);
+	void setType(int iType);
+	int getType() const;
+	int getValue() const;
 	void setValue(int iNewValue);
-	int getNumTurns();
+	int getNumTurns() const;
 	void setNumTurns(int iNewValue);
 	void changeNumTurns(int iChange);
 
 private:
-	EventActionTypes m_eEventAction;
+
+	EventActionTypeTypes m_eEventAction;
+	EventTypes m_eEventType;
+	EventOptionTypes m_eOption;
+	int m_iType;
 	int m_iValue;
 	int m_iNumTurns;
 };

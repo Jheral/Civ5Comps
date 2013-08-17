@@ -2094,6 +2094,17 @@ int CvPlayerTrade::GetTradeConnectionPolicyValueTimes100(const TradeConnection& 
 		}
 
 		// policy tree bonuses
+		// AdvancementScreen - v1.0, Snarko
+		// Seriously, why write it like it was? I don't agree with hardcoding in the first place but here it was just stupid.
+		PolicyBranchTypes eOwnerPlayerIdeology = GET_PLAYER(kTradeConnection.m_eOriginOwner).GetPlayerPolicies()->GetLateGamePolicyTree();
+		PolicyBranchTypes eDestPlayerPolicies = GET_PLAYER(kTradeConnection.m_eDestOwner).GetPlayerPolicies()->GetLateGamePolicyTree();
+
+		if (eOwnerPlayerIdeology != NO_POLICY_BRANCH_TYPE && eOwnerPlayerIdeology == eDestPlayerPolicies)
+		{
+			iValue += GET_PLAYER(kTradeConnection.m_eOriginOwner).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_SHARED_IDEOLOGY_TRADE_CHANGE) * 100;
+		}
+		// END AdvancementScreen
+		/* Original code
 		CvPlayerPolicies* pOwnerPlayerPolicies = GET_PLAYER(kTradeConnection.m_eOriginOwner).GetPlayerPolicies();
 		CvPlayerPolicies* pDestPlayerPolicies = GET_PLAYER(kTradeConnection.m_eDestOwner).GetPlayerPolicies();
 
@@ -2121,6 +2132,7 @@ int CvPlayerTrade::GetTradeConnectionPolicyValueTimes100(const TradeConnection& 
 		{
 			iValue += GET_PLAYER(kTradeConnection.m_eOriginOwner).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_SHARED_IDEOLOGY_TRADE_CHANGE) * 100;
 		}
+		*/
 
 		// city state bonus
 		if (GET_PLAYER(kTradeConnection.m_eDestOwner).isMinorCiv())
@@ -3118,10 +3130,20 @@ int CvPlayerTrade::GetTradeRouteRange (DomainTypes eDomain, CvCity* pOriginCity)
 	switch (eDomain)
 	{
 	case DOMAIN_SEA:
+		// Softcoding - v0.1, Snarko
+		/* Original code
 		iBaseRange = 20;
+		*/
+		iBaseRange = GC.getDefineINT("BASE_TRADE_RANGE_SEA");
+		// END Softcoding
 		break;
 	case DOMAIN_LAND:
+		// Softcoding - v0.1, Snarko
+		/* Original code
 		iBaseRange = 10;
+		*/
+		iBaseRange = GC.getDefineINT("BASE_TRADE_RANGE_LAND");
+		// END Softcoding
 		break;
 	default:
 		CvAssertMsg(false, "Undefined domain for trade route range");

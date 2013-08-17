@@ -7414,8 +7414,16 @@ int CvCity::GetJONSCultureThreshold() const
 		}
 	}
 
+	// Bugfix - 1.0, Snarko
+	// Fix by ls612
+	int iLocalModifier = getPlotCultureCostModifier(); 
+
+    // -50 = 50% cost 
+    int iModifier = GET_PLAYER(getOwner()).GetPlotCultureCostModifier() + m_iPlotCultureCostModifier + iReligionMod + iLocalModifier; 
+	/* Original code
 	// -50 = 50% cost
 	int iModifier = GET_PLAYER(getOwner()).GetPlotCultureCostModifier() + m_iPlotCultureCostModifier + iReligionMod;
+	*/
 	if(iModifier != 0)
 	{
 		iModifier = max(iModifier, /*-85*/ GC.getCULTURE_PLOT_COST_MOD_MINIMUM());	// value cannot reduced by more than 85%
@@ -9171,6 +9179,13 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	iModifier += iTempMod;
 	if(toolTipSink)
 		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_PLAYER", iTempMod);
+
+	// EventEngine - v0.1, Snarko
+	iTempMod = GET_PLAYER(getOwner()).getYieldModifierFromEvents(eIndex);
+	iModifier += iTempMod;
+	if(toolTipSink)
+		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_PLAYER_EVENT", iTempMod);
+	// END EventEngine
 
 	// Player Capital Yield Rate Modifier
 	if(isCapital())
@@ -15026,3 +15041,214 @@ bool CvCity::isFighting() const
 {
 	return getCombatUnit() != NULL;
 }
+
+//	----------------------------------------------------------------------------
+// EventEngine - v0.1, Snarko
+void CvCity::doEvents()
+{
+	bool bValid;
+	CvPlayer &pPlayer = GET_PLAYER(getOwner());
+	std::map<std::string, std::vector<int> > asziScopes;
+
+	for (int i = 0; i < GC.getNumEventInfos(); i++)
+	{
+		asziScopes.clear();
+		bValid = true;
+		CvEventInfo* kEvent = GC.getEventInfo((EventTypes)i);
+		if (kEvent->getEventType() != EVENT_CITY)
+			continue;
+		
+		for (int j = 0; j < kEvent->getNumRequirements(); j++)
+		{
+			CvEventModifierInfo kRequirement = *GC.getEventRequirementInfo(kEvent->getRequirement(j));
+			if (kRequirement.getModifierType() > EVENTMOD_CITY_START && kRequirement.getModifierType() < EVENTMOD_CITY_END)
+			{
+				if (!checkEventModifier(kRequirement))
+				{
+					bValid = false;
+					break;
+				}
+			}
+			else if (kRequirement.getModifierType() > EVENTMOD_PLAYER_START && kRequirement.getModifierType() < EVENTMOD_PLAYER_END)
+			{
+				if (!pPlayer.checkEventModifier(kRequirement, asziScopes))
+				{
+					bValid = false;
+					break;
+				}
+			}
+			else //This is neither a city requirement, nor a player requirement, so we can't possibly pass it.
+			{
+				bValid = false;
+				break;
+			}
+		}
+		if (bValid)
+		{
+			pPlayer.doEventChance(*kEvent, asziScopes, this);
+		}
+	}
+}
+
+bool CvCity::checkEventModifier(CvEventModifierInfo& kModifier)
+{
+	int iValue = 0;
+	CvCityEspionage* pCityEspionage = GetCityEspionage();
+
+	switch(kModifier.getModifierType())
+	{
+	case EVENTMOD_CITY_HAPPINESS:
+		iValue = GetLocalHappiness();
+		break;
+
+	case EVENTMOD_CITY_STRENGTH:
+		iValue = getStrengthValue();
+		break;
+
+	case EVENTMOD_CITY_YIELD:
+		iValue = getBaseYieldRate((YieldTypes)kModifier.getTypeToCompare());
+		break;
+
+	case EVENTMOD_CITY_MODIFIEDYIELD:
+		iValue = getYieldRate((YieldTypes)kModifier.getTypeToCompare(), false);
+		break;
+
+	case EVENTMOD_CITY_CULTURE_LEVEL:
+		iValue = GetJONSCultureLevel();
+		break;
+
+	case EVENTMOD_CITY_POPULATION:
+		iValue = getPopulation();
+		break;
+
+	case EVENTMOD_CITY_SPY_PRESENT:
+		if(pCityEspionage)
+		{
+			//Looking for a specific civ (including ourselves!)
+			if (kModifier.getTypeToCompare() != -1)
+			{
+				for(int i = 0; i < MAX_MAJOR_CIVS; i++)
+				{
+					if (GET_PLAYER((PlayerTypes)i).isAlive())
+					{
+						if (GET_PLAYER((PlayerTypes)i).getCivilizationType() == (CivilizationTypes)kModifier.getTypeToCompare())
+						{
+							bool bAssignedSpy = (pCityEspionage->m_aiSpyAssignment[i] != -1);
+							return GC.EventBoolEval(bAssignedSpy, kModifier);
+						}
+					}
+				}
+			}
+			else //Any civ that isn't us.
+			{
+				for(int i = 0; i < MAX_MAJOR_CIVS; i++)
+				{
+					if (GET_PLAYER((PlayerTypes)i).isAlive() && GET_PLAYER((PlayerTypes)i).GetID() != GetID())
+					{
+						bool bAssignedSpy = (pCityEspionage->m_aiSpyAssignment[i] != -1);
+						return GC.EventBoolEval(bAssignedSpy, kModifier);
+					}
+				}
+			}
+			//TODO: self civ
+		}
+		else //No spies in city, return true if we are testing for no spy in city.
+		{
+			return (kModifier.getCompareType() == COMPARE_NOTEQUAL);
+		}
+		break;
+
+	case EVENTMOD_CITY_IS_CAPITAL:
+		return GC.EventBoolEval(isCapital(), kModifier);
+		break;
+
+	case EVENTMOD_CITY_PUPPET:
+		return GC.EventBoolEval(IsPuppet(), kModifier);
+		break;
+
+	case EVENTMOD_CITY_SPECIALIST:
+		iValue = GetCityCitizens()->GetSpecialistCount((SpecialistTypes)kModifier.getTypeToCompare());
+		break;
+
+	case EVENTMOD_CITY_BUILDING:
+		iValue = GetCityBuildings()->GetNumBuilding((BuildingTypes)kModifier.getTypeToCompare());
+		break;
+
+	case EVENTMOD_CITY_NATIONAL_WONDERS:
+		iValue = getNumNationalWonders();
+		break;
+
+	case EVENTMOD_CITY_TEAM_WONDERS:
+		iValue = getNumTeamWonders();
+		break;
+
+	case EVENTMOD_CITY_WORLD_WONDERS:
+		iValue = getNumWorldWonders();
+		break;
+
+	case EVENTMOD_CITY_WORKING_RESOURCE:
+	{
+		// Loop through all plots near this City to see if we can find eResource - tests are ordered to optimize performance
+		CvPlot* pLoopPlot;
+		ResourceTypes eResource = (ResourceTypes)kModifier.getTypeToCompare();
+		bool bFoundResource = false;
+		for(int iCityPlotLoop = 0; iCityPlotLoop < NUM_CITY_PLOTS; iCityPlotLoop++)
+		{
+			pLoopPlot = plotCity(getX(), getY(), iCityPlotLoop);
+
+			// Invalid plot
+			if(pLoopPlot == NULL)
+				continue;
+
+			// Doesn't have the resource (ignore team first to save time)
+			if(pLoopPlot->getResourceType() != eResource)
+				continue;
+
+			// Not owned by this player
+			if(pLoopPlot->getOwner() != getOwner())
+				continue;
+
+			// Team can't see the resource here
+			if(pLoopPlot->getResourceType(getTeam()) != eResource)
+				continue;
+
+			// Resource not linked to this city
+			if(pLoopPlot->GetResourceLinkedCity() != this)
+				continue;
+
+			//Resource not worked
+			if(!GetCityCitizens()->IsWorkingPlot(pLoopPlot))
+				continue;
+
+			bFoundResource = true;
+			break;
+		}
+		return GC.EventBoolEval(bFoundResource, kModifier);
+	}
+	case EVENTMOD_CITY_HAS_RESOURCE:
+		return GC.EventBoolEval(IsHasResourceLocal((ResourceTypes)kModifier.getTypeToCompare(), true), kModifier);
+
+	case EVENTMOD_CITY_HAS_RELIGION:
+		if ((ReligionTypes)kModifier.getTypeToCompare() == NO_RELIGION)
+		{
+			return GC.EventBoolEval(GetCityReligions()->IsReligionInCity(), kModifier);
+		}
+		else
+		{
+			return GC.EventBoolEval(GetCityReligions()->GetNumFollowers((ReligionTypes)kModifier.getTypeToCompare()), kModifier);
+		}
+		
+	case EVENTMOD_CITY_FOLLOWERS_RELIGION:
+		if ((ReligionTypes)kModifier.getTypeToCompare() == NO_RELIGION)
+		{
+			iValue = GC.EventBoolEval(GetCityReligions()->IsReligionInCity(), kModifier);
+		}
+		else
+		{
+			iValue = GC.EventBoolEval(GetCityReligions()->GetNumFollowers((ReligionTypes)kModifier.getTypeToCompare()), kModifier);
+		}
+	}
+
+	return true;
+}
+// END EventEngine

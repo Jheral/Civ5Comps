@@ -6794,3 +6794,403 @@ bool CvVoteSourceInfo::CacheResults(Database::Results& kResults, CvDatabaseUtili
 
 	return true;
 }
+
+// EventEngine - v0.1, Snarko
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//  class : CvEventInfo
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+CvEventInfo::CvEventInfo() : 
+	m_iMeanTimeToHappen(0),
+	m_eEventType(NO_EVENTTYPE),
+	m_aeEventRequirements(NULL),
+	m_aeEventModifiers(NULL),
+	m_aeEventOptions(NULL)
+{
+}
+
+bool CvEventInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
+{
+	gDLL->netMessageDebugLog("Loading from XML 0 \n");
+	if(!CvBaseInfo::CacheResults(kResults, kUtility))
+		return false;
+
+	std::string str(GetType());
+	gDLL->netMessageDebugLog("Loading from XML Type " + str + "\n");
+	m_iMeanTimeToHappen = kResults.GetInt("MeanTimeToHappen");
+	gDLL->netMessageDebugLog("Loading from XML MTTH " + FSerialization::toString(m_iMeanTimeToHappen) + "\n");
+	m_eEventType = GC.getEventTypeType(kResults.GetText("EventType"));
+	gDLL->netMessageDebugLog("Loading from XML EventType " + FSerialization::toString((int)m_eEventType) + "\n");
+	m_szImage = kResults.GetText("Image");
+
+	//Requirements
+	{
+		m_aeEventRequirements.clear();
+
+		std::string strKey = "Event_Requirements";
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		gDLL->netMessageDebugLog("Loading from XML Requirements 1 \n");
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Requirements where EventType = ? order by ID_Scope");
+		}
+		if(pResults != NULL)
+		{
+			pResults->Bind(1, GetType(), -1, false);
+
+			while(pResults->Step())
+			{
+				gDLL->netMessageDebugLog("Loading from XML Requirements 2 \n");
+				m_aeEventRequirements.push_back((EventRequirementTypes)pResults->GetInt(0));
+				/*
+				CvEventModifierInfo pNewEvent;
+				pNewEvent.CacheResults(*pResults, kUtility);
+				m_pEventRequirements.push_back(pNewEvent);
+				*/
+				gDLL->netMessageDebugLog("Loading from XML Requirements 3 \n");
+			}
+
+			pResults->Reset();
+		}
+		gDLL->netMessageDebugLog("Loading from XML Requirements 4 \n");
+	}
+
+	//Modifiers
+	{
+		m_aeEventModifiers.clear();
+
+		std::string strKey = "Event_Modifiers";
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		gDLL->netMessageDebugLog("Loading from XML Modifiers 1 \n");
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Modifiers where EventType = ? order by ID_Scope");
+		}
+		if(pResults != NULL)
+		{
+			pResults->Bind(1, GetType(), -1, false);
+
+			while(pResults->Step())
+			{
+				gDLL->netMessageDebugLog("Loading from XML Modifiers 2 \n");
+				m_aeEventModifiers.push_back((EventModifierTypes)pResults->GetInt(0));
+				/*
+				CvEventModifierInfo pNewEvent;
+				pNewEvent.CacheResults(*pResults, kUtility);
+				m_pEventModifiers.push_back(pNewEvent);
+				*/
+				gDLL->netMessageDebugLog("Loading from XML Modifiers 3 \n");
+			}
+
+			pResults->Reset();
+		}
+		gDLL->netMessageDebugLog("Loading from XML Modifiers 4 \n");
+	}
+
+	//Actions
+	{
+		m_aeEventOptions.clear();
+
+		std::string strKey = "Event_Options";
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		gDLL->netMessageDebugLog("Loading from XML Options 1 \n");
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Options where EventType = ? order by ID_Scope");
+		}
+		if(pResults != NULL)
+		{
+			pResults->Bind(1, GetType(), -1, false);
+
+			while(pResults->Step())
+			{
+				gDLL->netMessageDebugLog("Loading from XML Options 2 \n");
+				m_aeEventOptions.push_back((EventOptionTypes)pResults->GetInt(0));
+				/*
+				CvEventOptionInfo pNewEvent;
+				pNewEvent.CacheResults(*pResults, kUtility);
+				m_pEventOptions.push_back(pNewEvent);
+				*/
+				gDLL->netMessageDebugLog("Loading from XML Options 3 \n");
+			}
+
+			pResults->Reset();
+		}
+		gDLL->netMessageDebugLog("Loading from XML Options 4 \n");
+	}
+
+	return true;
+}
+int CvEventInfo::getMTTH()
+{
+	return m_iMeanTimeToHappen;
+}
+
+int CvEventInfo::getNumRequirements()
+{
+	return m_aeEventRequirements.size();
+}
+
+EventRequirementTypes CvEventInfo::getRequirement(int i)
+{
+	CvAssertMsg(i < m_aeEventRequirements.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_aeEventRequirements[i];
+}
+
+int CvEventInfo::getNumModifiers()
+{
+	return m_aeEventModifiers.size();
+}
+
+EventModifierTypes CvEventInfo::getModifier(int i)
+{
+	CvAssertMsg(i < m_aeEventModifiers.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_aeEventModifiers[i];
+}
+
+int CvEventInfo::getNumOptions()
+{
+	return m_aeEventOptions.size();
+}
+
+EventOptionTypes CvEventInfo::getOption(int i)
+{
+	CvAssertMsg(i < m_aeEventOptions.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_aeEventOptions[i];
+}
+
+EventTypeTypes CvEventInfo::getEventType()
+{
+	return m_eEventType;
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//  class : CvEventModifierInfo (also used for requirements)
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+CvEventModifierInfo::CvEventModifierInfo() :
+	m_eModifier(NO_EVENTMOD),
+	m_eCompare(NO_COMPARETYPE),
+	m_iTypeToCompare(-1),
+	m_iNumberToCompare(0),
+	m_iFactor(0)
+{
+}
+
+bool CvEventModifierInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
+{
+	gDLL->netMessageDebugLog("Loading modifier XML 0 \n");
+	if(!CvBaseInfo::CacheResults(kResults, kUtility))
+		return false;
+	gDLL->netMessageDebugLog("Loading modifier XML 1 \n");
+
+	m_eModifier = GC.getEventModifierType(kResults.GetText("EventModifierType"));
+	gDLL->netMessageDebugLog("Loading modifier XML EventModifierType " + FSerialization::toString((int)m_eModifier) + "\n");
+	m_eCompare = GC.getCompareType(kResults.GetText("EventCompareType"));
+	gDLL->netMessageDebugLog("Loading modifier XML CompareType " + FSerialization::toString((int)m_eCompare) + "\n");
+	m_iTypeToCompare = GC.getInfoTypeForString(kResults.GetText("CompareItem"));
+	gDLL->netMessageDebugLog("Loading modifier XML CompareItem " + FSerialization::toString(m_iTypeToCompare) + "\n");
+	m_iNumberToCompare = kResults.GetInt("iNumberToCompare");
+	gDLL->netMessageDebugLog("Loading modifier XML CompareNumber " + FSerialization::toString(m_iNumberToCompare) + "\n");
+	m_iFactor = (int)(kResults.GetFloat("fFactor") * 100); //We divide with 100 later on. The final chance is an int, 1 in X chance, so floats don't really make sense.
+	gDLL->netMessageDebugLog("Loading modifier XML Factor " + FSerialization::toString(m_iFactor) + "\n");
+	m_szScope = kResults.GetText("sScope");
+	gDLL->netMessageDebugLog("Loading modifier XML Scope " + m_szScope + "\n");
+
+	return true;
+}
+
+EventModifierTypeTypes CvEventModifierInfo::getModifierType()
+{
+	return m_eModifier;
+}
+
+CompareTypes CvEventModifierInfo::getCompareType()
+{
+	return m_eCompare;
+}
+
+std::string CvEventModifierInfo::getScope()
+{
+	return m_szScope;
+}
+
+int CvEventModifierInfo::getTypeToCompare()
+{
+	return m_iTypeToCompare;
+}
+
+int CvEventModifierInfo::getNumberToCompare()
+{
+	return m_iNumberToCompare;
+}
+
+int CvEventModifierInfo::getFactor()
+{
+	return m_iFactor;
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//  class : CvEventOptionInfo
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+CvEventOptionInfo::CvEventOptionInfo() :
+	bOverrideTooltip(false),
+	m_aeEventActions(NULL)
+{
+}
+
+bool CvEventOptionInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
+{
+	gDLL->netMessageDebugLog("Loading option 0 \n");
+	if(!CvBaseInfo::CacheResults(kResults, kUtility))
+		return false;
+	gDLL->netMessageDebugLog("Loading option 1 \n");
+
+	bOverrideTooltip = kResults.GetBool("bOverrideTooltip");
+
+	//Actions
+	{
+		gDLL->netMessageDebugLog("Loading option actions 1 \n");
+		m_aeEventActions.clear();
+
+		std::string strKey = "Event_Actions";
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		gDLL->netMessageDebugLog("Loading option actions 2 \n");
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Actions where EventOptionType = ? order by ID_Scope");
+		}
+		if(pResults != NULL)
+		{
+			pResults->Bind(1, GetType(), -1, false);
+
+			while(pResults->Step())
+			{
+				gDLL->netMessageDebugLog("Loading option actions 3 \n");
+				m_aeEventActions.push_back((EventActionTypes)pResults->GetInt(0));
+				/*
+				CvEventActionInfo pNewEvent;
+				pNewEvent.CacheResults(*pResults, kUtility);
+				m_pEventActions.push_back(pNewEvent);
+				*/
+				gDLL->netMessageDebugLog("Loading option actions 4 \n");
+			}
+
+			pResults->Reset();
+			gDLL->netMessageDebugLog("Loading option actions 5 \n");
+		}
+	}
+
+	return true;
+}
+
+int CvEventOptionInfo::getNumActions()
+{
+	return m_aeEventActions.size();
+}
+
+ EventActionTypes CvEventOptionInfo::getAction(int i)
+{
+	CvAssertMsg(i < m_aeEventActions.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_aeEventActions[i];
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//  class : CvEventActionInfo
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+CvEventActionInfo::CvEventActionInfo() :
+	m_eAction(NO_EVENTACTION),
+	m_iTurns(-1),
+	m_iChance(-1),
+	m_iTypeToAction(-1),
+	m_AIWeight(0),
+	m_iValue1(-1),
+	m_iValue2(-1)
+{
+}
+
+bool CvEventActionInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
+{
+	gDLL->netMessageDebugLog("Loading actions 0 \n");
+	if(!CvBaseInfo::CacheResults(kResults, kUtility))
+		return false;
+	gDLL->netMessageDebugLog("Loading actions 1 \n");
+
+	m_eAction = GC.getEventActionType(kResults.GetText("EventActionType"));
+	gDLL->netMessageDebugLog("Loading actions EventActionType " + FSerialization::toString((int)m_eAction) + "\n");
+	//ints
+	m_iTurns = kResults.GetInt("iTurns");
+	gDLL->netMessageDebugLog("Loading actions iTurns " + FSerialization::toString(m_iTurns) + "\n");
+	m_iChance = kResults.GetInt("iChance");
+	gDLL->netMessageDebugLog("Loading actions Chance " + FSerialization::toString(m_iChance) + "\n");
+	m_iTypeToAction = GC.getInfoTypeForString(kResults.GetText("ActionItem"));
+	gDLL->netMessageDebugLog("Loading actions ActionItem " + FSerialization::toString(m_iTypeToAction) + "\n");
+	m_AIWeight = kResults.GetInt("AIWeight");
+	gDLL->netMessageDebugLog("Loading actions AI weight " + FSerialization::toString(m_AIWeight) + "\n");
+	m_iValue1 = kResults.GetInt("iValue");
+	gDLL->netMessageDebugLog("Loading actions iValue1 " + FSerialization::toString(m_iValue1) + "\n");
+	m_iValue2 = kResults.GetInt("iValue2");
+	gDLL->netMessageDebugLog("Loading actions iValue2 " + FSerialization::toString(m_iValue2) + "\n");
+	//bools
+	m_bBool1 = kResults.GetBool("bBool");
+	gDLL->netMessageDebugLog("Loading actions Bool1 " + FSerialization::toString(m_bBool1) + "\n");
+	//strings
+	m_szString1 = kResults.GetText("sString");
+	gDLL->netMessageDebugLog("Loading actions String1 " + m_szString1 + "\n");
+	m_szScope = kResults.GetText("sScope");
+	gDLL->netMessageDebugLog("Loading actions Scope " + m_szScope + "\n");
+
+	return true;
+}
+
+EventActionTypeTypes CvEventActionInfo::getActionType()
+{
+	return m_eAction;
+}
+
+int CvEventActionInfo::getTurns()
+{
+	return m_iTurns;
+}
+
+int CvEventActionInfo::getChance()
+{
+	return m_iChance;
+}
+
+int CvEventActionInfo::getTypeToAction()
+{
+	return m_iTypeToAction;
+}
+
+int CvEventActionInfo::getAIWeight()
+{
+	return m_AIWeight;
+}
+
+int CvEventActionInfo::getValue1()
+{
+	return m_iValue1;
+}
+
+int CvEventActionInfo::getValue2()
+{
+	return m_iValue2;
+}
+
+bool CvEventActionInfo::getBool1()
+{
+	return m_bBool1;
+}
+
+std::string CvEventActionInfo::getString1()
+{
+	return m_szString1;
+}
+
+std::string CvEventActionInfo::getScope()
+{
+	return m_szScope;
+}
+// END EventEngine

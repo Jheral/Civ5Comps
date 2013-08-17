@@ -1021,6 +1021,34 @@ int CvLuaEnums::pRegister(lua_State* L)
 	RegisterEnum(CONTROL_RESTART_GAME);
 	EnumEnd(L);
 
+	// EventEngine - v0.1, Snarko
+	//All of these are stored in XML, to get string<->enum functionality, so we can register them dynamically here.
+	//Also makes it one less place to change when they are updated/changed...
+	// EventTypeTypes
+	EnumStart(L, "EventTypeTypes");
+	RegisterEnum(NO_EVENTTYPE);
+	RegisterDynamicEnums(L, "EventTypeTypes", "ID", "Name", "NUM_EVENTTYPE_TYPES");
+	EnumEnd(L);
+
+	// CompareTypes
+	EnumStart(L, "CompareTypes");
+	RegisterEnum(NO_COMPARETYPE);
+	RegisterDynamicEnums(L, "CompareTypes", "ID", "Name", "NUM_COMPARE_TYPES");
+	EnumEnd(L);
+
+	// EventModifierTypes
+	EnumStart(L, "EventModifierTypeTypes");
+	RegisterEnum(NO_EVENTMOD);
+	RegisterDynamicEnums(L, "EventModifierTypeTypes", "ID", "Name", "NUM_EVENTMOD_TYPES");
+	EnumEnd(L);
+
+	// EventActionTypes
+	EnumStart(L, "EventActionTypeTypes");
+	RegisterEnum(NO_EVENTACTION);
+	RegisterDynamicEnums(L, "EventActionTypeTypes", "ID", "Name", "NUM_EVENTACTION_TYPES");
+	EnumEnd(L);
+	// END EventEngine
+
 	return 0;
 }
 //------------------------------------------------------------------------------

@@ -16,7 +16,6 @@ CvEvent::CvEvent():
 	m_pCity(NULL),
 	m_pUnit(NULL)
 {
-
 }
 
 /// Destructor
@@ -134,9 +133,9 @@ int CvEvent::getNumOptions() const
 {
 	return GC.getEventInfo(m_eEventType)->getNumOptions();
 }
-int CvEvent::getOptionInfoType(int iOption) const
+int CvEvent::getOption(int iOption) const
 {
-	return GC.getEventInfo(m_eEventType)->getOption(iOption).GetID();
+	return GC.getEventInfo(m_eEventType)->getOption(iOption);
 }
 
 void CvEvent::trigger()
@@ -149,7 +148,7 @@ void CvEvent::trigger()
 		if(pNotifications)
 		{
 			gDLL->netMessageDebugLog("We got to 8");
-			pNotifications->Add(NOTIFICATION_EVENT, "An event has happened", "Event", -1, -1, -1);
+			pNotifications->Add(NOTIFICATION_EVENT, "An event has happened", "Event", -1, -1, (int)m_eEventType, GetID());
 		}
 	}
 	else
@@ -163,52 +162,84 @@ void CvEvent::trigger()
 void CvEvent::processEventOption(int iOption)
 {
 	gDLL->netMessageDebugLog("Processing option EventType " + FSerialization::toString((int)getEventType()) + " Option " + FSerialization::toString(iOption));
-	CvEventOption& kOption = GC.getEventInfo(m_eEventType)->getOption(iOption);
+	EventOptionTypes eOption = GC.getEventInfo(m_eEventType)->getOption(iOption);
+	CvEventOptionInfo* pOption = GC.getEventOptionInfo(eOption);
 
-	gDLL->netMessageDebugLog("Number of actions are " + FSerialization::toString(kOption.getNumActions()));
-	for (int iI = 0; iI < kOption.getNumActions(); iI++)
+	gDLL->netMessageDebugLog("Number of actions are " + FSerialization::toString(pOption->getNumActions()));
+	for (int iI = 0; iI < pOption->getNumActions(); iI++)
 	{
-		processEventAction(kOption.getAction(iI));
+		processEventAction(pOption->getAction(iI), eOption);
 	}
 }
 
-void CvEvent::processEventAction(CvEventAction& kAction)
+void CvEvent::processEventAction(EventActionTypes eAction, EventOptionTypes eOption)
 {
 	gDLL->netMessageDebugLog("Processing EventAction");
+	CvEventActionInfo kAction = *GC.getEventActionInfo(eAction);
 	if ((kAction.getChance() == -1) || (kAction.getChance() > GC.getGame().getJonRandNum(100, "EventAction Chance")))
 	{
+		int iTypeToAction = -1;
+		if (kAction.getTypeToAction() != -1 || kAction.getScope() == "default")
+		{
+			iTypeToAction = kAction.getTypeToAction();
+		}
+		else if (kAction.getScope() != "default")
+		{
+			std::vector<int> aScopes = m_asziScopes[kAction.getScope()];
+			if (aScopes.empty())
+			{
+				//This should never happen.
+				return;
+			}
+			if (aScopes.size() == 1)
+			{
+				//This should always happen.
+				iTypeToAction = aScopes[0];
+				FAssertMsg(iTypeToAction != -1, "iTypeToAction was unexpectedly -1 when processing an action");
+			}
+			else
+			{
+				//Just in case. 
+				//THIS SHOULD BE DONE BEFORE WE GET HERE AND ONLY ONE CHOICE REMAIN, TO GET CONSISTENCY BETWEEN ACTIONS.
+				int iRnd = GC.getGame().getJonRandNum(aScopes.size(), "Choosing a random target for an action");
+				iTypeToAction = aScopes[iRnd];
+				FAssertMsg(iTypeToAction != -1, "iTypeToAction was unexpectedly -1 when processing an action");
+			}
+		}
+		//else probably something which does not need TypeToAction.
+
+		if (kAction.getTurns() > 0)
+		{
+			m_pPlayer->addTempEventEffect(m_eEventType, eOption, kAction.getActionType(), kAction.getTurns(), iTypeToAction, -kAction.getValue1());
+		}
+
 		switch (kAction.getActionType())
 		{
 		case EVENTACTION_YIELD:
 			gDLL->netMessageDebugLog("Processing Yield!");
-			m_pPlayer->changeYieldFromEvents((YieldTypes)kAction.getTypeToAction(), kAction.getValue1());
-			//TODO
+			m_pPlayer->changeYieldFromEvents((YieldTypes)iTypeToAction, kAction.getValue1());
 			break;
 
 		case EVENTACTION_YIELDMOD:
 			gDLL->netMessageDebugLog("Processing YieldMod!");
-			m_pPlayer->changeYieldModFromEvents((YieldTypes)kAction.getTypeToAction(), kAction.getValue1());
-			//TODO
+			m_pPlayer->changeYieldModifierFromEvents((YieldTypes)iTypeToAction, kAction.getValue1());
 			break;
 
 		case EVENTACTION_HAPPY:
 			gDLL->netMessageDebugLog("Processing Happy!");
 			m_pPlayer->changeHappyFromEvents(kAction.getValue1());
-			//TODO
 			break;
 
 		case EVENTACTION_TECH:
 			gDLL->netMessageDebugLog("Processing Tech!");
 			if ((TechTypes)kAction.getTypeToAction() != NO_TECH)
-				GET_TEAM(m_pPlayer->getTeam()).setHasTech((TechTypes)kAction.getTypeToAction(), kAction.getBool1(), m_pPlayer->GetID(), true, true);
-			//Cannot be temporary
+				GET_TEAM(m_pPlayer->getTeam()).setHasTech((TechTypes)iTypeToAction, kAction.getBool1(), m_pPlayer->GetID(), true, true);
 			break;
 
 		case EVENTACTION_POLICY:
 			gDLL->netMessageDebugLog("Processing Policy!");
 			if ((PolicyTypes)kAction.getTypeToAction() != NO_POLICY)
-				m_pPlayer->setHasPolicy((PolicyTypes)kAction.getTypeToAction(), kAction.getBool1());
-			//Cannot be temporary
+				m_pPlayer->setHasPolicy((PolicyTypes)iTypeToAction, kAction.getBool1());
 			break;
 		
 		case EVENTACTION_BELIEF:
@@ -222,7 +253,6 @@ void CvEvent::processEventAction(CvEventAction& kAction)
 				CvPlot* pPlot = GC.getMap().plot(kAction.getValue1(), kAction.getValue2());
 				if (pPlot)
 					GC.getMap().plot(kAction.getValue1(), kAction.getValue2())->setRevealed(m_pPlayer->getTeam(), true);
-				//Cannot be temporary
 				break;
 			}
 
@@ -254,17 +284,56 @@ void CvEvent::processEventAction(CvEventAction& kAction)
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //  CLASS: CvEventEffects
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-EventActionTypes CvEventEffects::getAction()
+/// Constructor
+CvEventEffects::CvEventEffects()
+{
+}
+
+/// Destructor
+CvEventEffects::~CvEventEffects()
+{
+}
+
+void CvEventEffects::init(EventTypes eEvent, EventOptionTypes eOption, EventActionTypeTypes eEventAction, int iNumTurns, int iType, int iValue)
+{
+	m_eEventType = eEvent;
+	m_eOption = eOption;
+	m_eEventAction = eEventAction;
+	m_iType = iType;
+	m_iValue = iValue;
+	m_iNumTurns = iNumTurns;
+}
+
+EventTypes CvEventEffects::getEventType() const
+{
+	return m_eEventType;
+}
+
+EventOptionTypes CvEventEffects::getOption() const
+{
+	return m_eOption;
+}
+
+EventActionTypeTypes CvEventEffects::getAction() const
 {
 	return m_eEventAction;
 }
 
-void CvEventEffects::setAction(EventActionTypes eAction)
+void CvEventEffects::setAction(EventActionTypeTypes eAction)
 {
 	m_eEventAction = eAction;
 }
 
-int CvEventEffects::getValue()
+void CvEventEffects::setType(int iType)
+{
+	m_iType = iType;
+}
+int CvEventEffects::getType() const
+{
+	return m_iType;
+}
+
+int CvEventEffects::getValue() const
 {
 	return m_iValue;
 }
@@ -274,7 +343,7 @@ void CvEventEffects::setValue(int iNewValue)
 	m_iValue = iNewValue;
 }
 
-int CvEventEffects::getNumTurns()
+int CvEventEffects::getNumTurns() const
 {
 	return m_iNumTurns;
 }
