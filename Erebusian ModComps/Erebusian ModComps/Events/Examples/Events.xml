@@ -171,6 +171,37 @@
 			<iTurns>2</iTurns>
 		</Row>
 		<Row>
+			<Type>Test_Event_Action2</Type>
+			<EventOptionType>Test_Event_Option1</EventOptionType>
+			<EventActionType>EVENTACTION_YIELD</EventActionType>
+			<ActionItem>YIELD_GOLD</ActionItem>
+			<iValue>10</iValue>
+			<iTurns>2</iTurns>
+		</Row>
+		<Row>
+			<Type>Test_Event_Action3</Type>
+			<EventOptionType>Test_Event_Option1</EventOptionType>
+			<EventActionType>EVENTACTION_YIELD</EventActionType>
+			<ActionItem>YIELD_SCIENCE</ActionItem>
+			<iValue>10</iValue>
+		</Row>
+		<Row>
+			<Type>Test_Event_Action4</Type>
+			<EventOptionType>Test_Event_Option1</EventOptionType>
+			<EventActionType>EVENTACTION_YIELD</EventActionType>
+			<ActionItem>YIELD_CULTURE</ActionItem>
+			<iValue>20</iValue>
+			<iTurns>2</iTurns>
+		</Row>
+		<Row>
+			<Type>Test_Event_Action5</Type>
+			<EventOptionType>Test_Event_Option1</EventOptionType>
+			<EventActionType>EVENTACTION_YIELDMOD</EventActionType>
+			<ActionItem>YIELD_PRODUCTION</ActionItem>
+			<iValue>100</iValue>
+			<iTurns>2</iTurns>
+	</Row>
+		<Row>
 			<Type>EventTestAction1</Type>
 			<EventOptionType>EventTestOption1</EventOptionType>
 			<EventActionType>EVENTACTION_HAPPY</EventActionType>

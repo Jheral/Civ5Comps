@@ -8,5 +8,20 @@
 		<Row Tag="TXT_KEY_EVENTS_CHOOSE_OPTIONS_ACCEPT">
 			<Text>Accept</Text>
 		</Row>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_PLAYER_EVENT">
+			<Text>[NEWLINE][ICON_BULLET]Events Player Modifier: {1_Num}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TP_HAPPINESS_EVENTS">
+			<Text>{1_Num} from events.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TP_SCIENCE_FROM_EVENTS">
+			<Text>{1_Num} from events.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TP_GOLD_FROM_EVENTS">
+			<Text>{1_Num} from events.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TP_CULTURE_FROM_EVENTS">
+			<Text>{1_Num} from events.</Text>
+		</Row>
 	</Language_en_US>
 </GameData>

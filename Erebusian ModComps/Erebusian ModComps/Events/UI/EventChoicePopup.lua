@@ -27,6 +27,7 @@ g_PlayerEventReference = nil;
 g_CurrentEventType = nil;
 g_CurrentOptions = {};
 g_ActiveOption = nil;
+g_CurrentEventID = nil;
 
 -------------------------------------------------
 -- Diplo Corner Hook ( Here for testing purposes, nothing more. Should be removed in final version )
@@ -68,10 +69,10 @@ function OnPopupMessage(popupInfo)
     end
 	--print(string.format("Player is the active player"));
 	
-	PopulateView(2);
+	--PopulateView(2);
     if( popupInfo.Data2 ~= nil ) then
 		print(string.format("The event has a real id"));
-		PopulateView(popupInfo.Data2);
+		PopulateView(popupInfo.Data2, popupInfo.Data3);
 	else
 		print(string.format("The event doesn't have a real id"));
     end
@@ -114,6 +115,7 @@ function OnClose()
 	end
 	g_PlayerEventReference = nil;
 	g_CurrentEventType = nil;
+	g_CurrentEventID = nil;
 	g_CurrentOptions = {};
     UIManager:DequeuePopup(ContextPtr);
 end
@@ -125,7 +127,8 @@ Controls.CloseButton:RegisterCallback( Mouse.eLClick, OnClose );
 function OnAccept()
 	if g_ActiveOption == nil then return; end
 	local pPlayer = Players[Game:GetActivePlayer()];
-	--print(string.format("%s - %s: %s", g_ActiveOption.Key, g_ActiveOption.Option.ID, g_ActiveOption.Option.Type));
+	print(string.format("%s - %s: %s", g_ActiveOption.Key, g_ActiveOption.Option.ID, g_ActiveOption.Option.Type));
+	pPlayer:ProcessEventOptionByID(g_CurrentEventID, g_ActiveOption.Option.ID);
 	OnClose();
 	return;
 end
@@ -149,7 +152,7 @@ ContextPtr:SetInputHandler( InputHandler );
 -------------------------------------------------------------------------------
 -- Populate View
 -------------------------------------------------------------------------------
-function PopulateView(iEventID)
+function PopulateView(iEventID, iEventIndex)
 	--print(string.format("Inside PopulateView"));
 	g_OptionIM:ResetInstances();
 
@@ -159,6 +162,7 @@ function PopulateView(iEventID)
 	if eEvent ~= nil then
 		g_ActiveOption = nil;
 		g_CurrentEventType = eEvent;
+		g_CurrentEventID = iEventIndex;
 		local options = GetEventOptions(eEvent);
 		Controls.AcceptButton:SetDisabled(true);
 		--print(string.format("Before Title"));

@@ -12,9 +12,6 @@
 		<Row Tag="TXT_KEY_TEST_EVENT">
 			<Text>A longer explanation for the event. Can be an entire story if you so like. Of course, if it's too long people might not even bother reading it, but something like this should work. Or a little longer if you need to.</Text>
 		</Row>
-		<Row Tag="TXT_KEY_TP_HAPPINESS_EVENTS">
-			<Text>{1_Num} from events.</Text>
-		</Row>
 		<Row Tag="TXT_KEY_EVENTTESTOPTION1">
 			<Text>BAM!</Text>
 		</Row>

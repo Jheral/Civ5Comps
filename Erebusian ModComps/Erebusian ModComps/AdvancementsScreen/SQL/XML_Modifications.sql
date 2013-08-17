@@ -8,6 +8,7 @@ CREATE TABLE PolicyBranchClassTypes(
 	Help TEXT,
 	Style TEXT,
 	TenetMaxLevel INT,
+	iMaxBranches INT DEFAULT '-1',
 	FOREIGN KEY (Description) REFERENCES Language_en_US(Tag),
 	FOREIGN KEY (Civilopedia) REFERENCES Language_en_US(Tag),
 	FOREIGN KEY (Strategy) REFERENCES Language_en_US(Tag),

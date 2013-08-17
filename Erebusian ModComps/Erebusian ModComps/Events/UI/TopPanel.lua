@@ -491,6 +491,21 @@ function ScienceTipHandler( control )
 	
 			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_SCIENCE_FROM_RESEARCH_AGREEMENTS", iScienceFromRAs / 100);
 		end
+
+		-- EventEngine - v0.1, Snarko
+		-- Science from events
+		local iScienceFromEvents = pPlayer:GetYieldFromEvents(YieldTypes.YIELD_SCIENCE);
+		if (iScienceFromEvents ~= 0) then
+			-- Add separator for non-initial entries
+			if (bFirstEntry) then
+				bFirstEntry = false;
+			else
+				strText = strText .. "[NEWLINE]";
+			end
+
+			strText = strText .. "[ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_SCIENCE_FROM_EVENTS", iScienceFromEvents);
+		end
+		-- END EventEngine
 		
 		-- Let people know that building more cities makes techs harder to get
 		if (not OptionsManager.IsNoBasicHelp()) then
@@ -558,6 +573,12 @@ function GoldTipHandler( control )
 	if (iGoldPerTurnFromReligion > 0) then
 		strText = strText .. "[NEWLINE]  [ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_GOLD_FROM_RELIGION", iGoldPerTurnFromReligion);
 	end
+	-- EventEngine - v0.1, Snarko
+	local iGoldFromEvents = pPlayer:GetYieldFromEvents(YieldTypes.YIELD_GOLD);
+	if (iGoldFromEvents ~= 0) then
+		strText = strText .. "[NEWLINE]  [ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_GOLD_FROM_EVENTS", iGoldFromEvents);
+	end
+	-- END EventEngine
 	strText = strText .. "[/COLOR]";
 	
 	local iUnitCost = pPlayer:CalculateUnitCost();
@@ -739,6 +760,12 @@ function HappinessTipHandler( control )
 			strText = strText .. "[NEWLINE]";
 			strText = strText .. "  [ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_HAPPINESS_LEAGUES", iLeagueHappiness);
 		end
+		-- EventEngine - v0.1, Snarko
+		if (iEventHappiness >= 0) then
+			strText = strText .. "[NEWLINE]";
+			strText = strText .. "  [ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_HAPPINESS_EVENTS", iEventHappiness);
+		end
+		-- END EventEngine
 		strText = strText .. "[NEWLINE]";
 		strText = strText .. "  [ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_HAPPINESS_DIFFICULTY_LEVEL", iHandicapHappiness);
 		strText = strText .. "[/COLOR]";
@@ -795,9 +822,9 @@ function HappinessTipHandler( control )
 			strText = strText .. "  [ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_UNHAPPINESS_PUBLIC_OPINION", iUnhappinessPublicOpinion);
 		end		
 		-- EventEngine - v0.1, Snarko
-		if (iEventHappiness ~= 0) then
+		if (iEventHappiness < 0) then
 			strText = strText .. "[NEWLINE]";
-			strText = strText .. "  [ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_HAPPINESS_EVENTS", math.abs(iEventHappiness));
+			strText = strText .. "  [ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_HAPPINESS_EVENTS", iEventHappiness);
 		end
 		-- END EventEngine
 		strText = strText .. "[/COLOR]";
@@ -1015,9 +1042,26 @@ function CultureTipHandler( control )
 			strText = strText .. "[NEWLINE]";
 			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_CULTURE_FROM_BONUS_TURNS", iCultureFromBonusTurns, iBonusTurns);
 		end
+
+		-- EventEngine - v0.1, Snarko
+		local iCultureFromEvents = pPlayer:GetYieldFromEvents(YieldTypes.YIELD_CULTURE);
+		if (iCultureFromEvents ~= 0) then
+			-- Add separator for non-initial entries
+			if (bFirstEntry) then
+				strText = strText .. "[NEWLINE]";
+				bFirstEntry = false;
+			end
+
+			strText = strText .. "[NEWLINE]";
+			strText = strText .. "[ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_CULTURE_FROM_EVENTS", iCultureFromEvents);
+		end
+
+		
 		
 		-- Culture from Golden Age
-		local iCultureFromGoldenAge = pPlayer:GetTotalJONSCulturePerTurn() - iCultureForFree - iCultureFromCities - iCultureFromHappiness - iCultureFromMinors - iCultureFromReligion - iCultureFromTraits - iCultureFromBonusTurns;
+		--local iCultureFromGoldenAge = pPlayer:GetTotalJONSCulturePerTurn() - iCultureForFree - iCultureFromCities - iCultureFromHappiness - iCultureFromMinors - iCultureFromReligion - iCultureFromTraits - iCultureFromBonusTurns;
+		local iCultureFromGoldenAge = pPlayer:GetTotalJONSCulturePerTurn() - iCultureForFree - iCultureFromCities - iCultureFromHappiness - iCultureFromMinors - iCultureFromReligion - iCultureFromTraits - iCultureFromBonusTurns - iCultureFromEvents;
+		-- END EventEngine
 		if (iCultureFromGoldenAge ~= 0) then
 		
 			-- Add separator for non-initial entries
@@ -1029,6 +1073,8 @@ function CultureTipHandler( control )
 			strText = strText .. "[NEWLINE]";
 			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_CULTURE_FROM_GOLDEN_AGE", iCultureFromGoldenAge);
 		end
+
+		
 
 		-- Let people know that building more cities makes policies harder to get
 		if (not OptionsManager.IsNoBasicHelp()) then
