@@ -23,11 +23,11 @@ Controls.EventScrollPanel:ReprocessAnchoring();
 Controls.MainPanel:SetSizeVal(mpWidth, mpHeight);
 Controls.MainPanel:ReprocessAnchoring();
 
-g_PlayerEventReference = nil;
+g_PlayerEventIndex = nil;
+g_PlayerEvents = {};
 g_CurrentEventType = nil;
 g_CurrentOptions = {};
 g_ActiveOption = nil;
-g_CurrentEventID = nil;
 
 -------------------------------------------------
 -- Diplo Corner Hook ( Here for testing purposes, nothing more. Should be removed in final version )
@@ -35,7 +35,7 @@ g_CurrentEventID = nil;
 function OnAdditionalInformationDropdownGatherEntries(additionalEntries)
         table.insert(additionalEntries, {
                 text="Event Choice Popup",
-                call=function() OnShow(); end
+                call=function() PopulateView(2); OnShow(); end
         });
 end
 LuaEvents.AdditionalInformationDropdownGatherEntries.Add(OnAdditionalInformationDropdownGatherEntries);
@@ -69,14 +69,13 @@ function OnPopupMessage(popupInfo)
     end
 	--print(string.format("Player is the active player"));
 	
-	--PopulateView(2);
     if( popupInfo.Data2 ~= nil ) then
-		print(string.format("The event has a real id"));
-		PopulateView(popupInfo.Data2, popupInfo.Data3);
+		--print(string.format("The event has a real id"));
+		g_PlayerEventIndex = popupInfo.Data3;
+		PopulateView(popupInfo.Data2);
 	else
-		print(string.format("The event doesn't have a real id"));
+		--print(string.format("The event doesn't have a real id"));
     end
-	
 	OnShow();
 end
 Events.SerialEventGameMessagePopup.Add( OnPopupMessage );
@@ -113,9 +112,8 @@ function OnClose()
 		g_ActiveOption.Button.EventOption:SetCheck(false);
 		g_ActiveOption = nil;
 	end
-	g_PlayerEventReference = nil;
+	g_PlayerEventIndex = nil;
 	g_CurrentEventType = nil;
-	g_CurrentEventID = nil;
 	g_CurrentOptions = {};
     UIManager:DequeuePopup(ContextPtr);
 end
@@ -127,8 +125,8 @@ Controls.CloseButton:RegisterCallback( Mouse.eLClick, OnClose );
 function OnAccept()
 	if g_ActiveOption == nil then return; end
 	local pPlayer = Players[Game:GetActivePlayer()];
-	print(string.format("%s - %s: %s", g_ActiveOption.Key, g_ActiveOption.Option.ID, g_ActiveOption.Option.Type));
-	pPlayer:ProcessEventOptionByID(g_CurrentEventID, g_ActiveOption.Option.ID);
+	--print(string.format("%s - %s: %s", g_ActiveOption.Key, g_ActiveOption.Option.ID, g_ActiveOption.Option.Type));
+	pPlayer:ProcessEventOptionByID(g_PlayerEventIndex, g_ActiveOption.Option.ID);
 	OnClose();
 	return;
 end
@@ -152,17 +150,18 @@ ContextPtr:SetInputHandler( InputHandler );
 -------------------------------------------------------------------------------
 -- Populate View
 -------------------------------------------------------------------------------
-function PopulateView(iEventID, iEventIndex)
+function PopulateView(iEventID)
 	--print(string.format("Inside PopulateView"));
 	g_OptionIM:ResetInstances();
 
 	local pPlayer = Players[Game:GetActivePlayer()];
 	local eEvent = GameInfo.Events[iEventID];
+	
+	PopulatePullDown(Controls.MultiPull);
 
 	if eEvent ~= nil then
 		g_ActiveOption = nil;
 		g_CurrentEventType = eEvent;
-		g_CurrentEventID = iEventIndex;
 		local options = GetEventOptions(eEvent);
 		Controls.AcceptButton:SetDisabled(true);
 		--print(string.format("Before Title"));
@@ -202,6 +201,30 @@ function PopulateView(iEventID, iEventIndex)
 		end
 	end
 	--print(string.format("Event doesn't exist"));
+end
+
+-------------------------------------------------------------------------------
+-- PopulatePullDown
+-------------------------------------------------------------------------------
+function PopulatePullDown(pullDown)
+	pullDown:ClearEntries();
+	local pPlayer = Players[Game:GetActivePlayer()];
+	for event in pPlayer:Events() do
+		local eEvent = GameInfo.Events[event:GetEventType()];
+		local instance = {};
+		pullDown:BuildEntry("InstanceOne", instance);
+		instance.Button:SetText(Locale.ConvertTextKey(eEvent.Description));
+		instance.Button:SetToolTipString(Locale.ConvertTextKey(eEvent.Civilopedia));
+		instance.Button:SetVoids(event:GetID(), event:GetEventType());
+	end
+	pullDown:CalculateInternals();
+	local dropDown = Controls.MultiPull;
+	local width, height = dropDown:GetGrid():GetSizeVal();
+	dropDown:GetGrid():SetSizeVal(width, height+100);
+	pullDown:RegisterSelectionCallback(	function(eventIndex, iEventType) 
+											g_PlayerEventIndex = eventIndex;
+											PopulateView(iEventType); 
+										end);
 end
 
 -------------------------------------------------------------------------------

@@ -8,6 +8,9 @@
 		<Row Tag="TXT_KEY_EVENTS_CHOOSE_OPTIONS_ACCEPT">
 			<Text>Accept</Text>
 		</Row>
+		<Row Tag="TXT_KEY_EVENTS_CHOOSE_AVAILABLE_EVENTS">
+			<Text>Available Events</Text>
+		</Row>
 		<Row Tag="TXT_KEY_PRODMOD_YIELD_PLAYER_EVENT">
 			<Text>[NEWLINE][ICON_BULLET]Events Player Modifier: {1_Num}%</Text>
 		</Row>
