@@ -89,12 +89,15 @@
     <Folder Include="AdvancementsScreen\UI" />
     <Folder Include="AdvancementsScreen\SQL" />
     <Folder Include="AdvancementsScreen\UI\Text" />
+    <Folder Include="CityView Local Happiness\UI\" />
+    <Folder Include="CityView Local Happiness\XML" />
     <Folder Include="Events" />
     <Folder Include="Events\Examples" />
     <Folder Include="Events\Examples\Resources" />
     <Folder Include="Events\Examples\Text" />
     <Folder Include="Events\UI" />
     <Folder Include="Events\UI\Text" />
+    <Folder Include="CityView Local Happiness" />
     <Folder Include="Shared Assets" />
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +126,22 @@
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
     <Content Include="AdvancementsScreen\XML\PolicyBranchUpdates.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="CityView Local Happiness\UI\CityView.lua">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="CityView Local Happiness\UI\CityView.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="CityView Local Happiness\UI\CityView_small.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="CityView Local Happiness\XML\HappyTXT.xml">
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
