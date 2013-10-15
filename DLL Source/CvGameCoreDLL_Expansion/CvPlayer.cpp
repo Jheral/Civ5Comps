@@ -131,13 +131,25 @@ CvPlayer::CvPlayer() :
 	, m_iTotalPopulation("CvPlayer::m_iTotalPopulation", m_syncArchive, true)
 	, m_iTotalLand("CvPlayer::m_iTotalLand", m_syncArchive)
 	, m_iTotalLandScored("CvPlayer::m_iTotalLandScored", m_syncArchive)
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	, m_iJONSCulturePerTurnForFree("CvPlayer::m_iJONSCulturePerTurnForFree", m_syncArchive)
 	, m_iJONSCulturePerTurnFromMinorCivs("CvPlayer::m_iJONSCulturePerTurnFromMinorCivs", m_syncArchive)
 	, m_iJONSCultureCityModifier("CvPlayer::m_iJONSCultureCityModifier", m_syncArchive)
+	*/
+	// END Revamped yields
 	, m_iJONSCulture("CvPlayer::m_iJONSCulture", m_syncArchive, true)
 	, m_iJONSCultureEverGenerated("CvPlayer::m_iJONSCulture", m_syncArchive)
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	, m_iCulturePerWonder("CvPlayer::m_iCulturePerWonder", m_syncArchive)
 	, m_iCultureWonderMultiplier("CvPlayer::m_iCultureWonderMultiplier", m_syncArchive)
+	*/
+	, m_aiYieldPerWonder("CvPlayer::m_aiYieldPerWonder", m_syncArchive)
+	, m_aiYieldWonderMultiplier("CvPlayer::m_aiYieldWonderMultiplier", m_syncArchive)
+	// END Revamped yields
 	, m_iCulturePerTechResearched("CvPlayer::m_iCulturePerTechResearched", m_syncArchive)
 	, m_iFaith(0)
 	, m_iFaithEverGenerated(0)
@@ -168,7 +180,13 @@ CvPlayer::CvPlayer() :
 	, m_iHappinessPerXPolicies(0)
 	, m_iAdvancedStartPoints("CvPlayer::m_iAdvancedStartPoints", m_syncArchive)
 	, m_iAttackBonusTurns("CvPlayer::m_iAttackBonusTurns", m_syncArchive)
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	, m_iCultureBonusTurns(0)
+	*/
+	, m_aiResolutionYieldEffects("CvPlayer::m_aiResolutionYieldEffects", m_syncArchive)
+	// END Revamped yields
 	, m_iTourismBonusTurns(0)
 	, m_iGoldenAgeProgressMeter("CvPlayer::m_iGoldenAgeProgressMeter", m_syncArchive, true)
 	, m_iGoldenAgeMeterMod("CvPlayer::m_iGoldenAgeMeterMod", m_syncArchive)
@@ -204,7 +222,13 @@ CvPlayer::CvPlayer() :
 	, m_iDomesticGreatGeneralRateModifier("CvPlayer::m_iDomesticGreatGeneralRateModifier", m_syncArchive)
 	, m_iDomesticGreatGeneralRateModFromBldgs("CvPlayer::m_iDomesticGreatGeneralRateModFromBldgs", m_syncArchive)
 	, m_iGreatScientistBeakerModifier(0)
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	, m_iGreatPersonExpendGold(0)
+	*/
+	, m_aiGreatPersonExpendYield("CvPlayer::m_aiGreatPersonExpendYield", m_syncArchive)
+	// END Revamped yields
 	, m_iMaxGlobalBuildingProductionModifier("CvPlayer::m_iMaxGlobalBuildingProductionModifier", m_syncArchive)
 	, m_iMaxTeamBuildingProductionModifier("CvPlayer::m_iMaxTeamBuildingProductionModifier", m_syncArchive)
 	, m_iMaxPlayerBuildingProductionModifier("CvPlayer::m_iMaxPlayerBuildingProductionModifier", m_syncArchive)
@@ -244,8 +268,15 @@ CvPlayer::CvPlayer() :
 	, m_iExtraUnitCost("CvPlayer::m_iExtraUnitCost", m_syncArchive)
 	, m_iNumMilitaryUnits("CvPlayer::m_iNumMilitaryUnits", m_syncArchive)
 	, m_iHappyPerMilitaryUnit("CvPlayer::m_iHappyPerMilitaryUnit", m_syncArchive)
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	, m_iHappinessToCulture("CvPlayer::m_iHappinessToCulture", m_syncArchive)
 	, m_iHappinessToScience("CvPlayer::m_iHappinessToScience", m_syncArchive)
+	*/
+	, m_aiHappinessToYield("CvPlayer::m_aiHappinessToYield", m_syncArchive)
+	, m_aiHappyYieldMultiplier("CvPlayer::m_aiHappyYieldMultiplier", m_syncArchive)
+	// END Revamped yields
 	, m_iHalfSpecialistUnhappinessCount("CvPlayer::m_iHalfSpecialistUnhappinessCount", m_syncArchive)
 	, m_iHalfSpecialistFoodCount("CvPlayer::m_iHalfSpecialistFoodCount", m_syncArchive)
 	, m_iMilitaryFoodProductionCount("CvPlayer::m_iMilitaryFoodProductionCount", m_syncArchive)
@@ -341,6 +372,12 @@ CvPlayer::CvPlayer() :
 	, m_aiCapitalYieldRateModifier("CvPlayer::m_aiCapitalYieldRateModifier", m_syncArchive)
 	, m_aiExtraYieldThreshold("CvPlayer::m_aiExtraYieldThreshold", m_syncArchive)
 	, m_aiSpecialistExtraYield("CvPlayer::m_aiSpecialistExtraYield", m_syncArchive)
+	// Revamped yields - v0.1, Snarko
+	, m_aiYieldFromGarrison("CvPlayer::m_aiYieldFromGarrison", m_syncArchive)
+	, m_aiCityConnectionTradeRouteYieldModifier("CvPlayer::m_aiCityConnectionTradeRouteYieldModifier", m_syncArchive)
+	, m_aiCityConnectionTradeRouteYieldChange("CvPlayer::m_aiCityConnectionTradeRouteYieldChange", m_syncArchive)
+	, m_aiCityConnectionYieldTimes100("CvPlayer::m_aiCityConnectionYieldTimes100", m_syncArchive)
+	// END Revamped yields
 	// EventEngine - v0.1, Snarko
 	, m_aiYieldFromEvents("CvPlayer::m_aiYieldFromEvents", m_syncArchive)
 	, m_aiYieldModFromEvents("CvPlayer::m_aiYieldModFromEvents", m_syncArchive)
@@ -385,7 +422,13 @@ CvPlayer::CvPlayer() :
 	, m_iTurnsSinceSettledLastCity("CvPlayer::m_iTurnsSinceSettledLastCity", m_syncArchive)
 	, m_iNumNaturalWondersDiscoveredInArea("CvPlayer::m_iNumNaturalWondersDiscoveredInArea", m_syncArchive)
 	, m_iStrategicResourceMod("CvPlayer::m_iStrategicResourceMod", m_syncArchive)
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	, m_iSpecialistCultureChange("CvPlayer::m_iSpecialistCultureChange", m_syncArchive)
+	*/
+	// END Revamped yields
 	, m_iGreatPeopleSpawnCounter("CvPlayer::m_iGreatPeopleSpawnCounter", m_syncArchive)
 	, m_iFreeTechCount("CvPlayer::m_iFreeTechCount", m_syncArchive, true)
 	, m_iMedianTechPercentage(50)
@@ -445,10 +488,6 @@ CvPlayer::CvPlayer() :
 
 	m_aiGreatWorkYieldChange.clear();
 	m_aiSiphonLuxuryCount.clear();
-
-	// EventEngine - v0.1, Snarko
-	m_aEventEffects.clear();
-	// END EventEngine
 
 	reset(NO_PLAYER, true);
 }
@@ -598,7 +637,12 @@ void CvPlayer::init(PlayerTypes eID)
 		changeMaxPlayerBuildingProductionModifier(GetPlayerTraits()->GetMaxPlayerBuildingProductionModifier());
 		ChangePlotGoldCostMod(GetPlayerTraits()->GetPlotBuyCostModifier());
 		ChangePlotCultureCostModifier(GetPlayerTraits()->GetPlotCultureCostModifier());
+		// Revamped yields - v0.1, Snarko
+		// No longer used, use ChangeCityConnectionTradeRouteYieldChange
+		/* Original code
 		GetTreasury()->ChangeCityConnectionTradeRouteGoldChange(GetPlayerTraits()->GetCityConnectionTradeRouteChange());
+		*/
+		// END Revamped yields
 		changeWonderProductionModifier(GetPlayerTraits()->GetWonderProductionModifier());
 		ChangeRouteGoldMaintenanceMod(GetPlayerTraits()->GetImprovementMaintenanceModifier());
 
@@ -606,6 +650,9 @@ void CvPlayer::init(PlayerTypes eID)
 		{
 			ChangeCityYieldChange((YieldTypes)iJ, 100 * GetPlayerTraits()->GetFreeCityYield((YieldTypes)iJ));
 			changeYieldRateModifier((YieldTypes)iJ, GetPlayerTraits()->GetYieldRateModifier((YieldTypes)iJ));
+			// Revamped yields - v0.1, Snarko
+			ChangeCityConnectionTradeRouteYieldChange((YieldTypes)iJ, GetPlayerTraits()->GetCityConnectionTradeRouteChange(iJ));
+			// END Revamped yields
 		}
 
 		recomputeGreatPeopleModifiers();
@@ -752,13 +799,23 @@ void CvPlayer::uninit()
 	m_iTotalLand = 0;
 	m_iTotalLandScored = 0;
 	m_iCityConnectionHappiness = 0;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	m_iJONSCulturePerTurnForFree = 0;
 	m_iJONSCulturePerTurnFromMinorCivs = 0;
 	m_iJONSCultureCityModifier = 0;
+	*/
+	// END Revamped yields
 	m_iJONSCulture = 0;
 	m_iJONSCultureEverGenerated = 0;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	m_iCulturePerWonder = 0;
 	m_iCultureWonderMultiplier = 0;
+	*/
+	// END Revamped yields
 	m_iCulturePerTechResearched = 0;
 	m_iFaith = 0;
 	m_iFaithEverGenerated = 0;
@@ -789,7 +846,12 @@ void CvPlayer::uninit()
 	m_iHappinessPerXPolicies = 0;
 	m_iAdvancedStartPoints = -1;
 	m_iAttackBonusTurns = 0;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	m_iCultureBonusTurns = 0;
+	*/
+	// END Revamped yields
 	m_iTourismBonusTurns = 0;
 	m_iGoldenAgeProgressMeter = 0;
 	m_iGoldenAgeMeterMod = 0;
@@ -832,7 +894,12 @@ void CvPlayer::uninit()
 	m_iGreatScientistRateModifier = 0;
 	m_iGreatScientistBeakerModifier = 0;
 	m_iGreatEngineerRateModifier = 0;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	m_iGreatPersonExpendGold = 0;
+	*/
+	// END Revamped yields
 	m_iMaxGlobalBuildingProductionModifier = 0;
 	m_iMaxTeamBuildingProductionModifier = 0;
 	m_iMaxPlayerBuildingProductionModifier = 0;
@@ -872,8 +939,13 @@ void CvPlayer::uninit()
 	m_iExtraUnitCost = 0;
 	m_iNumMilitaryUnits = 0;
 	m_iHappyPerMilitaryUnit = 0;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	m_iHappinessToCulture = 0;
 	m_iHappinessToScience = 0;
+	*/
+	// END Revamped yields
 	m_iHalfSpecialistUnhappinessCount = 0;
 	m_iHalfSpecialistFoodCount = 0;
 	m_iMilitaryFoodProductionCount = 0;
@@ -944,7 +1016,13 @@ void CvPlayer::uninit()
 	m_iTurnsSinceSettledLastCity = -1;
 	m_iNumNaturalWondersDiscoveredInArea = 0;
 	m_iStrategicResourceMod = 0;
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	m_iSpecialistCultureChange = 0;
+	*/
+	// END Revamped yields
 	m_iGreatPeopleSpawnCounter = 0;
 	m_iFreeTechCount = 0;
 	m_iMedianTechPercentage = 50;
@@ -1038,6 +1116,38 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 	m_aiSpecialistExtraYield.clear();
 	m_aiSpecialistExtraYield.resize(NUM_YIELD_TYPES, 0);
 
+	// Revamped yields - v0.1, Snarko
+	m_aiYieldFromGarrison.clear();
+	m_aiYieldFromGarrison.resize(NUM_YIELD_TYPES, 0);
+
+	m_aiCityConnectionTradeRouteYieldModifier.clear();
+	m_aiCityConnectionTradeRouteYieldModifier.resize(NUM_YIELD_TYPES, 0);
+
+	m_aiCityConnectionTradeRouteYieldChange.clear();
+	m_aiCityConnectionTradeRouteYieldChange.resize(NUM_YIELD_TYPES, 0);
+
+	m_aiCityConnectionYieldTimes100.clear();
+	m_aiCityConnectionYieldTimes100.resize(NUM_YIELD_TYPES, 0);
+
+	m_aiHappinessToYield.clear();
+	m_aiHappinessToYield.resize(NUM_YIELD_TYPES, 0);
+
+	m_aiHappyYieldMultiplier.clear();
+	m_aiHappyYieldMultiplier.resize(NUM_YIELD_TYPES, 0);
+
+	m_aiGreatPersonExpendYield.clear();
+	m_aiGreatPersonExpendYield.resize(NUM_YIELD_TYPES, 0);
+
+	m_aiYieldWonderMultiplier.clear();
+	m_aiYieldWonderMultiplier.resize(NUM_YIELD_TYPES, 0);
+
+	m_aiYieldPerWonder.clear();
+	m_aiYieldPerWonder.resize(NUM_YIELD_TYPES, 0);
+
+	m_aiResolutionYieldEffects.clear();
+	m_aiResolutionYieldEffects.resize(NUM_YIELD_TYPES, 0);
+	// END Revamped yields
+
 	// EventEngine - v0.1, Snarko
 	m_aiYieldFromEvents.clear();
 	m_aiYieldFromEvents.resize(NUM_YIELD_TYPES, 0);
@@ -1067,6 +1177,8 @@ void CvPlayer::reset(PlayerTypes eID, bool bConstructorCall)
 
 	// EventEngine - v0.1, Snarko
 	m_aEventEffects.clear();
+
+	m_asziFlags.clear();
 	// END EventEngine
 
 	m_aOptions.clear();
@@ -1319,8 +1431,15 @@ void CvPlayer::initFreeState(CvGameInitialItemsOverrides& kOverrides)
 		iInitialCulture /= 100;
 		setJONSCulture(iInitialCulture);
 
+		// Revamped yields - v0.1, Snarko
+		// REMOVED
+		// Call it what you like, this seems like a pretty useless tag either way.
+		// Since it's not used and not likely to be used it has been removed.
+		/* Original code
 		 // I think policy points is a better name than Jon's Culture, don't you?
 		ChangeJONSCulturePerTurnForFree(kHandicapInfo.getFreeCulturePerTurn()); // No, IMNSHO ;P
+		*/
+		// END Revamped yields
 	}
 	// Extra Happiness from Luxuries
 	ChangeExtraHappinessPerLuxury(kHandicapInfo.getExtraHappinessPerLuxury());
@@ -1688,6 +1807,9 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 	CvString strBuffer;
 	CvString strName;
 	bool abEverOwned[MAX_PLAYERS];
+	// EventEngine - v0.1, Snarko
+	bool abEverConquered[MAX_PLAYERS];
+	// END EventEngine
 	PlayerTypes eOldOwner;
 	PlayerTypes eOriginalOwner;
 	BuildingTypes eBuilding;
@@ -1904,7 +2026,12 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 						if(GET_TEAM(GET_PLAYER(eMajor).getTeam()).isHasMet(getTeam()))
 						{
 							int iNumCities = max(GET_PLAYER(pOldCity->getOwner()).getNumCities(), 1);
+							// Softcoding - v0.1, Snarko
+							/* Original code
 							int iWarmongerOffset = (1000 * GC.getMap().getWorldInfo().GetEstimatedNumCities()) / (max(GC.getGame().getNumCities(), 1) * iNumCities);
+							*/
+							int iWarmongerOffset = (GC.getCITY_CAPTURE_WARMONGER_OFFSET() * GC.getMap().getWorldInfo().GetEstimatedNumCities()) / (max(GC.getGame().getNumCities(), 1) * iNumCities);
+							// END Softcoding
 							GET_PLAYER(eMajor).GetDiplomacyAI()->ChangeOtherPlayerWarmongerAmount(GetID(), iWarmongerOffset);
 						}
 					}
@@ -1958,9 +2085,16 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 	for(iI = 0; iI < MAX_PLAYERS; iI++)
 	{
 		abEverOwned[iI] = pOldCity->isEverOwned((PlayerTypes)iI);
+		// EventEngine - v0.1, Snarko
+		abEverConquered[iI] = pOldCity->isEverConquered((PlayerTypes)iI);
+		// END EventEngine
 	}
 
 	abEverOwned[GetID()] = true;
+	// EventEngine - v0.1, Snarko
+	if (bConquest)
+		abEverConquered[GetID()] = true;
+	// END EventEngine
 
 	for(iI = 0; iI < GC.getNumBuildingInfos(); iI++)
 	{
@@ -2202,6 +2336,9 @@ void CvPlayer::acquireCity(CvCity* pOldCity, bool bConquest, bool bGift)
 	for(iI = 0; iI < MAX_PLAYERS; iI++)
 	{
 		pNewCity->setEverOwned(((PlayerTypes)iI), abEverOwned[iI]);
+		// EventEngine - v0.1, Snarko
+		pNewCity->setEverConquered((PlayerTypes)iI, abEverConquered[iI]);
+		// END EventEngine
 	}
 
 	pNewCity->SetJONSCultureLevel(iOldCultureLevel);
@@ -3188,7 +3325,12 @@ void CvPlayer::DoLiberatePlayer(PlayerTypes ePlayer, int iOldCityID)
 			if(GET_TEAM(GET_PLAYER(eMajor).getTeam()).isHasMet(getTeam()))
 			{
 				int iNumCities = max(GET_PLAYER(ePlayer).getNumCities(), 1);
+				// Softcoding - v0.1, Snarko
+				/* Original code
 				int iWarmongerOffset = (1000 * GC.getMap().getWorldInfo().GetEstimatedNumCities()) / (max(GC.getGame().getNumCities(), 1) * iNumCities);
+				*/
+				int iWarmongerOffset = (GC.getCITY_CAPTURE_WARMONGER_OFFSET() * GC.getMap().getWorldInfo().GetEstimatedNumCities()) / (max(GC.getGame().getNumCities(), 1) * iNumCities);
+				// END Softcoding
 				GET_PLAYER(eMajor).GetDiplomacyAI()->ChangeOtherPlayerWarmongerAmount(GetID(), -iWarmongerOffset);
 			}
 		}
@@ -3693,11 +3835,21 @@ int CvPlayer::GetNumUnitsWithUnitAI(UnitAITypes eUnitAIType, bool bIncludeBeingT
 
 //	--------------------------------------------------------------------------------
 /// Returns number of Units a player has of a particular domain.  The second argument allows you to check whether or not to include civilians.
+// EventEngine - v0.1, Snarko
+/* Original code
 int CvPlayer::GetNumUnitsWithDomain(DomainTypes eDomain, bool bMilitaryOnly)
+*/
+int CvPlayer::GetNumUnitsWithDomain(DomainTypes eDomain, bool bMilitaryOnly) const
+// END EventEngine
 {
 	int iNumUnits = 0;
 
+	// EventEngine - v0.1, Snarko
+	/* Original code
 	CvUnit* pLoopUnit;
+	*/
+	const CvUnit* pLoopUnit;
+	// END EventEngine
 	int iLoop;
 
 	// Current Units
@@ -3716,11 +3868,21 @@ int CvPlayer::GetNumUnitsWithDomain(DomainTypes eDomain, bool bMilitaryOnly)
 }
 
 //	-----------------------------------------------------------------------------------------------
+// EventEngine - v0.1, Snarko
+/* Original code
 int CvPlayer::GetNumUnitsWithUnitCombat(UnitCombatTypes eUnitCombat)
+*/
+int CvPlayer::GetNumUnitsWithUnitCombat(UnitCombatTypes eUnitCombat) const
+// END EventEngine
 {
 	int iNumUnits = 0;
 
+	// EventEngine - v0.1, Snarko
+	/* Original code
 	CvUnit* pLoopUnit;
+	*/
+	const CvUnit* pLoopUnit;
+	// END EventEngine
 	int iLoop;
 
 	// Current Units
@@ -4143,8 +4305,7 @@ void CvPlayer::doTurn()
 	m_kPlayerAchievements.StartTurn();
 
 	// EventEngine - v0.1, Snarko
-	// doTempEventEffects should be before doEvents, so we do not count down an event we just triggered.
-	// Since the AI pick an option immediately.
+	// doTempEventEffects should be before doEvents, so we do not count down an event we just triggered. The AI pick an option immediately.
 	doTempEventEffects(); 
 	doEvents();
 	// END EventEngine
@@ -4187,10 +4348,16 @@ void CvPlayer::doTurnPostDiplomacy()
 	{
 		ChangeAttackBonusTurns(-1);
 	}
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use ChangeYieldBonusTurns
+	/* Original code
 	if(GetCultureBonusTurns() > 0)
 	{
 		ChangeCultureBonusTurns(-1);
 	}
+	*/
+	ChangeYieldBonusTurns(-1);
+	// END Revamped yields
 	if(GetTourismBonusTurns() > 0)
 	{
 		ChangeTourismBonusTurns(-1);
@@ -8203,11 +8370,16 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	ChangePlotCultureCostModifier(pBuildingInfo->GetGlobalPlotCultureCostModifier() * iChange);
 	ChangePlotGoldCostMod(pBuildingInfo->GetGlobalPlotBuyCostModifier() * iChange);
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	// City Culture Mod
 	ChangeJONSCultureCityModifier(pBuildingInfo->GetGlobalCultureRateModifier() * iChange);
 
 	// Trade route gold modifier
 	GetTreasury()->ChangeCityConnectionTradeRouteGoldModifier(pBuildingInfo->GetCityConnectionTradeRouteModifier() * iChange);
+	*/
+	// END Revamped yields
 
 	// Free Promotion
 	PromotionTypes eFreePromotion = (PromotionTypes) pBuildingInfo->GetFreePromotion();
@@ -8237,19 +8409,34 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 	changeGreatPeopleRateModFromBldgs(pBuildingInfo->GetGlobalGreatPeopleRateModifier() * iChange);
 	changeGreatGeneralRateModFromBldgs(pBuildingInfo->GetGreatGeneralRateModifier() * iChange);
 	ChangeGreatScientistBeakerMod(pBuildingInfo->GetGreatScientistBeakerModifier() * iChange);
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use ChangeGreatPersonExpendYield
+	/* Original code
 	ChangeGreatPersonExpendGold(pBuildingInfo->GetGreatPersonExpendGold() * iChange);
+	*/
+	// END Revamped yields
 	recomputeGreatPeopleModifiers();
 
 	changeGoldenAgeModifier(pBuildingInfo->GetGoldenAgeModifier() * iChange);
 	changeFreeExperienceFromBldgs(pBuildingInfo->GetGlobalFreeExperience() * iChange);
 	changeWorkerSpeedModifier(pBuildingInfo->GetWorkerSpeedModifier() * iChange);
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	ChangeSpecialistCultureChange(pBuildingInfo->GetSpecialistExtraCulture() * iChange);
+	*/
+	// END Revamped yields
 	changeBorderObstacleCount(pBuildingInfo->IsPlayerBorderObstacle() * iChange);
 
 	changeSpaceProductionModifier(pBuildingInfo->GetGlobalSpaceProductionModifier() * iChange);
 
 	for(iI = 0; iI < NUM_YIELD_TYPES; iI++)
 	{
+		// Revamped yields - v0.1, Snarko
+		ChangeCityConnectionTradeRouteYieldModifier((YieldTypes)iI, pBuildingInfo->GetCityConnectionTradeRouteModifier(iI) * iChange);
+		ChangeGreatPersonExpendYield((YieldTypes)iI, pBuildingInfo->GetGreatPersonExpendYield(iI) * iChange);
+		// END Revamped yields
 		pArea->changeYieldRateModifier(GetID(), ((YieldTypes)iI), (pBuildingInfo->GetAreaYieldModifier(iI) * iChange));
 		changeYieldRateModifier(((YieldTypes)iI), (pBuildingInfo->GetGlobalYieldModifier(iI) * iChange));
 	}
@@ -8309,13 +8496,19 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 
 					if(iBuildingCount > 0)
 					{
+						// Revamped yields - v0.1, Snarko
+						/* Original code
 						pLoopCity->ChangeJONSCulturePerTurnFromBuildings(pBuildingInfo->GetBuildingClassYieldChange(eBuildingClass, YIELD_CULTURE) * iBuildingCount * iChange);
+						*/
+						// END Revamped yields
 
 						// Building Class Yield Stuff
 						for(iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
 						{
+							// Revamped yields - v0.1, Snarko
+							/* Original code
 							switch(iJ)
-							{
+							{	
 							case YIELD_CULTURE:
 							{
 								// Skip, handled above
@@ -8336,6 +8529,14 @@ void CvPlayer::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst
 								}
 							}
 							}
+							*/
+							YieldTypes eYield = (YieldTypes) iJ;
+							int iYieldChange = pBuildingInfo->GetBuildingClassYieldChange(eBuildingClass, eYield);
+							if(iYieldChange > 0)
+							{
+								pLoopCity->ChangeBaseYieldRateFromBuildings(eYield, iYieldChange * iBuildingCount * iChange);
+							}
+							// END Revamped yields
 						}
 					}
 				}
@@ -9207,36 +9408,52 @@ int CvPlayer::GetTotalJONSCulturePerTurn() const
 
 	int iCulturePerTurn = 0;
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	// Culture per turn from Cities
 	iCulturePerTurn += GetJONSCulturePerTurnFromCities();
 
 	// Special bonus which adds excess Happiness to Culture?
 	iCulturePerTurn += GetJONSCulturePerTurnFromExcessHappiness();
 
-	// Trait bonus which adds Culture for trade partners? 
 	iCulturePerTurn += GetJONSCulturePerTurnFromTraits();
+	*/
+	iCulturePerTurn += GetGenericYieldsPerTurn(YIELD_CULTURE);
 
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	// Free culture that's part of the player
 	iCulturePerTurn += GetJONSCulturePerTurnForFree();
+	*/
+	// END Revamped yields
 
 	// Culture from Minor Civs
 	iCulturePerTurn += GetCulturePerTurnFromMinorCivs();
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	// Culture from Religion
 	iCulturePerTurn += GetCulturePerTurnFromReligion();
 	
 	// Temporary boost from bonus turns
 	iCulturePerTurn += GetCulturePerTurnFromBonusTurns();
 
-	// EventEngine - v0.1, Snarko
-	iCulturePerTurn += getYieldFromEvents(YIELD_CULTURE);
-	// END EventEngine
-
 	// Golden Age bonus
 	if (isGoldenAge() && !IsGoldenAgeCultureBonusDisabled())
 	{
 		iCulturePerTurn += ((iCulturePerTurn * GC.getGOLDEN_AGE_CULTURE_MODIFIER()) / 100);
 	}
+	*/
+	int iModifier = 100;
+
+	iModifier += GetGenericYieldModifiers(YIELD_CULTURE);
+
+	iCulturePerTurn *= iModifier;
+	iCulturePerTurn /= 100;
+	// END Revamped yields
 
 	return iCulturePerTurn;
 }
@@ -9260,6 +9477,9 @@ int CvPlayer::GetJONSCulturePerTurnFromCities() const
 
 //	--------------------------------------------------------------------------------
 /// Special bonus which adds excess Happiness to Culture?
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 int CvPlayer::GetJONSCulturePerTurnFromExcessHappiness() const
 {
 	if(GC.getGame().isOption(GAMEOPTION_NO_HAPPINESS))
@@ -9267,6 +9487,7 @@ int CvPlayer::GetJONSCulturePerTurnFromExcessHappiness() const
 		return 0;
 	}
 
+	
 	if(getHappinessToCulture() != 0)
 	{
 		if(GetExcessHappiness() > 0)
@@ -9289,6 +9510,10 @@ int CvPlayer::GetJONSCulturePerTurnFromTraits() const
 }
 
 //	--------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// REMOVED
+// This tag is not used in base civ 5 and there's little reason to keep it.
+/* Original code
 /// Culture per turn player starts with for free
 int CvPlayer::GetJONSCulturePerTurnForFree() const
 {
@@ -9307,6 +9532,8 @@ void CvPlayer::ChangeJONSCulturePerTurnForFree(int iChange)
 		GC.GetEngineUserInterface()->setDirty(GameData_DIRTY_BIT, true);
 	}
 }
+*/
+// END Revamped yields
 
 //	--------------------------------------------------------------------------------
 /// DEPRECATED, use GetCulturePerTurnFromMinorCivs() instead
@@ -9356,6 +9583,9 @@ int CvPlayer::GetCulturePerTurnFromMinor(PlayerTypes eMinor) const
 /// Culture per turn from religion
 int CvPlayer::GetCulturePerTurnFromReligion() const
 {
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int iOtherCulturePerTurn = 0;
 	int iReligionCulturePerTurn = 0;
 
@@ -9364,6 +9594,9 @@ int CvPlayer::GetCulturePerTurnFromReligion() const
 	iOtherCulturePerTurn += GetJONSCulturePerTurnFromExcessHappiness();
 	iOtherCulturePerTurn += GetJONSCulturePerTurnForFree();
 	iOtherCulturePerTurn += GetCulturePerTurnFromMinorCivs();
+	*/
+	int iReligionCulturePerTurn = 0;
+	// END Revamped yields
 
 	// Founder beliefs
 	CvGameReligions* pReligions = GC.getGame().GetGameReligions();
@@ -9391,6 +9624,9 @@ int CvPlayer::GetCulturePerTurnFromReligion() const
 				}
 			}
 
+			// Revamped yields - v0.1, Snarko
+			// No longer used, code rewritten and moved elsewhere.
+			/* Original code
 			bool bAtPeace = GET_TEAM(getTeam()).getAtWarCount(false) == 0;
 			int iMod = pReligion->m_Beliefs.GetPlayerCultureModifier(bAtPeace);
 
@@ -9398,6 +9634,8 @@ int CvPlayer::GetCulturePerTurnFromReligion() const
 			{
 				iReligionCulturePerTurn += ((iReligionCulturePerTurn + iOtherCulturePerTurn) * iMod) / 100;
 			}
+			*/
+			// END Revamped yields
 			return iReligionCulturePerTurn;
 		}
 	}
@@ -9407,6 +9645,9 @@ int CvPlayer::GetCulturePerTurnFromReligion() const
 
 //	--------------------------------------------------------------------------------
 /// Culture from Bonus Turns
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 int CvPlayer::GetCulturePerTurnFromBonusTurns() const
 {
 	int iValue = 0;
@@ -9448,6 +9689,8 @@ void CvPlayer::ChangeJONSCultureCityModifier(int iChange)
 		}
 	}
 }
+*/
+// END Revamped yields
 
 
 //	--------------------------------------------------------------------------------
@@ -9537,6 +9780,9 @@ int CvPlayer::GetJONSCulturePerCityPerTurn() const
 }
 
 //	--------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 /// Amount of extra Culture per Wonder
 int CvPlayer::GetCulturePerWonder() const
 {
@@ -9578,6 +9824,318 @@ void CvPlayer::ChangeCultureWonderMultiplier(int iChange)
 	if(iChange != 0)
 		m_iCultureWonderMultiplier += iChange;
 }
+*/
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetYieldPerWonder(YieldTypes eYield) const
+{
+	return m_aiYieldPerWonder[eYield];
+}
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::ChangeYieldPerWonder(YieldTypes eYield, int iChange)
+{
+	m_aiYieldPerWonder.setAt(eYield, m_aiYieldPerWonder[eYield] + iChange);
+}
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetYieldWonderMultiplier(YieldTypes eYield) const
+{
+	return m_aiYieldWonderMultiplier[eYield];
+}
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::ChangeYieldWonderMultiplier(YieldTypes eYield, int iChange)
+{
+	m_aiYieldWonderMultiplier.setAt(eYield, m_aiYieldWonderMultiplier[eYield] + iChange);
+}
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetReligionYieldModifier(YieldTypes eYield) const
+{
+	int iModifier = 0;
+
+	CvGameReligions* pReligions = GC.getGame().GetGameReligions();
+	ReligionTypes eFoundedReligion = pReligions->GetFounderBenefitsReligion(GetID());
+	if(eFoundedReligion != NO_RELIGION)
+	{
+		const CvReligion* pReligion = pReligions->GetReligion(eFoundedReligion, NO_PLAYER);
+		if (pReligion)
+		{
+			bool bAtPeace = GET_TEAM(getTeam()).getAtWarCount(false) == 0;
+			iModifier += pReligion->m_Beliefs.GetPlayerYieldModifier(eYield, bAtPeace);
+		}
+	}
+
+	return iModifier;
+}
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetYieldPerTurnFromTraits(YieldTypes eYield) const
+{
+	return GetPlayerTraits()->GetYieldChangePerTradePartner(eYield) * GetTrade()->GetNumDifferentTradingPartners();
+}
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetYieldPerTurnFromReligion(YieldTypes eYield) const
+{
+	int iYieldFromReligion = 0;
+
+	CvGameReligions* pReligions = GC.getGame().GetGameReligions();
+
+	// Founder beliefs
+	ReligionTypes eFoundedReligion = pReligions->GetFounderBenefitsReligion(GetID());
+	if(eFoundedReligion != NO_RELIGION)
+	{
+		const CvReligion* pReligion = pReligions->GetReligion(eFoundedReligion, NO_PLAYER);
+		if(pReligion)
+		{
+			// There should probably be a check if we control the holy city here...
+			// But there wasn't one in the original code so letting it be like this for now
+			iYieldFromReligion += pReligion->m_Beliefs.GetHolyCityYieldChange(eYield);
+
+			int iTemp = pReligion->m_Beliefs.GetYieldChangePerForeignCity(eYield);
+			if (iTemp != 0)
+			{
+				iYieldFromReligion += (iTemp * GetReligions()->GetNumForeignCitiesFollowing());
+			}
+
+			iTemp = pReligion->m_Beliefs.GetYieldChangePerXForeignFollowers(eYield);
+			if (iTemp != 0)
+			{
+				int iFollowers = GetReligions()->GetNumForeignFollowers(false /*bAtPeace*/);
+				if (iFollowers > 0)
+				{
+					iYieldFromReligion += (iFollowers / iTemp);
+				}
+			}
+
+			int iYieldPerFollowingCity = pReligion->m_Beliefs.GetYieldPerFollowingCity(eYield);
+			iYieldFromReligion += (pReligions->GetNumCitiesFollowing(eFoundedReligion) * iYieldPerFollowingCity);
+
+			int iYieldPerXFollowers = pReligion->m_Beliefs.GetYieldPerXFollowers(eYield);
+			if(iYieldPerXFollowers != 0)
+			{
+				iYieldFromReligion += (pReligions->GetNumFollowers(eFoundedReligion) / iYieldPerXFollowers);
+			}
+		}
+	}
+
+	return iYieldFromReligion;
+}
+
+//	--------------------------------------------------------------------------------
+// Yield from Cities
+int CvPlayer::GetYieldFromCities(YieldTypes eYield, bool bExcludeTradeRoutes) const
+{
+	return GetYieldFromCitiesTimes100(eYield, bExcludeTradeRoutes) / 100;
+}
+//	--------------------------------------------------------------------------------
+// Yield from Cities times 100
+int CvPlayer::GetYieldFromCitiesTimes100(YieldTypes eYield, bool bExcludeTradeRoutes) const
+{
+	int iYield = 0;
+
+	const CvCity* pLoopCity;
+
+	int iLoop;
+	for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+	{
+		iYield += pLoopCity->getYieldRateTimes100(eYield, bExcludeTradeRoutes);
+	}
+
+	return iYield;
+}
+
+//	--------------------------------------------------------------------------------
+/// How much of a percent bonus do we get for Trade Routes
+int CvPlayer::GetCityConnectionTradeRouteYieldModifier(YieldTypes eIndex) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+	return m_aiCityConnectionTradeRouteYieldModifier[eIndex];
+}
+
+//	--------------------------------------------------------------------------------
+/// Changes how much of a percent bonus do we get for Trade Routes
+void CvPlayer::ChangeCityConnectionTradeRouteYieldModifier(YieldTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+	if(iChange != 0)
+	{
+		m_aiCityConnectionTradeRouteYieldModifier.setAt(eIndex, m_aiCityConnectionTradeRouteYieldModifier[eIndex] + iChange);
+
+		DoUpdateCityConnectionYield(eIndex);
+	}
+}
+
+//	--------------------------------------------------------------------------------
+// Yield from city connections
+int CvPlayer::GetCityConnectionTradeRouteYieldChange(YieldTypes eIndex) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+	return m_aiCityConnectionTradeRouteYieldChange[eIndex];
+}
+
+//	--------------------------------------------------------------------------------
+// Changes how much of a yield we get from city connections
+void CvPlayer::ChangeCityConnectionTradeRouteYieldChange(YieldTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+	if (iChange != 0)
+	{
+		m_aiCityConnectionTradeRouteYieldChange.setAt(eIndex, m_aiCityConnectionTradeRouteYieldChange[eIndex] + iChange);
+
+		DoUpdateCityConnectionYield(eIndex);
+	}
+}
+
+//	--------------------------------------------------------------------------------
+/// Returns cached amount of Yield being brought in for having Cities connected via a Route
+int CvPlayer::GetCityConnectionYield(YieldTypes eYield) const
+{
+	return GetCityConnectionYieldTimes100(eYield) / 100;
+}
+
+//	--------------------------------------------------------------------------------
+/// Returns cached amount of Yield being brought in for having Cities connected via a Route
+int CvPlayer::GetCityConnectionYieldTimes100(YieldTypes eIndex) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+	return m_aiCityConnectionYieldTimes100[eIndex];
+}
+
+//	--------------------------------------------------------------------------------
+// Updates how much of a specific yield we are getting from cities.
+void CvPlayer::DoUpdateCityConnectionYield(YieldTypes eIndex)
+{
+	int iNumYield = 0;
+
+	CvCity* pCapitalCity = getCapitalCity();
+
+	// Must have a capital before we can check if other Cities are connected to it!
+	if(pCapitalCity != NULL && getNumCities() > 1)
+	{
+		CvCity* pLoopCity;
+
+		int iLoop;
+		for(pLoopCity = firstCity(&iLoop); pLoopCity != NULL; pLoopCity = nextCity(&iLoop))
+		{
+			if(pLoopCity != pCapitalCity)
+			{
+				if(GetTreasury()->HasCityConnectionRouteBetweenCities(pCapitalCity, pLoopCity))
+				{
+					iNumYield += GetCityConnectionRouteYieldTimes100(eIndex, pLoopCity);
+				}
+			}
+		}
+	}
+
+	m_aiCityConnectionYieldTimes100.setAt(eIndex, iNumYield);
+}
+
+//	--------------------------------------------------------------------------------
+// Updates how much of all yields we are getting from cities.
+void CvPlayer::DoUpdateAllCityConnectionYields()
+{
+	for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+	{
+		DoUpdateCityConnectionYield((YieldTypes)iI);
+	}
+}
+
+//	--------------------------------------------------------------------------------
+/// Get the amount of yield granted by connecting the city
+int CvPlayer::GetCityConnectionRouteYieldTimes100(YieldTypes eYield, CvCity* pNonCapitalCity) const
+{
+	const CvCity* pCapitalCity = getCapitalCity();
+	if(!pNonCapitalCity || pNonCapitalCity == pCapitalCity || pCapitalCity == NULL)
+	{
+		return 0;
+	}
+
+	int iYield = 0;
+
+	CvYieldInfo* pYield = GC.getYieldInfo(eYield);
+
+	int iTradeRouteBaseYield = pYield->getCityConnectionBase();
+	int iTradeRouteCapitalYieldMultiplier = pYield->getCityConnectionCapitalPopMultiplier();
+	int iTradeRouteCityYieldMultiplier = pYield->getCityConnectionCityPopMultiplier();
+
+	iYield += iTradeRouteBaseYield; // Base yield
+	iYield += (pCapitalCity->getPopulation() * iTradeRouteCapitalYieldMultiplier);	// Capital Multiplier
+	iYield += (pNonCapitalCity->getPopulation() * iTradeRouteCityYieldMultiplier);	// City Multiplier
+	iYield += GetCityConnectionTradeRouteYieldChange(eYield) * 100;
+
+	if(GetCityConnectionTradeRouteYieldModifier(eYield) != 0)
+	{
+		iYield *= (100 + GetCityConnectionTradeRouteYieldModifier(eYield));
+		iYield /= 100;
+	}
+
+	return iYield;
+}
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetGenericYieldsPerTurn(YieldTypes eYield) const
+{
+	return GetGenericYieldsPerTurnTimes100(eYield) / 100;
+}
+// Yields that are common for all types (that are used on player level)
+int CvPlayer::GetGenericYieldsPerTurnTimes100(YieldTypes eYield) const
+{
+	int iYieldPerTurn = 0;
+	// Culture per turn from Cities
+	iYieldPerTurn += GetYieldFromCitiesTimes100(eYield);
+
+	// Excess Happiness (policy)
+	iYieldPerTurn += GetYieldPerTurnFromExcessHappiness(eYield) * 100;
+
+	// Happy (policy)
+	iYieldPerTurn += GetYieldFromHappinessTimes100(eYield);
+
+	// City connection bonuses
+	iYieldPerTurn += GetCityConnectionYieldTimes100(eYield);
+
+	// International trade
+	iYieldPerTurn += GetYieldPerTurnFromTraits(eYield) * 100;
+
+	// Religion
+	iYieldPerTurn += GetYieldPerTurnFromReligion(eYield) * 100;
+
+	// Resolutions
+	iYieldPerTurn += GetYieldFromResolutions(eYield) * 100;
+
+	// EventEngine - v0.1, Snarko
+	iYieldPerTurn += getYieldFromEvents(eYield) * 100;
+	// END EventEngine
+
+	return iYieldPerTurn;
+}
+
+// Yields modifiers that are common for all types (that are used on player level)
+int CvPlayer::GetGenericYieldModifiers(YieldTypes eYield) const
+{
+	int iModifier = 0;
+
+	// League rewards
+	iModifier += GetYieldFromLeagueReward(eYield);
+
+	// Religion modifier
+	iModifier += GetReligionYieldModifier(eYield);
+
+	// Golden Age modifier
+	if (isGoldenAge() && !IsGoldenAgeCultureBonusDisabled())
+	{
+		iModifier += GC.getYieldInfo(eYield)->getGoldenAgePlayerYieldMod();
+	}
+
+	return iModifier;
+}
+// END Revamped yields
 
 //	--------------------------------------------------------------------------------
 /// Amount of Culture provided for each Tech Researched
@@ -9597,6 +10155,10 @@ void CvPlayer::ChangeCulturePerTechResearched(int iChange)
 }
 
 //	--------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// REMOVED
+// This is not used in base civ 5 and there's little reason to keep it.
+/* Original code
 /// Specialist Culture Modifier
 int CvPlayer::GetSpecialistCultureChange() const
 {
@@ -9650,6 +10212,8 @@ void CvPlayer::ChangeSpecialistCultureChange(int iChange)
 		}
 	}
 }
+*/
+// END Revamped yields
 
 //	--------------------------------------------------------------------------------
 /// What is the sum of culture yield from the previous N turns?
@@ -9960,18 +10524,32 @@ int CvPlayer::GetTotalFaithPerTurn() const
 	if(IsAnarchy())
 		return 0;
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	// Faith per turn from Cities
 	iFaithPerTurn += GetFaithPerTurnFromCities();
+	*/
+	iFaithPerTurn += GetGenericYieldsPerTurn(YIELD_FAITH);
+	// END Revamped yields
 
 	// Faith per turn from Minor Civs
 	iFaithPerTurn += GetFaithPerTurnFromMinorCivs();
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	// Faith per turn from Religion (Founder beliefs)
 	iFaithPerTurn += GetFaithPerTurnFromReligion();
+	*/
+	// Modifiers
+	int iModifier = 100;
 
-	// EventEngine - v0.1, Snarko
-	iFaithPerTurn += getYieldFromEvents(YIELD_FAITH);
-	// END EventEngine
+	iModifier += GetGenericYieldModifiers(YIELD_FAITH);
+
+	iFaithPerTurn *= iModifier;
+	iFaithPerTurn /= 100;
+	// END Revamped yields
 
 	return iFaithPerTurn;
 }
@@ -12111,6 +12689,9 @@ void CvPlayer::ChangeAttackBonusTurns(int iChange)
 }
 
 //	--------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 // Get Culture Bonus for a certain period of time
 int CvPlayer::GetCultureBonusTurns() const
 {
@@ -12126,6 +12707,69 @@ void CvPlayer::ChangeCultureBonusTurns(int iChange)
 		m_iCultureBonusTurns += iChange;
 	}
 }
+*/
+int CvPlayer::GetYieldFromLeagueReward(YieldTypes eYield) const
+{
+	int iBonus = 0;
+	for (std::vector<LeagueRewardYieldModifier>::const_iterator it = m_aYieldBonusTurns.begin(); it != m_aYieldBonusTurns.end(); ++it)
+	{
+		if ((*it).eYield == eYield)
+		{
+			iBonus += (*it).iChange;
+		}
+	}
+	return iBonus;
+}
+
+std::vector<LeagueRewardYieldModifier> CvPlayer::GetYieldBonusTurns(YieldTypes eYield) const
+{
+	std::vector<LeagueRewardYieldModifier> returnVector;
+	for (std::vector<LeagueRewardYieldModifier>::const_iterator it = m_aYieldBonusTurns.begin(); it != m_aYieldBonusTurns.end(); ++it)
+	{
+		if ((*it).eYield == eYield)
+		{
+			returnVector.push_back((*it));
+		}
+	}
+
+	return returnVector;
+}
+
+std::vector<LeagueRewardYieldModifier> CvPlayer::GetYieldBonusTurns() const
+{
+	return m_aYieldBonusTurns;
+}
+
+
+void CvPlayer::ChangeYieldBonusTurns(std::vector<LeagueRewardYieldModifier> pYieldBonusTurns)
+{
+	m_aYieldBonusTurns.insert(m_aYieldBonusTurns.end(), pYieldBonusTurns.begin(), pYieldBonusTurns.end());
+}
+
+void CvPlayer::ChangeYieldBonusTurns(int iChange)
+{
+	for (std::vector<LeagueRewardYieldModifier>::iterator it = m_aYieldBonusTurns.begin(); it != m_aYieldBonusTurns.end();)
+	{
+		(*it).iTurns += iChange;
+		if ((*it).iTurns <= 0)
+			it = m_aYieldBonusTurns.erase(it);
+		else
+			++it;
+	}
+}
+
+int CvPlayer::GetYieldFromResolutions(YieldTypes eYield) const
+{
+	return m_aiResolutionYieldEffects[eYield];
+}
+
+void CvPlayer::ChangeYieldFromResolutions(int iYield, int iChange)
+{
+	FAssert(iYield > NO_YIELD);
+	FAssert(iYield < NUM_YIELD_TYPES);
+	m_aiResolutionYieldEffects.setAt(iYield, m_aiResolutionYieldEffects[iYield] + iChange);
+}
+// END Revamped yields
 
 //	--------------------------------------------------------------------------------
 // Get Tourism Bonus for a certain period of time
@@ -12761,6 +13405,10 @@ void CvPlayer::DoUnitKilledCombat(PlayerTypes eKilledPlayer, UnitTypes eUnitType
 /// Do effects when a GP is consumed
 void CvPlayer::DoGreatPersonExpended(UnitTypes /*eGreatPersonUnit*/)
 {
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	// Gold gained
 	int iExpendGold = GetGreatPersonExpendGold();
 	if(iExpendGold > 0)
@@ -12809,8 +13457,66 @@ void CvPlayer::DoGreatPersonExpended(UnitTypes /*eGreatPersonUnit*/)
 			}
 		}
 	}
+	*/
+	// Yields gained
+	for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+	{
+		int iYield = GetGreatPersonExpendYield((YieldTypes)iI);
+		if (iYield != 0)
+		{
+			ChangeImmediateYield((YieldTypes)iI, iYield);
+			// Probably useless since achievements are deactivated in mods, but doesn't hurt to leave it in.
+			if ((YieldTypes)iI == YIELD_GOLD && isHuman() && !GC.getGame().isGameMultiPlayer() && GET_PLAYER(GC.getGame().getActivePlayer()).isLocalPlayer())
+			{
+				// Update Steam stat and check achievement
+				const int HALICARNASSUS_ACHIEVEMENT_GOLD = 1000;
+				int iHalicarnassus = GC.getInfoTypeForString("BUILDINGCLASS_MAUSOLEUM_HALICARNASSUS");
+				// Does player have DLC_06, and if so, do they have the Mausoleum of Halicarnassus?
+				if(iHalicarnassus != -1 && getBuildingClassCount((BuildingClassTypes)iHalicarnassus) >= 1)
+				{
+					BuildingTypes eHalicarnassus = (BuildingTypes)GC.getInfoTypeForString("BUILDING_MAUSOLEUM_HALICARNASSUS");
+					CvBuildingEntry* pHalicarnassusInfo = GC.getBuildingInfo(eHalicarnassus);
+					int iHalicarnassusGold = pHalicarnassusInfo->GetGreatPersonExpendYield(YIELD_GOLD);
+
+					int32 iTotalHalicarnassusGold = 0;
+					if(gDLL->GetSteamStat(ESTEAMSTAT_HALICARNASSUSGOLDEARNED, &iTotalHalicarnassusGold))
+					{
+						iTotalHalicarnassusGold += iHalicarnassusGold;
+						gDLL->SetSteamStat(ESTEAMSTAT_HALICARNASSUSGOLDEARNED, iTotalHalicarnassusGold);
+						if(iTotalHalicarnassusGold >= HALICARNASSUS_ACHIEVEMENT_GOLD)
+						{
+							gDLL->UnlockAchievement(ACHIEVEMENT_SPECIAL_HALICARNASSUS_GOLD);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	ReligionTypes eReligionFounded = GetReligions()->GetReligionCreatedByPlayer();
+	if(eReligionFounded > RELIGION_PANTHEON)
+	{
+		const CvReligion* pReligion = GC.getGame().GetGameReligions()->GetReligion(eReligionFounded, GetID());
+		if(pReligion)
+		{
+			for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+			{
+				int iYield = pReligion->m_Beliefs.GetGreatPersonExpendedYield((YieldTypes)iI);
+				iYield *= GC.getGame().getGameSpeedInfo().getTrainPercent();
+				iYield /= 100;
+				if (iYield != 0)
+				{
+					ChangeImmediateYield((YieldTypes)iI, iYield);
+				}
+			}
+		}
+	}
+	// END Revamped yields
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 //	--------------------------------------------------------------------------------
 int CvPlayer::GetGreatPersonExpendGold() const
 {
@@ -12822,6 +13528,17 @@ void CvPlayer::ChangeGreatPersonExpendGold(int ichange)
 {
 	m_iGreatPersonExpendGold += ichange;
 }
+*/
+int CvPlayer::GetGreatPersonExpendYield(YieldTypes eYield) const
+{
+	return m_aiGreatPersonExpendYield[eYield];
+}
+
+void CvPlayer::ChangeGreatPersonExpendYield(YieldTypes eYield, int iChange)
+{
+	m_aiGreatPersonExpendYield.setAt(eYield, m_aiGreatPersonExpendYield[eYield] + iChange);
+}
+// END Revamped yields
 
 //	--------------------------------------------------------------------------------
 void CvPlayer::recomputeGreatPeopleModifiers()
@@ -13860,6 +14577,9 @@ void CvPlayer::changeHappyPerMilitaryUnit(int iChange)
 }
 
 //	--------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 int CvPlayer::getHappinessToCulture() const
 {
 	return m_iHappinessToCulture;
@@ -13890,6 +14610,37 @@ void CvPlayer::changeHappinessToScience(int iChange)
 		CvAssert(getHappinessToScience() >= 0);
 	}
 }
+*/
+//	--------------------------------------------------------------------------------
+int CvPlayer::getHappinessToYield(YieldTypes eYield) const
+{
+	return m_aiHappinessToYield[eYield];
+}
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::changeHappinessToYield(YieldTypes eYield, int iChange)
+{
+	if (iChange != 0)
+	{
+		m_aiHappinessToYield.setAt(eYield, m_aiHappinessToYield[eYield] + iChange);
+	}
+}
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::getHappyYieldMultiplier(YieldTypes eYield) const
+{
+	return m_aiHappyYieldMultiplier[eYield];
+}
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::changeHappyYieldMultiplier(YieldTypes eYield, int iChange)
+{
+	if (iChange != 0)
+	{
+		m_aiHappyYieldMultiplier.setAt(eYield, m_aiHappyYieldMultiplier[eYield] + iChange);
+	}
+}
+// END Revamped yields
 
 //	--------------------------------------------------------------------------------
 int CvPlayer::getHalfSpecialistUnhappinessCount() const
@@ -15734,7 +16485,13 @@ void CvPlayer::setTurnActive(bool bNewValue, bool bDoTurn)
 
 					// This block all has things which might change based on city connections changing
 					m_pCityConnections->Update();
+					// Revamped yields - v0.1, Snarko
+					// No longer used
+					/*
 					GetTreasury()->DoUpdateCityConnectionGold();
+					*/
+					DoUpdateAllCityConnectionYields();
+					// END Revamped yields
 					DoUpdateHappiness();
 				}
 
@@ -16420,6 +17177,138 @@ const CvColorA& CvPlayer::getPlayerTextColor() const
 	return black;
 }
 
+// Revamped yields - v0.1, Snarko
+//	--------------------------------------------------------------------------------
+int CvPlayer::getYieldFromGarrison(YieldTypes eIndex) const
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+	return m_aiYieldFromGarrison[eIndex];
+}
+
+
+//	--------------------------------------------------------------------------------
+void CvPlayer::changeYieldFromGarrison(YieldTypes eIndex, int iChange)
+{
+	CvAssertMsg(eIndex >= 0, "eIndex is expected to be non-negative (invalid Index)");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex is expected to be within maximum bounds (invalid Index)");
+
+	if(iChange != 0)
+	{
+		m_aiYieldFromGarrison.setAt(eIndex, m_aiYieldFromGarrison[eIndex] + iChange);
+
+		invalidateYieldRankCache(eIndex);
+
+		if(getTeam() == GC.getGame().getActiveTeam())
+		{
+			GC.GetEngineUserInterface()->setDirty(CityInfo_DIRTY_BIT, true);
+		}
+	}
+}
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetYieldPerTurnFromExcessHappiness(YieldTypes eYield) const
+{
+	if(GC.getGame().isOption(GAMEOPTION_NO_HAPPINESS))
+	{
+		return 0;
+	}
+
+	
+	if (getHappinessToYield(eYield) != 0)
+	{
+		if (GetExcessHappiness() > 0)
+		{
+			int iYield = GetExcessHappiness() * getHappinessToYield(eYield);
+			iYield /= 100;
+
+			return iYield;
+		}
+	}
+
+	return 0;
+}
+
+//	--------------------------------------------------------------------------------
+int CvPlayer::GetYieldFromHappinessTimes100(YieldTypes eYield) const
+{
+	if(GC.getGame().isOption(GAMEOPTION_NO_HAPPINESS))
+	{
+		return 0;
+	}
+
+	if(getHappyYieldMultiplier(eYield) != 0)
+	{
+		if(GetExcessHappiness() >= 0)
+		{
+			int iYield = GetYieldFromCitiesTimes100(eYield, false) * getHappyYieldMultiplier(eYield);
+			iYield /= 100;
+
+			return iYield;
+		}
+	}
+
+	return 0;
+}
+
+void CvPlayer::ChangeImmediateYield(YieldTypes eYield, int iChange, bool bDisplay, int iX, int iY)
+{
+	char text[256] = {0};
+	switch(eYield)
+	{
+	case YIELD_GOLD:
+		GetTreasury()->ChangeGold(iChange);
+		if (bDisplay)
+		{
+			sprintf_s(text, "[COLOR_YELLOW]+%d[ENDCOLOR][ICON_GOLD]", iChange);
+			GC.GetEngineUserInterface()->AddPopupText(iX, iY, text, 0.5f);
+		}
+		break;
+
+	case YIELD_SCIENCE:
+		{
+			TechTypes eCurrentTech = GetPlayerTechs()->GetCurrentResearch();
+			if(eCurrentTech == NO_TECH)
+			{
+				changeOverflowResearch(iChange);
+			}
+			else
+			{
+				GET_TEAM(getTeam()).GetTeamTechs()->ChangeResearchProgress(eCurrentTech, iChange, GetID());
+			}
+			if (bDisplay)
+			{
+				sprintf_s(text, "[COLOR_BLUE]+%d[ENDCOLOR][ICON_RESEARCH]", iChange);
+				GC.GetEngineUserInterface()->AddPopupText(iX, iY, text, 0.5f);
+			}
+		}
+		break;
+
+	case YIELD_CULTURE:
+		changeJONSCulture(iChange);
+		if (bDisplay)
+		{
+			sprintf_s(text, "[COLOR_MAGENTA]+%d[ENDCOLOR][ICON_CULTURE]", iChange);
+			GC.GetEngineUserInterface()->AddPopupText(iX, iY, text, 0.5f);
+		}
+		break;
+
+	case YIELD_FAITH:
+		ChangeFaith(iChange);
+		if (bDisplay)
+		{
+			sprintf_s(text, "[COLOR_WHITE]+%d[ENDCOLOR][ICON_PEACE]", iChange);
+			GC.GetEngineUserInterface()->AddPopupText(iX, iY, text, 0.5f);
+		}
+		break;
+
+	// NO_YIELD, YIELD_FOOD or YIELD_PRODUCTION.
+	default:
+		break;
+	}
+}
+// END Revamped yields
+
 //	--------------------------------------------------------------------------------
 int CvPlayer::getSeaPlotYield(YieldTypes eIndex) const
 {
@@ -16600,7 +17489,12 @@ void CvPlayer::setFlag(std::string szFlag, int iValue)
 	m_asziFlags[szFlag] = iValue;
 }
 
-int CvPlayer::getFlag(std::string szFlag)
+void CvPlayer::changeFlag(std::string szFlag, int iValue)
+{
+	setFlag(szFlag, getFlag(szFlag) + iValue);
+}
+
+int CvPlayer::getFlag(std::string szFlag) const
 {
 	std::map<std::string, int>::const_iterator it = m_asziFlags.find(szFlag);
 	if (it == m_asziFlags.end())
@@ -16625,14 +17519,25 @@ int CvPlayer::GetScienceTimes100() const
 
 	int iValue = 0;
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	// Science from our Cities
 	iValue += GetScienceFromCitiesTimes100(false);
+	*/
+	iValue += GetGenericYieldsPerTurnTimes100(YIELD_SCIENCE);
+	// END Revamped yields
 
 	// Science from other players!
 	iValue += GetScienceFromOtherPlayersTimes100();
 
 	// Happiness converted to Science? (Policies, etc.)
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	iValue += GetScienceFromHappinessTimes100();
+	*/
+	// END Revamped yields
 
 	// Research Agreement bonuses
 	iValue += GetScienceFromResearchAgreementsTimes100();
@@ -16640,9 +17545,15 @@ int CvPlayer::GetScienceTimes100() const
 	// If we have a negative Treasury + GPT then it gets removed from Science
 	iValue += GetScienceFromBudgetDeficitTimes100();
 
-	// EventEngine - v0.1, Snarko
-	iValue += getYieldFromEvents(YIELD_SCIENCE) * 100;
-	// END EventEngine
+	// Revamped yields - v0.1, Snarko
+	// Modifiers
+	int iModifier = 100;
+
+	iModifier += GetGenericYieldModifiers(YIELD_SCIENCE);
+
+	iValue *= iModifier;
+	iValue /= 100;
+	// END Revamped yields
 
 	return max(iValue, 0);
 }
@@ -16692,6 +17603,9 @@ int CvPlayer::GetScienceFromOtherPlayersTimes100() const
 
 //	--------------------------------------------------------------------------------
 /// Where is our Science coming from?
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 int CvPlayer::GetScienceFromHappinessTimes100() const
 {
 	if(GC.getGame().isOption(GAMEOPTION_NO_HAPPINESS))
@@ -16714,6 +17628,8 @@ int CvPlayer::GetScienceFromHappinessTimes100() const
 
 	return iScience;
 }
+*/
+// END Revamped yields
 
 //	--------------------------------------------------------------------------------
 /// Where is our Science coming from?
@@ -20860,8 +21776,13 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 
 	const CvPolicyEntry& kPolicy = (*pPolicy);
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	ChangeCulturePerWonder(pPolicy->GetCulturePerWonder() * iChange);
 	ChangeCultureWonderMultiplier(pPolicy->GetCultureWonderMultiplier() * iChange);
+	*/
+	// END Revamped yields
 	ChangeCulturePerTechResearched(pPolicy->GetCulturePerTechResearched() * iChange);
 	ChangeGoldenAgeMeterMod(pPolicy->GetGoldenAgeMeterMod() * iChange);
 	changeGoldenAgeModifier(pPolicy->GetGoldenAgeDurationMod() * iChange);
@@ -20892,7 +21813,12 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	ChangeGarrisonFreeMaintenanceCount(pPolicy->IsGarrisonFreeMaintenance() * iChange);
 	ChangeGarrisonedCityRangeStrikeModifier(pPolicy->GetGarrisonedCityRangeStrikeModifier() * iChange);
 	ChangeUnitPurchaseCostModifier(pPolicy->GetUnitPurchaseCostModifier() * iChange);
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use ChangeCityConnectionTradeRouteYieldModifier
+	/* Original code
 	GetTreasury()->ChangeCityConnectionTradeRouteGoldModifier(pPolicy->GetCityConnectionTradeRouteGoldModifier() * iChange);
+	*/
+	// END Revamped yields
 	changeGoldPerUnit(pPolicy->GetGoldPerUnit() * iChange);
 	changeGoldPerMilitaryUnit(pPolicy->GetGoldPerMilitaryUnit() * iChange);
 	ChangeCityStrengthMod(pPolicy->GetCityStrengthMod() * iChange);
@@ -20905,8 +21831,13 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	ChangeUnitGoldMaintenanceMod(pPolicy->GetUnitGoldMaintenanceMod() * iChange);
 	ChangeUnitSupplyMod(pPolicy->GetUnitSupplyMod() * iChange);
 	changeHappyPerMilitaryUnit(pPolicy->GetHappyPerMilitaryUnit() * iChange);
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use changeHappinessToYields
+	/* Original code
 	changeHappinessToCulture(pPolicy->GetHappinessToCulture() * iChange);
 	changeHappinessToScience(pPolicy->GetHappinessToScience() * iChange);
+	*/
+	// END Revamped yields
 	changeHalfSpecialistUnhappinessCount((pPolicy->IsHalfSpecialistUnhappiness()) ? iChange : 0);
 	changeHalfSpecialistFoodCount((pPolicy->IsHalfSpecialistFood()) ? iChange : 0);
 	changeMilitaryFoodProductionCount((pPolicy->IsMilitaryFoodProduction()) ? iChange : 0);
@@ -20950,6 +21881,32 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 	for(iI = 0; iI < NUM_YIELD_TYPES; iI++)
 	{
 		eYield = (YieldTypes) iI;
+
+		// Revamped yields - v0.1, Snarko
+		iMod = pPolicy->GetYieldFromGarrison(iI) * iChange;
+		if (iMod != 0)
+			changeYieldFromGarrison(eYield, iMod);
+
+		iMod = pPolicy->GetYieldPerWonder(iI) * iChange;
+		if (iMod != 0)
+			ChangeYieldPerWonder(eYield, iMod);
+
+		iMod = pPolicy->GetYieldWonderMultiplier(iI) * iChange;
+		if (iMod != 0)
+			ChangeYieldWonderMultiplier(eYield, iMod);
+
+		iMod = pPolicy->GetHappinessToYield(iI) * iChange;
+		if (iMod != 0)
+			changeHappinessToYield(eYield, iMod);
+
+		iMod = pPolicy->GetHappyYieldMultiplier(iI) * iChange;
+		if (iMod != 0)
+			changeHappyYieldMultiplier(eYield, iMod);
+
+		iMod = pPolicy->GetCityConnectionTradeRouteYieldModifier(iI) * iChange;
+		if (iMod != 0)
+			ChangeCityConnectionTradeRouteYieldModifier(eYield, iMod);
+		// END Revamped yields
 
 		iMod = pPolicy->GetYieldModifier(iI) * iChange;
 		if(iMod != 0)
@@ -21129,13 +22086,20 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 			iNumCitiesFreeFoodBuilding--;
 		}
 
+		// Revamped yields - v0.1, Snarko
+		// No longer used, use ChangeCityYieldChange
+		// XML tag still kept for backwards compatibility
+		/* Original code
 		// Free Culture-per-turn in every City
 		int iCityCultureChange = pPolicy->GetCulturePerCity() * iChange;
+		
 		if(pLoopCity->GetGarrisonedUnit() != NULL)
 		{
 			iCityCultureChange += (pPolicy->GetCulturePerGarrisonedUnit() * iChange);
 		}
 		pLoopCity->ChangeJONSCulturePerTurnFromPolicies(iCityCultureChange);
+		*/
+		// END Revamped yields
 
 		// Building modifiers
 		for(iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
@@ -21159,11 +22123,17 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 
 					if(iBuildingCount > 0)
 					{
+						// Revamped yields - v0.1, Snarko
+						/* Original code
 						pLoopCity->ChangeJONSCulturePerTurnFromPolicies(pPolicy->GetBuildingClassCultureChange(eBuildingClass) * iBuildingCount * iChange);
+						*/
+						// END Revamped yields
 
 						// Building Class Yield Stuff
 						for(iJ = 0; iJ < NUM_YIELD_TYPES; iJ++)
 						{
+							// Revamped yields - v0.1, Snarko
+							/* Original code
 							switch(iJ)
 							{
 							case YIELD_CULTURE:
@@ -21187,6 +22157,19 @@ void CvPlayer::processPolicies(PolicyTypes ePolicy, int iChange)
 									}
 								}
 							}
+							*/
+							eYield = (YieldTypes) iJ;
+							iYieldMod = pPolicy->GetBuildingClassYieldModifiers(eBuildingClass, eYield);
+							if (iYieldMod > 0)
+							{
+								pLoopCity->changeYieldRateModifier(eYield, iYieldMod * iBuildingCount * iChange);
+							}
+							iYieldChange = pPolicy->GetBuildingClassYieldChanges(eBuildingClass, eYield);
+							if (iYieldChange != 0)
+							{
+								pLoopCity->ChangeBaseYieldRateFromBuildings(eYield, iYieldChange * iBuildingCount * iChange);
+							}
+							// END Revamped yields
 						}
 					}
 				}
@@ -21670,8 +22653,8 @@ void CvPlayer::Read(FDataStream& kStream)
 	uint uiVersion;
 	kStream >> uiVersion;
 	// modVersion - v1, Snarko
-	//We are using our own value here, for this modcomp and others to follow, to keep backwards compatibility.
-	//While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem! Well, except mod versions created before using our modcomp(s)...
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem! Well, except mod versions created before using our modcomp(s)...
 	// USEDBY: EventEngine
 	uint modVersion;
 	kStream >> modVersion;
@@ -21682,13 +22665,27 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iTotalPopulation;
 	kStream >> m_iTotalLand;
 	kStream >> m_iTotalLandScored;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	kStream >> m_iJONSCulturePerTurnForFree;
 	kStream >> m_iJONSCulturePerTurnFromMinorCivs;
 	kStream >> m_iJONSCultureCityModifier;
+	*/
+	// END Revamped yields
 	kStream >> m_iJONSCulture;
 	kStream >> m_iJONSCultureEverGenerated;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	kStream >> m_iCulturePerWonder;
 	kStream >> m_iCultureWonderMultiplier;
+	*/
+	kStream >> m_aiYieldPerWonder;
+	kStream >> m_aiYieldWonderMultiplier;
+	// END Revamped yields
 	kStream >> m_iCulturePerTechResearched;
 	kStream >> m_iFaith;
 	kStream >> m_iFaithEverGenerated;
@@ -21735,12 +22732,26 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iAttackBonusTurns;
 	if (uiVersion >= 9)
 	{
+		// Revamped yields - v0.1, Snarko
+		// No longer used
+		// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+		/* Original code
 		kStream >> m_iCultureBonusTurns;
+		*/
+		kStream >> m_aYieldBonusTurns;
+		kStream >> m_aiResolutionYieldEffects;
+		// END Revamped yields
 		kStream >> m_iTourismBonusTurns;
 	}
 	else
 	{
+		// Revamped yields - v0.1, Snarko
+		// No longer used
+		// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+		/* Original code
 		m_iCultureBonusTurns = 0;
+		*/
+		// END Revamped yields
 		m_iTourismBonusTurns = 0;
 	}
 	kStream >> m_iGoldenAgeProgressMeter;
@@ -21798,7 +22809,14 @@ void CvPlayer::Read(FDataStream& kStream)
 	{
 		m_iGreatEngineerRateModifier = 0;
 	}
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	kStream >> m_iGreatPersonExpendGold;
+	*/
+	kStream >> m_aiGreatPersonExpendYield;
+	// END Revamped yields
 	kStream >> m_iMaxGlobalBuildingProductionModifier;
 	kStream >> m_iMaxTeamBuildingProductionModifier;
 	kStream >> m_iMaxPlayerBuildingProductionModifier;
@@ -21845,8 +22863,16 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iExtraUnitCost;
 	kStream >> m_iNumMilitaryUnits;
 	kStream >> m_iHappyPerMilitaryUnit;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	kStream >> m_iHappinessToCulture;
 	kStream >> m_iHappinessToScience;
+	*/
+	kStream >> m_aiHappinessToYield;
+	kStream >> m_aiHappyYieldMultiplier;
+	// END Revamped yields
 	kStream >> m_iHalfSpecialistUnhappinessCount;
 	kStream >> m_iHalfSpecialistFoodCount;
 	kStream >> m_iMilitaryFoodProductionCount;
@@ -21935,7 +22961,14 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> m_iTurnsSinceSettledLastCity;
 	kStream >> m_iNumNaturalWondersDiscoveredInArea;
 	kStream >> m_iStrategicResourceMod;
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	kStream >> m_iSpecialistCultureChange;
+	*/
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	// END Revamped yields
 	kStream >> m_iGreatPeopleSpawnCounter;
 	kStream >> m_iFreeTechCount;
 	kStream >> m_iMedianTechPercentage;
@@ -22008,15 +23041,26 @@ void CvPlayer::Read(FDataStream& kStream)
 	}
 	kStream >> m_aiExtraYieldThreshold;
 	kStream >> m_aiSpecialistExtraYield;
+	// Revamped yields - v0.1, Snarko
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	kStream >> m_aiYieldFromGarrison;
+	kStream >> m_aiCityConnectionTradeRouteYieldModifier;
+	kStream >> m_aiCityConnectionTradeRouteYieldChange;
+	kStream >> m_aiCityConnectionYieldTimes100;
+	// END Revamped yields
 	// EventEngine - v0.1, Snarko
-	if (modVersion >= 1)
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	kStream >> m_aiYieldFromEvents;
+	kStream >> m_aiYieldModFromEvents;
+
+	uint iNumEntries;
+	kStream >> iNumEntries;
+	for (uint iI = 0; iI < iNumEntries; iI++)
 	{
-		kStream >> m_aiYieldFromEvents;
-		kStream >> m_aiYieldModFromEvents;
-		//TODO
-		//kStream >> m_aEventEffects;
+		CvEventEffect temp;
+		temp.Read(kStream);
+		m_aEventEffects.push_back(temp);
 	}
-	//No need for an else for the first modVersion, because adding modVersion in the first place breaks saves.
 	// END EventEngine
 	kStream >> m_aiProximityToPlayer;
 	kStream >> m_aiResearchAgreementCounter;
@@ -22248,8 +23292,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 	//Save version number.  THIS MUST BE FIRST!!
 	kStream << g_CurrentCvPlayerVersion;
 	// modVersion - v1, Snarko
-	//We are using our own value here, for this modcomp and others to follow, to keep backwards compatibility.
-	//While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem!
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem!
 	// USEDBY: EventEngine
 	uint modVersion = 1;
 	kStream << modVersion;
@@ -22260,13 +23304,25 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iTotalPopulation;
 	kStream << m_iTotalLand;
 	kStream << m_iTotalLandScored;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	kStream << m_iJONSCulturePerTurnForFree;
 	kStream << m_iJONSCulturePerTurnFromMinorCivs;
 	kStream << m_iJONSCultureCityModifier;
+	*/
+	// END Revamped yields
 	kStream << m_iJONSCulture;
 	kStream << m_iJONSCultureEverGenerated;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	kStream << m_iCulturePerWonder;
 	kStream << m_iCultureWonderMultiplier;
+	*/
+	kStream << m_aiYieldPerWonder;
+	kStream << m_aiYieldWonderMultiplier;
+	// END Revamped yields
 	kStream << m_iCulturePerTechResearched;
 	kStream << m_iFaith;
 	kStream << m_iFaithEverGenerated;
@@ -22297,7 +23353,14 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iHappinessPerCity;
 	kStream << m_iAdvancedStartPoints;
 	kStream << m_iAttackBonusTurns;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	kStream << m_iCultureBonusTurns;
+	*/
+	kStream << m_aYieldBonusTurns;
+	kStream << m_aiResolutionYieldEffects;
+	// END Revamped yields
 	kStream << m_iTourismBonusTurns;
 	kStream << m_iGoldenAgeProgressMeter;
 	kStream << m_iGoldenAgeMeterMod;
@@ -22340,7 +23403,13 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iGreatScientistRateModifier;
 	kStream << m_iGreatScientistBeakerModifier;
 	kStream << m_iGreatEngineerRateModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	kStream << m_iGreatPersonExpendGold;
+	*/
+	kStream << m_aiGreatPersonExpendYield;
+	// END Revamped yields
 	kStream << m_iMaxGlobalBuildingProductionModifier;
 	kStream << m_iMaxTeamBuildingProductionModifier;
 	kStream << m_iMaxPlayerBuildingProductionModifier;
@@ -22380,8 +23449,15 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iExtraUnitCost;
 	kStream << m_iNumMilitaryUnits;
 	kStream << m_iHappyPerMilitaryUnit;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	kStream << m_iHappinessToCulture;
 	kStream << m_iHappinessToScience;
+	*/
+	kStream << m_aiHappinessToYield;
+	kStream << m_aiHappyYieldMultiplier;
+	// END Revamped yields
 	kStream << m_iHalfSpecialistUnhappinessCount;
 	kStream << m_iHalfSpecialistFoodCount;
 	kStream << m_iMilitaryFoodProductionCount;
@@ -22449,7 +23525,13 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_iTurnsSinceSettledLastCity;
 	kStream << m_iNumNaturalWondersDiscoveredInArea;
 	kStream << m_iStrategicResourceMod;
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	kStream << m_iSpecialistCultureChange;
+	*/
+	// END Revamped yields
 	kStream << m_iGreatPeopleSpawnCounter;
 	kStream << m_iFreeTechCount;
 	kStream << m_iMedianTechPercentage;
@@ -22497,13 +23579,21 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << m_aiGreatWorkYieldChange;
 	kStream << m_aiExtraYieldThreshold;
 	kStream << m_aiSpecialistExtraYield;
+	// Revamped yields - v0.1, Snarko
+	kStream << m_aiYieldFromGarrison;
+	kStream << m_aiCityConnectionTradeRouteYieldModifier;
+	kStream << m_aiCityConnectionTradeRouteYieldChange;
+	kStream << m_aiCityConnectionYieldTimes100;
+	// END Revamped yields
 	// EventEngine - v0.1, Snarko
 	if (modVersion >= 1)
 	{
 		kStream << m_aiYieldFromEvents;
 		kStream << m_aiYieldModFromEvents;
-		//TODO
-		//kStream << m_aEventEffects;
+
+		kStream << m_aEventEffects.size();
+		for (uint iI = 0; iI < m_aEventEffects.size(); iI++)
+			m_aEventEffects[iI].Write(kStream);
 	}
 	// END EventEngine
 	kStream << m_aiProximityToPlayer;
@@ -24699,7 +25789,14 @@ void CvPlayer::GatherPerTurnReplayStats(int iGameTurn)
 		setReplayDataValue(getReplayDataSetIndex("REPLAYDATASET_TOTALLAND"), iGameTurn, getTotalLand());
 
 		CvTreasury* pkTreasury = GetTreasury();
+		// Revamped yields - v0.1, Snarko
+		// TODO do this for other yields?
+		// No longer used
+		/*
 		setReplayDataValue(getReplayDataSetIndex("REPLAYDATASET_GPTCITYCONNECTIONS"), iGameTurn, pkTreasury->GetCityConnectionGold());
+		*/
+		setReplayDataValue(getReplayDataSetIndex("REPLAYDATASET_GPTCITYCONNECTIONS"), iGameTurn, GetCityConnectionYield(YIELD_GOLD));
+		// END Revamped yields
 		setReplayDataValue(getReplayDataSetIndex("REPLAYDATASET_GPTINTERNATIONALTRADE"), iGameTurn, pkTreasury->GetGoldPerTurnFromTradeRoutes());
 		setReplayDataValue(getReplayDataSetIndex("REPLAYDATASET_GPTDEALS"), iGameTurn, pkTreasury->GetGoldPerTurnFromDiplomacy());
 		setReplayDataValue(getReplayDataSetIndex("REPLAYDATASET_UNITMAINTENANCE"), iGameTurn, pkTreasury->GetExpensePerTurnUnitMaintenance());
@@ -24791,105 +25888,237 @@ bool CancelActivePlayerEndTurn()
 // EventEngine - v0.1, Snarko
 void CvPlayer::doEvents()
 {
-	gDLL->netMessageDebugLog("We got to 0");
 	bool bValid;
-	//A scope can have multiple valid results, so we need a vector inside the map. 
-	//For example if we're testing against resource class luxury and both silk and citrus meet the first requirement.
-	//We have to keep checking against both, because later on we might realize only silk meet some other requirement we also have to pass. 
-	//Or it might be citrus that meets it. We don't know when we set the scope at first.
-	std::map<std::string, std::vector<int> > asziScopes;
-	gDLL->netMessageDebugLog("We got to 1");
 
-	for (int i = 0; i < GC.getNumEventInfos(); i++)
+	for (int iI = 0; iI < GC.getNumEventInfos(); iI++)
 	{
-		gDLL->netMessageDebugLog("We got to 1.2");
-		asziScopes.clear();
-		gDLL->netMessageDebugLog("We got to 1.4");
+		m_asziSets.clear();
 		bValid = true;
-		gDLL->netMessageDebugLog("We got to 1.6");
-		CvEventInfo* kEvent = GC.getEventInfo((EventTypes)i);
-		gDLL->netMessageDebugLog("We got to 1.8. i is " + FSerialization::toString(i) + "\n");
-		gDLL->netMessageDebugLog("kEvent.getType is " + FSerialization::toString((int)kEvent->getEventType()) + "\n" );
-		if (kEvent->getEventType() != EVENT_PLAYER)
+		CvEventInfo* pEvent = GC.getEventInfo((EventTypes)iI);
+		if (pEvent->getEventType() != EVENT_PLAYER)
 		{
-			gDLL->netMessageDebugLog("We got to 1.9");
 			continue;
 		}
-		gDLL->netMessageDebugLog("We got to 2");
-		for (int j = 0; j < kEvent->getNumRequirements(); j++)
+		for (int iJ = 0; iJ < pEvent->getNumRequirements(); iJ++)
 		{
-			gDLL->netMessageDebugLog("We got to 2.1 j is " + FSerialization::toString(j) + "\n");
-			CvEventModifierInfo kRequirement = *GC.getEventRequirementInfo(kEvent->getRequirement(j));
+			CvEventModifierInfo kRequirement = *GC.getEventRequirementInfo(pEvent->getRequirement(iJ));
 			if (kRequirement.getModifierType() > EVENTMOD_PLAYER_START && kRequirement.getModifierType() < EVENTMOD_PLAYER_END)
 			{
-				gDLL->netMessageDebugLog("We got to 2.2");
-				if (!checkEventModifier(kRequirement, asziScopes))
+				if (!checkEventModifier(kRequirement))
 				{
-					gDLL->netMessageDebugLog("We got to 2.3");
 					bValid = false;
 					break;
 				}
-				gDLL->netMessageDebugLog("We got to 2.4");
 			}
-			else //This is not a player requirement, so we can't possibly pass it.
+			else // This is not a player requirement, so we can't possibly pass it.
 			{
-				gDLL->netMessageDebugLog("We got to 2.5");
 				bValid = false;
 				break;
 			}
-			gDLL->netMessageDebugLog("We got to 2.6");
 		}
-		gDLL->netMessageDebugLog("We got to 3");
 		if (bValid)
 		{
-			doEventChance(*kEvent, asziScopes);
+			doEventChance(*pEvent);
 		}
 	}
 }
 
-void CvPlayer::doEventChance(CvEventInfo& kEvent, std::map<std::string, std::vector<int> > &asziScopes, CvCity* pCity, CvUnit* pUnit)
+void CvPlayer::doEventChance(CvEventInfo& kEvent, CvCity* pCity, CvUnit* pUnit)
 {
-	int iChance = kEvent.getMTTH();
-	gDLL->netMessageDebugLog("We got to 4");
+	int iEventChance = kEvent.getMTTH();
+
 	for (int j = 0; j < kEvent.getNumModifiers(); j++)
 	{
-		if (checkEventModifier(*GC.getEventModifierInfo(kEvent.getModifier(j)), asziScopes, false))
+		CvEventModifierInfo* pModifier = GC.getEventModifierInfo(kEvent.getModifier(j));
+		if (checkEventModifier(*pModifier, false))
 		{
-			iChance *= GC.getEventModifierInfo(kEvent.getModifier(j))->getFactor();
-			iChance /= 100; //We multiplied factor with 100 earlier, to avoid floats and rounding problems. Now time to divide it back.
+			// If the set is not default then we don't do anything here.
+			// Instead we let checkEventModifier alter the values for the items that passed the check
+			// Then we pick a weighted random item from that list and apply the modifiers from it
+			if (pModifier->getSet() == "default")
+			{
+				iEventChance *= pModifier->getFactor();
+				iEventChance /= 100; // We multiplied factor with 100 earlier, to avoid floats and rounding problems. Now time to divide it back.
+			}
 		}
 	}
-	gDLL->netMessageDebugLog("We got to 5");
 
-	if (iChance == -1 || GC.getGame().getJonRandNum(iChance, "Triggering player events") == 0)
+	std::map<std::string, std::vector< std::pair<int, int> > >::const_iterator it;
+	std::map<std::string, int> asziChosenItems;
+
+	// For each set
+	for (it = m_asziSets.begin(); it != m_asziSets.end(); ++it)
 	{
-		std::map<std::string, std::vector<int> >::iterator it;
-		for (it = asziScopes.begin(); it != asziScopes.end(); ++it)
+		int iTotalChance = 0;
+		int iChoice = -1;
+
+		std::vector< std::pair<int, int> >::const_iterator vecIt;
+		std::vector< int > guaranteedItems;
+		// For each item in the set
+		for (vecIt = it->second.begin(); vecIt != it->second.end(); ++it)
 		{
-			if (it->second.empty())
+			// If a modifier is zero it means the event will become guaranteed to happen
+			// So make a special vector with only such items
+			if (vecIt->second == 0)
 			{
-				FAssertMsg(false, "A scope was unexpectantly empty in doEventChance");
+				guaranteedItems.push_back(vecIt->first);
 			}
-			else if (it->second.size() > 1)
-			{
-				std::vector<int> newVector;
-				newVector.push_back(it->second[GC.getGame().getJonRandNum(it->second.size(), "Choosing which type in scope to perform action on")]);
-				it->second = newVector;
-			}
+			iTotalChance += vecIt->second;
 		}
 
-		CvEvent* Event = addEvent();
-		gDLL->netMessageDebugLog("We got to 6 and ID is " + FSerialization::toString(Event->GetID()));
-		Event->init(Event->GetID(), (EventTypes)kEvent.GetID(), &asziScopes, this);
-		Event->trigger();
+		// If guaranteedItems is not empty it means we have modifiers that are 0
+		// If a modifier is 0 it makes the event guaranteed to happen, so ONLY pick from that list
+		if (guaranteedItems.size() > 0)
+		{
+			int iChance = GC.getGame().getJonRandNum(guaranteedItems.size(), "Choosing guaranteed Set item for an event");
+			iChoice = guaranteedItems[iChance];
+			asziChosenItems[it->first] = iChoice;
+			// If it is a guaranteed item it means it has a modifier of zero.
+			// This makes the event guaranteed to happen so set iEventChance to zero.
+			// We can't break out of the loop however, as we may still need to make a choice for other sets.
+			iEventChance = 0;
+		}
+		else
+		{
+			// Pick a random number based on the total chance we just got.
+			int iChance = GC.getGame().getJonRandNum(iTotalChance, "Choosing Set item for an event");
+			vecIt = it->second.begin();
+			while (vecIt != it->second.end())
+			{
+				// Pick an item based on it's weight
+				iChance -= vecIt->second;
+				if (iChance <= 0)
+				{
+					iChoice = vecIt->first;
+					asziChosenItems[it->first] = iChoice;
+					// The weight is actually the inverse of the modifiers multiplied with 1000
+					// So inverse it again and multiply the event chance with the result.
+					// Using 100000 and then dividing by 100 to minimize rounding issues.
+					// While it may seem like we are dividing vecIt->second in an unsafe way here (division by zero) we are not
+					// If it's chance is zero it is a guaranteed item, and we won't even be here.
+					int iModifier = 100000 / vecIt->second;
+					iEventChance *= iModifier;
+					iEventChance /= 100;
+					break;
+				}
+				++vecIt;
+			}
+		}
+		// This should never happen. The vector of items should always contain items and we should always end up choosing one.
+		if (iChoice == -1)
+		{
+			FAssertMsg(false, "Invalid Set item chosen in CvPlayer::doEventChance");
+			return;
+		}
 	}
-	gDLL->netMessageDebugLog("We got to 10");
+
+	
+
+	if (iEventChance <= 0 || GC.getGame().getJonRandNum(iEventChance, "Triggering player events") == 0)
+	{
+		CvEvent* Event = addEvent();
+		Event->init(Event->GetID(), (EventTypes)kEvent.GetID(), asziChosenItems, GetID(), pCity, pUnit);
+		Event->trigger();
+
+		if (!isHuman())
+			AI_chooseEventOption(Event->GetID());
+	}
 }
 
-bool CvPlayer::checkEventModifier(CvEventModifierInfo& kModifier, std::map<std::string, std::vector<int> > &asziScopes, bool bRequirement)
+void CvPlayer::triggerEvent(EventTypes eEvent, bool bCheckRequirements, std::map<std::string, int > Sets, CvCity* pCity, CvUnit* pUnit)
+{
+	CvEventInfo* pEvent = GC.getEventInfo(eEvent);
+	if (pEvent == NULL)
+		return;
+
+	bool bValid = true;
+	if (bCheckRequirements)
+	{
+		m_asziSets.clear();
+		for (int iI = 0; iI < pEvent->getNumRequirements(); iI++)
+		{
+			CvEventModifierInfo* pRequirement = GC.getEventRequirementInfo(pEvent->getRequirement(iI));
+			if (pRequirement->getModifierType() > EVENTMOD_PLAYER_START && pRequirement->getModifierType() < EVENTMOD_PLAYER_END)
+			{
+				if (!checkEventModifier(*pRequirement))
+				{
+					bValid = false;
+					break;
+				}
+			}
+			else if (pRequirement->getModifierType() > EVENTMOD_CITY_START && pRequirement->getModifierType() < EVENTMOD_CITY_END)
+			{
+				if (pCity == NULL || !pCity->checkEventModifier(*pRequirement))
+				{
+					bValid = false;
+					break;
+				}
+			}
+			else if (pRequirement->getModifierType() > EVENTMOD_UNIT_START && pRequirement->getModifierType() < EVENTMOD_UNIT_END)
+			{
+				if (pUnit == NULL || !pUnit->checkEventModifier(*pRequirement))
+				{
+					bValid = false;
+					break;
+				}
+			}
+			else
+			{
+				bValid = false;
+				break;
+			}
+		}
+		if (bValid)
+		{
+			std::map<std::string, std::vector< std::pair<int, int> > >::const_iterator it;
+			for (it = m_asziSets.begin(); it != m_asziSets.end(); ++it)
+			{
+				// Old Sets are inherited. We only add to it if we're bringing something new.
+				// Don't want to use the old Sets? Just name your new ones something else.
+				if (Sets.find(it->first) == Sets.end())
+				{
+					FAssertMsg(it->second.size() > 0, "No Set item to choose in CvPlayer::triggerEvent");
+					int iItemChosen = GC.getGame().getJonRandNum(it->second.size(), "Choosing Set item for an event");
+					Sets[it->first] = it->second[iItemChosen].first;
+				}
+			}
+		}
+	}
+	else
+	{
+		for (int iI = 0; iI < pEvent->getNumOptions(); iI++)
+		{
+			CvEventOptionInfo* pOption = GC.getEventOptionInfo(pEvent->getOption(iI));
+			for (int iJ = 0; iJ < pOption->getNumActions(); iJ++)
+			{
+				CvEventActionInfo* pAction = GC.getEventActionInfo(pOption->getAction(iJ));
+				if (pAction->getSet() != "default")
+				{
+					if (Sets.find(pAction->getSet()) == Sets.end())
+					{
+						bValid = false;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	if (!bValid)
+		return;
+
+	CvEvent* Event = addEvent();
+	Event->init(Event->GetID(), (EventTypes)pEvent->GetID(), Sets, GetID(), pCity, pUnit);
+	Event->trigger();
+
+	if (!isHuman())
+		AI_chooseEventOption(Event->GetID());
+
+}
+
+bool CvPlayer::checkEventModifier(CvEventModifierInfo& kModifier, bool bRequirement)
 {
 	int iValue = 0;
-	gDLL->netMessageDebugLog("CheckEventModifier1");
 
 	switch(kModifier.getModifierType())
 	{
@@ -24948,81 +26177,31 @@ bool CvPlayer::checkEventModifier(CvEventModifierInfo& kModifier, std::map<std::
 
 	case EVENTMOD_RESOURCE:
 		{
-			gDLL->netMessageDebugLog("CheckEventModifier 2");
-			//Set resource
+			// This stuff with Sets would have been better to put in a function, but I don't know a good way to do it since different ones call different functions.
+			// Preset resource
 			if ((ResourceTypes)kModifier.getTypeToCompare() != NO_RESOURCE)
 			{
-				gDLL->netMessageDebugLog("CheckEventModifier 3");
 				iValue = getNumResourceTotal((ResourceTypes)kModifier.getTypeToCompare(), true);
 			}
-			//Any resource which matches scope test
-			else if (kModifier.getScope() != "default")
+			// Any resource which matches set test
+			else if (kModifier.getSet() != "default")
 			{
-				gDLL->netMessageDebugLog("CheckEventModifier 4");
-				std::vector<int> aScopes = asziScopes[kModifier.getScope()];
-				//If it's not empty it means we have set it before
-				//Just remove the ones that don't pass this requirement
-				if (!aScopes.empty())
-				{
-					gDLL->netMessageDebugLog("CheckEventModifier 5");
-					std::vector<int>::iterator iter = aScopes.begin();
-					while (iter != aScopes.end())
-					{
-						gDLL->netMessageDebugLog("CheckEventModifier 6");
-						iValue = getNumResourceTotal((ResourceTypes)(*iter), true);
-						if (GC.EventIntEval(iValue, kModifier))
-							++iter;
-						else
-							iter = aScopes.erase(iter);
-					}
-				}
-				//It is empty. Set it. 
-				//We should never get here with it being empty, but having already been checked.
-				//If it has been checked and nothing met the requirements we should have already returned false when checking that requirement.
-				else
-				{
-					gDLL->netMessageDebugLog("CheckEventModifier 7");
-					for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
-					{
-						gDLL->netMessageDebugLog("CheckEventModifier 8");
-						iValue = getNumResourceTotal((ResourceTypes)iI, true);
-						if (GC.EventIntEval(iValue, kModifier))
-						{
-							gDLL->netMessageDebugLog("CheckEventModifier 9");
-							aScopes.push_back(iI);
-						}
-					}
-				}
-				if (aScopes.empty())
-				{
-					gDLL->netMessageDebugLog("CheckEventModifier 10");
-					return false;
-				}
-				else
-				{
-					gDLL->netMessageDebugLog("CheckEventModifier 11");
-					if (bRequirement)
-					{
-						gDLL->netMessageDebugLog("CheckEventModifier 12");
-						asziScopes[kModifier.getScope()] = aScopes;
-					}
-					return true;
-				}
+				return testSetItems(kModifier, GC.getNumResourceInfos(), bRequirement);
 			}
-			//Scope set to -1 and no specific type to check. So anything goes.
-			//I don't think this will be used but you never know.
+			// Set set to default and no specific type to check. So anything goes.
+			// I don't think this will be used but you never know.
 			else 
 			{
-				gDLL->netMessageDebugLog("CheckEventModifier 13");
 				for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
 				{
 					iValue = getNumResourceTotal((ResourceTypes)iI, true);
 					if (GC.EventIntEval(iValue, kModifier))
 					{
-						gDLL->netMessageDebugLog("CheckEventModifier 14");
 						return true;
 					}
 				}
+				// Nothing passed
+				return false;
 			}
 		}
 
@@ -25030,172 +26209,58 @@ bool CvPlayer::checkEventModifier(CvEventModifierInfo& kModifier, std::map<std::
 
 	case EVENTMOD_RESOURCE_AVAILABLE:
 		{
-			gDLL->netMessageDebugLog("CheckEventModifier 15");
+			// Preset resource
 			if ((ResourceTypes)kModifier.getTypeToCompare() != NO_RESOURCE)
 			{
-				gDLL->netMessageDebugLog("CheckEventModifier 16");
 				iValue = getNumResourceAvailable((ResourceTypes)kModifier.getTypeToCompare(), true);
 			}
-			//Any resource which matches scope test
-			else if (kModifier.getScope() != "default")
+			// Any resource which matches set test
+			else if (kModifier.getSet() != "default")
 			{
-				gDLL->netMessageDebugLog("CheckEventModifier 17");
-				std::vector<int> aScopes = asziScopes[kModifier.getScope()];
-				//If it's not empty it means we have set it before
-				//Just remove the ones that don't pass this requirement
-				if (!aScopes.empty())
-				{
-					gDLL->netMessageDebugLog("CheckEventModifier 18");
-					std::vector<int>::iterator iter = aScopes.begin();
-					while (iter != aScopes.end())
-					{
-						gDLL->netMessageDebugLog("CheckEventModifier 19");
-						iValue = getNumResourceAvailable((ResourceTypes)(*iter), true);
-						if (GC.EventIntEval(iValue, kModifier))
-							++iter;
-						else
-							iter = aScopes.erase(iter);
-					}
-				}
-				//It is empty. Set it. 
-				//We should never get here with it being empty, but having already been checked.
-				//If it has been checked and nothing met the requirements we should have already returned false when checking that requirement.
-				else
-				{
-					gDLL->netMessageDebugLog("CheckEventModifier 20");
-					for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
-					{
-						iValue = getNumResourceAvailable((ResourceTypes)iI, true);
-						if (GC.EventIntEval(iValue, kModifier))
-						{
-							gDLL->netMessageDebugLog("CheckEventModifier 21");
-							aScopes.push_back(iI);
-						}
-					}
-				}
-				if (aScopes.empty())
-				{
-					gDLL->netMessageDebugLog("CheckEventModifier 22");
-					return false;
-				}
-				else
-				{
-					gDLL->netMessageDebugLog("CheckEventModifier 23");
-					if (bRequirement)
-					{
-						gDLL->netMessageDebugLog("CheckEventModifier 24");
-						asziScopes[kModifier.getScope()] = aScopes;
-					}
-					return true;
-				}
+				return testSetItems(kModifier, GC.getNumResourceInfos(), bRequirement);
 			}
-			//Scope set to -1 and no specific type to check. So anything goes.
-			//I don't think this will be used but you never know.
+			// Set set to default and no specific type to check. So anything goes.
+			// I don't think this will be used but you never know.
 			else 
 			{
-				gDLL->netMessageDebugLog("CheckEventModifier 25");
 				for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
 				{
-					gDLL->netMessageDebugLog("CheckEventModifier 26");
 					iValue = getNumResourceAvailable((ResourceTypes)iI, true);
 					if (GC.EventIntEval(iValue, kModifier))
 					{
-						gDLL->netMessageDebugLog("CheckEventModifier 27");
 						return true;
 					}
 				}
+				// Nothing passed
+				return false;
 			}
 		}
 		break;
 
 	case EVENTMOD_RESOURCE_CLASS:
 		{
-			gDLL->netMessageDebugLog("CheckEventModifier 28");
-			//Any resource which matches resource class, don't use scope.
-			if ((ResourceClassTypes)kModifier.getTypeToCompare() != NO_RESOURCECLASS && kModifier.getScope() == "default")
+			// Any resource which matches resource class, don't use sets.
+			if ((ResourceClassTypes)kModifier.getTypeToCompare() != NO_RESOURCECLASS && kModifier.getSet() == "default")
 			{
-				gDLL->netMessageDebugLog("CheckEventModifier 29");
 				for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
 				{
 					if (GC.getResourceInfo((ResourceTypes)iI)->getResourceClassType() == kModifier.getTypeToCompare())
 					{
-						gDLL->netMessageDebugLog("CheckEventModifier 30");
 						int iNumResource = getNumResourceTotal((ResourceTypes)iI, true);
 						if (GC.EventIntEval(iNumResource, kModifier))
 						{
-							gDLL->netMessageDebugLog("CheckEventModifier 31");
 							return true;
 						}
 					}
 				}
 			}
-			//Any resource which matches scope test. Must match resource class if set.
-			else if (kModifier.getScope() != "default")
+			// Any resource which matches set test. Must match resource class if set.
+			else if (kModifier.getSet() != "default")
 			{
-				gDLL->netMessageDebugLog("CheckEventModifier 32");
-				std::vector<int> aScopes = asziScopes[kModifier.getScope()];
-				//If it's not empty it means we have set it before
-				//Just remove the ones that don't pass this requirement
-				if (!aScopes.empty())
-				{
-					gDLL->netMessageDebugLog("CheckEventModifier 33");
-					std::vector<int>::iterator iter = aScopes.begin();
-					bool bValid;
-					while (iter != aScopes.end())
-					{
-						gDLL->netMessageDebugLog("CheckEventModifier 34");
-						bValid = true;
-						if ((ResourceClassTypes)kModifier.getTypeToCompare() == NO_RESOURCECLASS || GC.getResourceInfo((ResourceTypes)(*iter))->getResourceClassType() == kModifier.getTypeToCompare())
-						{
-							gDLL->netMessageDebugLog("CheckEventModifier 35");
-							iValue = getNumResourceTotal((ResourceTypes)(*iter), true);
-							if (GC.EventIntEval(iValue, kModifier))
-								++iter;
-							else
-								iter = aScopes.erase(iter);
-						}
-						else
-							iter = aScopes.erase(iter);
-					}
-				}
-				//It is empty. Set it. 
-				//We should never get here with it being empty, but having already been checked.
-				//If it has been checked and nothing met the requirements we should have already returned false when checking that requirement.
-				else
-				{
-					gDLL->netMessageDebugLog("CheckEventModifier 36");
-					for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
-					{
-						if ((ResourceClassTypes)kModifier.getTypeToCompare() == NO_RESOURCECLASS || GC.getResourceInfo((ResourceTypes)iI)->getResourceClassType() == kModifier.getTypeToCompare())
-						{
-							gDLL->netMessageDebugLog("CheckEventModifier 37");
-							iValue = getNumResourceTotal((ResourceTypes)iI, true);
-							if (GC.EventIntEval(iValue, kModifier))
-							{
-								gDLL->netMessageDebugLog("CheckEventModifier 38");
-								aScopes.push_back(iI);
-							}
-						}
-					}
-				}
-				if (aScopes.empty())
-				{
-					gDLL->netMessageDebugLog("CheckEventModifier 39");
-					return false;
-				}
-				else
-				{
-					gDLL->netMessageDebugLog("CheckEventModifier 40");
-					if (bRequirement)
-					{
-						gDLL->netMessageDebugLog("CheckEventModifier 41");
-						asziScopes[kModifier.getScope()] = aScopes;
-					}
-					return true;
-				}
+				return testSetItems(kModifier, GC.getNumResourceInfos(), bRequirement);
 			}
-			//Scope set to -1 and no specific type to check. So anything goes.
-			//This should not be used. If you actually want this functionality, use EVENTMOD_RESOURCE. It makes no sense to have this here, this is for checking classes.
+			// Set set to default and no specific type to check. So anything goes.
+			// This should not be used. If you actually want this functionality, use EVENTMOD_RESOURCE. It makes no sense to have this here, this is for checking classes.
 			else 
 				return false;
 		}
@@ -25203,8 +26268,8 @@ bool CvPlayer::checkEventModifier(CvEventModifierInfo& kModifier, std::map<std::
 
 	case EVENTMOD_RESOURCE_CLASS_AVAILABLE:
 		{
-			//Any resource which matches resource class, don't use scope.
-			if ((ResourceTypes)kModifier.getTypeToCompare() != NO_RESOURCE && kModifier.getScope() == "default")
+			// Any resource which matches resource class, don't use sets.
+			if ((ResourceTypes)kModifier.getTypeToCompare() != NO_RESOURCE && kModifier.getSet() == "default")
 			{
 				for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
 				{
@@ -25218,57 +26283,13 @@ bool CvPlayer::checkEventModifier(CvEventModifierInfo& kModifier, std::map<std::
 					}
 				}
 			}
-			//Any resource which matches scope test. Must match resource class if set.
-			else if (kModifier.getScope() != "default")
+			// Any resource which matches set test. Must match resource class if set.
+			else if (kModifier.getSet() != "default")
 			{
-				std::vector<int> aScopes = asziScopes[kModifier.getScope()];
-				//If it's not empty it means we have set it before
-				//Just remove the ones that don't pass this requirement
-				if (!aScopes.empty())
-				{
-					std::vector<int>::iterator iter = aScopes.begin();
-					bool bValid;
-					while (iter != aScopes.end())
-					{
-						bValid = true;
-						if (kModifier.getTypeToCompare() == -1 || GC.getResourceInfo((ResourceTypes)(*iter))->getResourceClassType() == kModifier.getTypeToCompare())
-						{
-							iValue = getNumResourceAvailable((ResourceTypes)(*iter), true);
-							if (GC.EventIntEval(iValue, kModifier))
-								++iter;
-							else
-								iter = aScopes.erase(iter);
-						}
-						else
-							iter = aScopes.erase(iter);
-					}
-				}
-				//It is empty. Set it. 
-				//We should never get here with it being empty, but having already been checked.
-				//If it has been checked and nothing met the requirements we should have already returned false when checking that requirement.
-				else
-				{
-					for (int iI = 0; iI < GC.getNumResourceInfos(); iI++)
-					{
-						if (kModifier.getTypeToCompare() == -1 || GC.getResourceInfo((ResourceTypes)iI)->getResourceClassType() == kModifier.getTypeToCompare())
-						{
-							iValue = getNumResourceAvailable((ResourceTypes)iI, true);
-							if (GC.EventIntEval(iValue, kModifier))
-								aScopes.push_back(iI);
-						}
-					}
-				}
-				if (aScopes.empty())
-					return false;
-				else
-				{
-					if (bRequirement)
-						asziScopes[kModifier.getScope()] = aScopes;
-					return true;
-				}
+				return testSetItems(kModifier, GC.getNumResourceInfos(), bRequirement);
 			}
-			//Scope set to -1 and no specific type to check. So anything goes.
-			//This should not be used. If you actually want this functionality, use EVENTMOD_RESOURCE. It makes no sense to have this here, this is for checking classes.
+			// Set set to default and no specific type to check. So anything goes.
+			// This should not be used. If you actually want this functionality, use EVENTMOD_RESOURCE. It makes no sense to have this here, this is for checking classes.
 			else 
 				return false;
 		}
@@ -25279,7 +26300,55 @@ bool CvPlayer::checkEventModifier(CvEventModifierInfo& kModifier, std::map<std::
 		break;
 
 	case EVENTMOD_NUMDOMAINUNITS:
-		iValue = GetNumUnitsWithDomain((DomainTypes)kModifier.getTypeToCompare(), false);
+		{
+			if (kModifier.getTypeToCompare() != NO_DOMAIN)
+				iValue = GetNumUnitsWithDomain((DomainTypes)kModifier.getTypeToCompare(), false);
+			else if (kModifier.getSet() != "default")
+			{
+				return testSetItems(kModifier, NUM_DOMAIN_TYPES, bRequirement);
+			}
+			// Set set to default and no specific type to check. So anything goes.
+			// I don't think this will be used but you never know.
+			else
+			{
+				for (int iI = 0; iI < NUM_DOMAIN_TYPES; iI++)
+				{
+					iValue = GetNumUnitsWithDomain((DomainTypes)iI, false);
+					if (GC.EventIntEval(iValue, kModifier))
+					{
+						return true;
+					}
+				}
+				// Nothing passed
+				return false;
+			}
+		}
+		break;
+
+	case EVENTMOD_NUMUNITCOMBATUNITS:
+		{
+			if (kModifier.getTypeToCompare() != NO_UNITCOMBAT)
+				iValue = GetNumUnitsWithUnitCombat((UnitCombatTypes)kModifier.getTypeToCompare());
+			else if (kModifier.getSet() != "default")
+			{
+				return testSetItems(kModifier, GC.getNumUnitCombatClassInfos(), bRequirement);
+			}
+			// Set set to default and no specific type to check. So anything goes.
+			// I don't think this will be used but you never know.
+			else
+			{
+				for (int iI = 0; iI < GC.getNumUnitCombatClassInfos(); iI++)
+				{
+					iValue = GetNumUnitsWithUnitCombat((UnitCombatTypes)iI);
+					if (GC.EventIntEval(iValue, kModifier))
+					{
+						return true;
+					}
+				}
+				// Nothing passed
+				return false;
+			}
+		}
 		break;
 
 	case EVENTMOD_HIGHESTUNITLEVEL:
@@ -25287,7 +26356,29 @@ bool CvPlayer::checkEventModifier(CvEventModifierInfo& kModifier, std::map<std::
 		break;
 
 	case EVENTMOD_UNITCLASS:
-		iValue = getUnitClassCount((UnitClassTypes)kModifier.getTypeToCompare());
+		{
+			if (kModifier.getTypeToCompare() != NO_UNITCLASS)
+				iValue = getUnitClassCount((UnitClassTypes)kModifier.getTypeToCompare());
+			else if (kModifier.getSet() != "default")
+			{
+				return testSetItems(kModifier, GC.getNumUnitClassInfos(), bRequirement);
+			}
+			// Set set to default and no specific type to check. So anything goes.
+			// I don't think this will be used but you never know.
+			else
+			{
+				for (int iI = 0; iI < GC.getNumUnitClassInfos(); iI++)
+				{
+					iValue = getUnitClassCount((UnitClassTypes)iI);
+					if (GC.EventIntEval(iValue, kModifier))
+					{
+						return true;
+					}
+				}
+				// Nothing passed
+				return false;
+			}
+		}
 		break;
 
 	case EVENTMOD_NUMCITIES:
@@ -25306,7 +26397,29 @@ bool CvPlayer::checkEventModifier(CvEventModifierInfo& kModifier, std::map<std::
 		break;
 
 	case EVENTMOD_BUILDINGCLASS:
-		iValue = getBuildingClassCount((BuildingClassTypes)kModifier.getTypeToCompare());
+		{
+			if (kModifier.getTypeToCompare() != NO_BUILDINGCLASS)
+				iValue = getBuildingClassCount((BuildingClassTypes)kModifier.getTypeToCompare());
+			else if (kModifier.getSet() != "default")
+			{
+				return testSetItems(kModifier, GC.getNumBuildingClassInfos(), bRequirement);
+			}
+			// Set set to default and no specific type to check. So anything goes.
+			// I don't think this will be used but you never know.
+			else
+			{
+				for (int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
+				{
+					iValue = getBuildingClassCount((BuildingClassTypes)iI);
+					if (GC.EventIntEval(iValue, kModifier))
+					{
+						return true;
+					}
+				}
+				// Nothing passed
+				return false;
+			}
+		}
 		break;
 
 	case EVENTMOD_NUMWONDERS:
@@ -25324,13 +26437,23 @@ bool CvPlayer::checkEventModifier(CvEventModifierInfo& kModifier, std::map<std::
 		break;
 
 	case EVENTMOD_CIVILIZATION:
-		return GC.EventBoolEval((int)getCivilizationType() == kModifier.getTypeToCompare(), kModifier);
+		if (kModifier.getSet() == "default")
+			return GC.EventBoolEval((int)getCivilizationType() == kModifier.getTypeToCompare(), kModifier);
+		else
+			return testSetItems(kModifier, -1, bRequirement);
+		break;
 
 	case EVENTMOD_LEADER:
-		return GC.EventBoolEval((int)getLeaderType() == kModifier.getTypeToCompare(), kModifier);
+		if (kModifier.getSet() == "default")
+			return GC.EventBoolEval((int)getLeaderType() == kModifier.getTypeToCompare(), kModifier);
+		else
+			return testSetItems(kModifier, -1, bRequirement);
 
 	case EVENTMOD_PERSONALITY:
-		return GC.EventBoolEval((int)getPersonalityType() == kModifier.getTypeToCompare(), kModifier);
+		if (kModifier.getSet() == "default")
+			return GC.EventBoolEval((int)getPersonalityType() == kModifier.getTypeToCompare(), kModifier);
+		else
+			return testSetItems(kModifier, -1, bRequirement);
 
 	case EVENTMOD_MINORCIV:
 		return GC.EventBoolEval(isMinorCiv(), kModifier);
@@ -25390,10 +26513,290 @@ bool CvPlayer::checkEventModifier(CvEventModifierInfo& kModifier, std::map<std::
 		break;
 	default:
 		CvAssertMsg(false, "Could not find EventModifierType");
-		return false; //Return here. iValue was not properly set.
+		return false; // We can't pass a test we don't understand.
 	}
 	
 	return GC.EventIntEval(iValue, kModifier);
+}
+
+//	--------------------------------------------------------------------------------
+// Sets set values and returns if we pass the set test.
+// iMaximumItems = -1 means a test only on ourselves
+bool CvPlayer::testSetItems(CvEventModifierInfo& kModifier, int iMaximumItems, bool bRequirement, CvCity* pCity, CvUnit* pUnit)
+{
+	std::vector< std::pair<int, int> > aReturnVector;
+	// We don't remove items if this is a modifier, so we need a bool to remember if we passed or not.
+	bool bPassed = false;
+	
+	if (kModifier.getSet() != "default")
+	{
+		std::vector< std::pair<int, int> > aSets = m_asziSets[kModifier.getSet()];
+		// If it's not empty it means we have set it before.
+		// Just remove the ones that don't pass this requirement, if it is one.
+		// If it is not a requirement apply modifier to the items that pass it.
+		if (!aSets.empty())
+		{
+			std::vector< std::pair<int, int> >::iterator iter = aSets.begin();
+			while (iter != aSets.end())
+			{
+				if (isEventSetTest(kModifier, iter->first, pCity, pUnit))
+				{
+					++iter;
+					bPassed = true;
+					// If a modifier, modify the value to alter the chance of this specific item being chosen.
+					if (!bRequirement)
+					{
+						if (kModifier.getFactor() == 0)
+							iter->second = 0;
+						else
+						{
+							// Change the modifier by the inverse of the modifier.
+							// We do this because it makes it easier to do a weighted random list later on.
+							// Then we just inverse the modifier again when we want to alter the event chance.
+							iter->second *= 100;
+							iter->second /= kModifier.getFactor();
+						}
+					}
+				}
+				// Remove it if this is a requirement. It did not meet the requirement.
+				else if (bRequirement)
+					iter = aSets.erase(iter);
+				// If this is a modifier we want to keep it, even if it failed this specific modifier.
+				else
+					++iter;
+			}
+		}
+		// It is empty. Set it. 
+		// We should never get here with it being empty, but having already been checked.
+		// If it has been checked and nothing met the requirements we should have already returned false when checking that requirement.
+		else if (bRequirement)
+		{
+			// Something that requires looping through to see which ones we pass
+			if (iMaximumItems > 0)
+			{
+				for (int iI = 0; iI < iMaximumItems; iI++)
+				{
+					if (isEventSetTest(kModifier, iI, pCity, pUnit))
+					{
+						bPassed = true;
+						aSets.push_back(std::make_pair(iI, BASE_MODIFIER_CHANCE_SETS));
+					}
+				}
+			}
+			// Something where we know the item, just not if we pass.
+			// For example, checking if *our* civilization is something.
+			// We always know what *our* civilization is, without any sort of loop.
+			else if (iMaximumItems == -1)
+			{
+				int iItem = getSelfItemTest(kModifier, pCity);
+				if (iItem != -1)
+				{
+					if (kModifier.getTypeToCompare() == -1 || GC.EventBoolEval(iItem == kModifier.getTypeToCompare(), kModifier))
+					{
+						bPassed = true;
+						aSets.push_back(std::make_pair(iItem, BASE_MODIFIER_CHANCE_SETS));
+					}
+				}
+			}
+		}
+		// We can safely return here without changing the Sets.
+		// If this is a requirement and we did not pass we should not be doing any more checks against the Set, since it failed.
+		// If this is a modifier and we did not pass then we didn't change anything.
+		if (aSets.empty() || !bPassed)
+		{
+			return false;
+		}
+		else
+		{
+			// Requirements modify how many values we have (or add them in the first place), modifiers changes the chance.
+			// Either way we need to update the map with the new data.
+			m_asziSets[kModifier.getSet()] = aSets;
+			return true;
+		}
+	}
+	// This is for handling Sets.
+	// If the Set is default, then we do not pass, because we do not handle that case.
+	else 
+		return false;
+}
+//	--------------------------------------------------------------------------------
+int CvPlayer::getSelfItemTest(CvEventModifierInfo& kModifier, CvCity* pCity) const
+{
+	switch(kModifier.getModifierType())
+	{
+	case EVENTMOD_CIVILIZATION:
+		return (int)getCivilizationType();
+
+	case EVENTMOD_LEADER:
+		return (int)getLeaderType();
+
+	case EVENTMOD_PERSONALITY:
+		return (int)getPersonalityType();
+
+	case EVENTMOD_CITY_ORIGINAL_OWNER:
+		if (pCity == NULL)
+			return -1;
+		return (int)pCity->getOriginalOwner();
+
+	default:
+		return -1;
+	}
+}
+bool CvPlayer::isEventSetTest(CvEventModifierInfo& kModifier, int iItem, CvCity* pCity, CvUnit* pUnit) const
+{
+	int iValue = 0;
+	// Only need to include ModifierTypes which can have Sets.
+	// Because anything else should not use this function.
+	switch(kModifier.getModifierType())
+	{
+	case EVENTMOD_RESOURCE:
+		iValue = getNumResourceTotal((ResourceTypes)iItem, true); 
+		break;
+
+	case EVENTMOD_RESOURCE_AVAILABLE:
+		iValue = getNumResourceAvailable((ResourceTypes)iItem, true); 
+		break;
+
+	case EVENTMOD_RESOURCE_CLASS:
+		if (kModifier.getTypeToCompare() == -1 || GC.getResourceInfo((ResourceTypes)iItem)->getResourceClassType() == kModifier.getTypeToCompare())
+			iValue = getNumResourceTotal((ResourceTypes)iItem, true);
+		else
+			return false;
+		break;
+
+	case EVENTMOD_RESOURCE_CLASS_AVAILABLE:
+		if (kModifier.getTypeToCompare() == -1 || GC.getResourceInfo((ResourceTypes)iItem)->getResourceClassType() == kModifier.getTypeToCompare())
+			iValue = getNumResourceAvailable((ResourceTypes)iItem, true);
+		else
+			return false;
+		break;
+
+	case EVENTMOD_NUMDOMAINUNITS:
+		iValue = GetNumUnitsWithDomain((DomainTypes)iItem, false);
+		break;
+
+	case EVENTMOD_NUMUNITCOMBATUNITS:
+		iValue = GetNumUnitsWithUnitCombat((UnitCombatTypes)iItem);
+		break;
+
+	case EVENTMOD_UNITCLASS:
+		iValue = getUnitClassCount((UnitClassTypes)kModifier.getTypeToCompare());
+		break;
+
+	case EVENTMOD_BUILDINGCLASS:
+		iValue = getBuildingClassCount((BuildingClassTypes)kModifier.getTypeToCompare());
+		break;
+
+	case EVENTMOD_CIVILIZATION:
+		return GC.EventBoolEval((int)getCivilizationType() == iItem, kModifier);
+
+	case EVENTMOD_LEADER:
+		return GC.EventBoolEval((int)getLeaderType() == iItem, kModifier);
+
+	case EVENTMOD_PERSONALITY:
+		return GC.EventBoolEval((int)getPersonalityType() == iItem, kModifier);
+
+	case EVENTMOD_CITY_SPY_RANK:
+		{
+			if (pCity == NULL)
+				return false;
+			CvCityEspionage* pCityEspionage = pCity->GetCityEspionage();
+			if (pCityEspionage == NULL)
+				return false;
+			int iSpy = pCityEspionage->m_aiSpyAssignment[iItem];
+			// No spy for this civ
+			if (iSpy == -1)
+				return false;
+			// Have a spy, what is it's rank
+			else
+				iValue = (int)GET_PLAYER((PlayerTypes)iItem).GetEspionage()->m_aSpyList[iSpy].m_eRank;
+		}
+		break;
+
+	case EVENTMOD_CITY_SPECIALIST:
+		if (pCity == NULL)
+			return false;
+		iValue = pCity->GetCityCitizens()->GetSpecialistCount((SpecialistTypes)iItem);
+		break;
+
+	case EVENTMOD_CITY_BUILDING:
+		if (pCity == NULL)
+			return false;
+		iValue = pCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)iItem);
+		break;
+
+	case EVENTMOD_CITY_WORKING_RESOURCE:
+		if (pCity == NULL)
+			return false;
+		return GC.EventBoolEval(pCity->IsWorkingResource((ResourceTypes)iItem), kModifier);
+
+	case EVENTMOD_CITY_HAS_RESOURCE:
+		if (pCity == NULL)
+			return false;
+		return GC.EventBoolEval(pCity->IsHasResourceLocal((ResourceTypes)iItem, true), kModifier);
+
+	case EVENTMOD_CITY_RELIGION_PRESSURE:
+		if (pCity == NULL)
+			return false;
+		iValue = pCity->GetCityReligions()->GetPressure((ReligionTypes)iItem);
+		break;
+
+	case EVENTMOD_CITY_FOLLOWERS_RELIGION:
+		if (pCity == NULL)
+			return false;
+		iValue = pCity->GetCityReligions()->GetNumFollowers((ReligionTypes)iItem);
+		break;
+
+	case EVENTMOD_CITY_RELIGION_HOLY:
+		if (pCity == NULL)
+			return false;
+		return GC.EventBoolEval(pCity->GetCityReligions()->IsHolyCityForReligion((ReligionTypes)iItem), kModifier);
+
+	case EVENTMOD_CITY_EVER_OWNED:
+		if (pCity == NULL)
+			return false;
+		return GC.EventBoolEval(pCity->isEverOwned((PlayerTypes)iItem), kModifier);
+
+	case EVENTMOD_CITY_EVER_CONQUERED:
+		if (pCity == NULL)
+			return false;
+		return GC.EventBoolEval(pCity->isEverConquered((PlayerTypes)iItem), kModifier);
+
+	case EVENTMOD_CITY_ORIGINAL_OWNER:
+		if (pCity == NULL)
+			return false;
+		return GC.EventBoolEval((int)pCity->getOriginalOwner() == iItem, kModifier);
+
+	case EVENTMOD_UNIT_REQ_RESOURCE:
+		if (pUnit == NULL)
+			return false;
+		return GC.EventBoolEval(pUnit->getUnitInfo().GetResourceQuantityRequirement(iItem), kModifier);
+
+	case EVENTMOD_UNIT_PROMOTION:
+		if (pUnit == NULL)
+			return false;
+		return GC.EventBoolEval(pUnit->isHasPromotion((PromotionTypes)iItem), kModifier);
+
+	default:
+		FAssert(false);
+		return false;
+	}
+
+	return GC.EventIntEval(iValue, kModifier);
+}
+//	--------------------------------------------------------------------------------
+void CvPlayer::getSet(std::string szSet, std::vector<std::pair<int, int> >& aValues )
+{
+	std::map<std::string, std::vector< std::pair<int, int> > >::const_iterator it = m_asziSets.find(szSet);
+	if (it != m_asziSets.end())
+	{
+		aValues = it->second;
+	}
+}
+//	--------------------------------------------------------------------------------
+void CvPlayer::setSet(std::string szSet, std::vector<std::pair<int, int> > aValues)
+{
+	m_asziSets[szSet] = aValues;
 }
 
 //	--------------------------------------------------------------------------------
@@ -25401,23 +26804,26 @@ void CvPlayer::processEventOption(int iID, int iOption)
 {
 	CvEvent* pEvent = getEvent(iID);
 	pEvent->processEventOption(iOption);
+
+	int iNotificationID = pEvent->getNotificationID();
+	if (iNotificationID != -1)
+		GetNotifications()->Dismiss(iNotificationID, false);
+
 	deleteEvent(iID);
 }
 
 //	--------------------------------------------------------------------------------
-bool CvPlayer::processEventOptionByID(int iID, int iOptionID)
+void CvPlayer::processEventOptionByID(int iID, int iOptionID)
 {
 	CvEvent* pEvent = getEvent(iID);
 	for (int i = 0; i < pEvent->getNumOptions(); i++)
 	{
 		if (pEvent->getOption(i) == iOptionID)
 		{
-			pEvent->processEventOption(i);
-			deleteEvent(iID);
-			return true;
+			processEventOption(iID, i);
+			break;
 		}
 	}
-	return false;
 }
 
 //	--------------------------------------------------------------------------------
@@ -25469,75 +26875,72 @@ void CvPlayer::deleteEvent(int iID)
 	m_events.RemoveAt(iID);
 }
 
-
-void CvPlayer::addTempEventEffect(EventTypes eEvent, EventOptionTypes eOption, EventActionTypeTypes eEventAction, int iNumTurns, int iType, int iValue)
+//	--------------------------------------------------------------------------------
+void CvPlayer::addTempEventEffect(CvEventEffect& kEventEffect)
 {
-	CvEventEffects kEventEffect;
-	kEventEffect.init(eEvent, eOption, eEventAction, iNumTurns, iType, iValue);
 	m_aEventEffects.push_back(kEventEffect);
 }
 
+//	--------------------------------------------------------------------------------
 int CvPlayer::getNumTempEventEffects() const
 {
 	return m_aEventEffects.size();
 }
 
-CvEventEffects& CvPlayer::getTempEventEffect(int index)
+//	--------------------------------------------------------------------------------
+CvEventEffect& CvPlayer::getTempEventEffect(int index)
 {
 	return m_aEventEffects[index];
 }
 
+//	--------------------------------------------------------------------------------
 void CvPlayer::doTempEventEffects()
 {
-	int i = 0;
-	while (i != m_aEventEffects.size())
+	std::vector<CvEventEffect>::iterator it = m_aEventEffects.begin();
+	while (it != m_aEventEffects.end())
 	{
-		m_aEventEffects[i].changeNumTurns(-1);
-		if (m_aEventEffects[i].getNumTurns() <= 0)
+		it->changeNumTurns(-1);
+		if (it->getNumTurns() <= 0)
 		{
-			unprocessTempEventEffect(i);
-			m_aEventEffects.erase(m_aEventEffects.begin() + i);
+			unprocessTempEventEffect(it);
+			it = m_aEventEffects.erase(it);
 		}
 		else
 		{
-			i++;
+			++it;
 		}
 	}
 }
 
-void CvPlayer::unprocessTempEventEffect(int i)
+//	--------------------------------------------------------------------------------
+void CvPlayer::unprocessTempEventEffect(std::vector<CvEventEffect>::iterator& kEventEffects)
 {
-	CvEventEffects &kEventEffects = m_aEventEffects[i];
-	switch(kEventEffects.getAction())
+	EventActionTypeTypes eAction = kEventEffects->getEventAction();
+	CvEventActionInfo* pAction = GC.getEventActionInfo(kEventEffects->getAction());
+	switch(eAction)
 	{
-	case EVENTACTION_EVENT:
-	case EVENTACTION_PLAYER_START:
-	case EVENTACTION_EVENT_FOR_CAPITAL:
-	case EVENTACTION_EVENT_FOR_ALL_CITIES:
-	case EVENTACTION_EVENT_FOR_ALL_UNITS:
-	case EVENTACTION_PLAYER_END:
-	case EVENTACTION_CITY_START:
-	case EVENTACTION_CITY_END:
-	case EVENTACTION_UNIT_START:
-	case EVENTACTION_UNIT_END:
-	case EVENTACTION_EVENT_FOR_ALL_PLAYERS:
-	case EVENTACTION_CHANGE_ROUTE:
-	case EVENTACTION_CHANGE_FEATURE:
-	case EVENTACTION_CHANGE_RESOURCE:
-	case EVENTACTION_CHANGE_IMPROVEMENT:
-		break;
-
 	case EVENTACTION_YIELD:
-		changeYieldFromEvents((YieldTypes)kEventEffects.getType(), kEventEffects.getValue());
+		changeYieldFromEvents((YieldTypes)kEventEffects->getTypeToAction(), -pAction->getValue1());
 		break;
 
 	case EVENTACTION_YIELDMOD:
-		changeYieldModifierFromEvents((YieldTypes)kEventEffects.getType(), kEventEffects.getValue());
+		changeYieldModifierFromEvents((YieldTypes)kEventEffects->getTypeToAction(), -pAction->getValue1());
 		break;
 
 	case EVENTACTION_HAPPY:
-		changeHappyFromEvents(kEventEffects.getValue());
+		changeHappyFromEvents(-pAction->getValue1());
 		break;
+
+	case EVENTACTION_SET_FLAG:
+		if (pAction->getBool1())
+			changeFlag(pAction->getString1(), -pAction->getValue1());
+		else
+			setFlag(pAction->getString1(), -pAction->getValue1());
+		break;
+
+	case EVENTACTION_SPECIALIST_YIELD:
+		changeSpecialistExtraYield((SpecialistTypes)kEventEffects->getTypeToAction(), (YieldTypes)pAction->getValue1(), -pAction->getValue2());
+		break;	
 
 	default:
 		FAssertMsg(false, "Unknown EventActionTypeTypes in CvPlayer::unprocessTempEventEffect");

@@ -38,6 +38,76 @@ struct MayaBonusChoice
 	int m_iBaktunJustFinished;
 };
 
+// Revamped yields - v0.1, Snarko
+struct TraitYieldFromFeatures
+{
+	TraitYieldFromFeatures()
+		: eYield(NO_YIELD)
+		, iChange(0)
+		, iFeaturesRequired(0)
+	{
+	}
+
+	YieldTypes eYield;
+	int iChange;
+	int iFeaturesRequired;
+};
+
+FDataStream& operator<<(FDataStream&, const TraitYieldFromFeatures&);
+FDataStream& operator>>(FDataStream&, TraitYieldFromFeatures&);
+
+// So this is going from hardcoded to give faith, hardcoded to only check one range around the city, 
+// hardcoded to only work for forests, hardcoded to not work on plots with improvements,
+// and hardcoded to give two faith if it's three or more forests, else one faith if any forests
+// to all of those being softcoded. A lot of work for a little gain but it may help a lot later.
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//  CLASS:      CvTraitYieldFromFeatures
+//!  \brief		City yields based on nearby features from a trait
+//
+//! Key Attributes:
+//! - NOT HARDCODED
+//! - Populated from XML\GameInfo\CIV5Traits.xml
+//! - Contains information about feature(s), yield(s) and how many feature(s) are requires to get yield(s).
+//! - One instance per trait
+//! - Set functions for backwards compatibility.
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+class CvTraitYieldFromFeatures
+{
+public:
+	CvTraitYieldFromFeatures(void);
+	~CvTraitYieldFromFeatures(void);
+
+	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
+
+	int GetRange() const;
+
+	bool IsRequiresImprovement() const;
+	bool IsRequiresNoImprovement() const;
+
+	int IsFeature(int i) const;
+
+	int NumYieldChanges() const;
+	TraitYieldFromFeatures& GetYieldChange(int i);
+
+	void Read(FDataStream& kStream);
+	void Write(FDataStream& kStream);
+
+private:
+
+	// ints
+	int m_iRange;
+
+	// bools
+	bool m_bRequiresImprovement;
+	bool m_bRequiresNoImprovement;
+
+	// arrays
+	bool* m_abFeatures;
+	std::vector<TraitYieldFromFeatures> m_aYieldChanges;
+
+};
+// END Revamped yields
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //  CLASS:      CvTraitEntry
 //!  \brief		A single entry in the trait XML file
@@ -74,10 +144,23 @@ public:
 	int GetPlotBuyCostModifier() const;
 	int GetPlotCultureCostModifier() const;
 	int GetCultureFromKills() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use GetYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetCityCultureBonus() const;
+	*/
+	// END Revamped yields
 	int GetCapitalThemingBonusModifier() const;
 	int GetPolicyCostModifier() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetCityConnectionTradeRouteChange() const;
+	*/
+	int GetCityConnectionTradeRouteChange(int i) const;
+	// END Revamped yields
 	int GetWonderProductionModifier() const;
 	int GetPlunderModifier() const;
 	int GetImprovementMaintenanceModifier() const;
@@ -96,7 +179,13 @@ public:
 	int GetNaturalWonderHappinessModifier() const;
 	int GetNearbyImprovementCombatBonus() const;
 	int GetNearbyImprovementBonusRange() const;
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it, as it is in no way compatible with culture being normal yields.
+	/* Original code
 	int GetCultureBuildingYieldChange() const;
+	*/
+	// END Revamped yields
 	int GetCombatBonusVsHigherTech() const;
 	int GetCombatBonusVsLargerCiv() const;
 	int GetLandUnitMaintenanceModifier() const;
@@ -132,7 +221,14 @@ public:
 	bool IsNoHillsImprovementMaintenance() const;
 	bool IsTechBoostFromCapitalScienceBuildings() const;
 	bool IsStaysAliveZeroCities() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	bool IsFaithFromUnimprovedForest() const;
+	*/
+	int NumYieldFromFeatures() const;
+	CvTraitYieldFromFeatures& GetYieldFromFeatures(int i);
+	// END Revamped yields
 	bool IsBonusReligiousBelief() const;
 	bool IsAbleToAnnexCityStates() const;
 	bool IsCrossesMountainsAfterGreatGeneral() const;
@@ -195,10 +291,23 @@ protected:
 	int m_iPlotBuyCostModifier;
 	int m_iPlotCultureCostModifier;
 	int m_iCultureFromKills;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_paiYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iCityCultureBonus;
+	*/
+	// END Revamped yields
 	int m_iCapitalThemingBonusModifier;
 	int m_iPolicyCostModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_paiYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iCityConnectionTradeRouteChange;
+	*/
+	int* m_paiCityConnectionYieldChange;
+	// END Revamped yields
 	int m_iWonderProductionModifier;
 	int m_iPlunderModifier;
 	int m_iImprovementMaintenanceModifier;
@@ -219,7 +328,13 @@ protected:
 	int m_iNaturalWonderHappinessModifier;
 	int m_iNearbyImprovementCombatBonus;
 	int m_iNearbyImprovementBonusRange;
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it, as it is in no way compatible with culture being normal yields.
+	/* Original code
 	int m_iCultureBuildingYieldChange;
+	*/
+	// END Revamped yields
 	int m_iCombatBonusVsHigherTech;
 	int m_iCombatBonusVsLargerCiv;
 	int m_iLandUnitMaintenanceModifier;
@@ -255,7 +370,15 @@ protected:
 	bool m_bNoHillsImprovementMaintenance;
 	bool m_bTechBoostFromCapitalScienceBuildings;
 	bool m_bStaysAliveZeroCities;
+	// Revamped yields - v0.1, Snarko
+	/// REMOVED
+	// This tag is a pain to keep with how substantially yield from features have changed
+	// The Celts have been updated to use the new system
+	/* Original code
 	bool m_bFaithFromUnimprovedForest;
+	*/
+	std::vector<CvTraitYieldFromFeatures> m_aTraitYieldFromFeatures;
+	// END Revamped yields
 	bool m_bBonusReligiousBelief;
 	bool m_bAbleToAnnexCityStates;
 	bool m_bCrossesMountainsAfterGreatGeneral;
@@ -432,10 +555,16 @@ public:
 	{
 		return m_iCultureFromKills;
 	};
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use GetYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetCityCultureBonus() const
 	{
 		return m_iCityCultureBonus;
 	};
+	*/
+	// END Revamped yields
 	int GetCapitalThemingBonusModifier() const
 	{
 		return m_iCapitalThemingBonusModifier;
@@ -444,10 +573,17 @@ public:
 	{
 		return m_iPolicyCostModifier;
 	};
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetCityConnectionTradeRouteChange() const
 	{
 		return m_iCityConnectionTradeRouteChange;
 	};
+	*/
+	int GetCityConnectionTradeRouteChange(int i) const;
+	// END Revamped yields
 	int GetWonderProductionModifier() const
 	{
 		return m_iWonderProductionModifier;
@@ -518,10 +654,16 @@ public:
 	{
 		return m_iNearbyImprovementBonusRange;
 	};
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it, as it is in no way compatible with culture being normal yields.
+	/* Original code
 	int GetCultureBuildingYieldChange() const
 	{
 		return m_iCultureBuildingYieldChange;
 	};
+	*/
+	// END Revamped yields
 	int GetCombatBonusVsHigherTech() const
 	{
 		return m_iCombatBonusVsHigherTech;
@@ -639,10 +781,17 @@ public:
 	{
 		return m_bStaysAliveZeroCities;
 	};
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	bool IsFaithFromUnimprovedForest() const
 	{
 		return m_bFaithFromUnimprovedForest;
 	};
+	*/
+	int NumYieldFromFeatures() const;
+	CvTraitYieldFromFeatures& GetYieldFromFeatures(int i);
+	// END Revamped yields
 	bool IsBonusReligiousBelief() const
 	{
 		return m_bBonusReligiousBelief;
@@ -794,10 +943,23 @@ private:
 	int m_iPlotBuyCostModifier;
 	int m_iPlotCultureCostModifier;
 	int m_iCultureFromKills;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_iFreeCityYield
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iCityCultureBonus;
+	*/
+	// END Revamped yields
 	int m_iCapitalThemingBonusModifier;
 	int m_iPolicyCostModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_aiCityConnectionTradeRouteChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iCityConnectionTradeRouteChange;
+	*/
+	std::vector<int> m_aiCityConnectionTradeRouteChange;
+	// END Revamped yields
 	int m_iWonderProductionModifier;
 	int m_iPlunderModifier;
 	int m_iImprovementMaintenanceModifier;
@@ -815,7 +977,13 @@ private:
 	int m_iNaturalWonderHappinessModifier;
 	int m_iNearbyImprovementCombatBonus;
 	int m_iNearbyImprovementBonusRange;
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it, as it is in no way compatible with culture being normal yields.
+	/* Original code
 	int m_iCultureBuildingYieldChange;
+	*/
+	// END Revamped yields
 	int m_iCombatBonusVsHigherTech;
 	int m_iCombatBonusVsLargerCiv;
 	int m_iLandUnitMaintenanceModifier;
@@ -848,7 +1016,13 @@ private:
 	bool m_bNoHillsImprovementMaintenance;
 	bool m_bTechBoostFromCapitalScienceBuildings;
 	bool m_bStaysAliveZeroCities;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	bool m_bFaithFromUnimprovedForest;
+	*/
+	std::vector<CvTraitYieldFromFeatures> m_aTraitYieldFromFeatures;
+	// END Revamped yields
 	bool m_bBonusReligiousBelief;
 	bool m_bAbleToAnnexCityStates;
 	bool m_bCrossesMountainsAfterGreatGeneral;

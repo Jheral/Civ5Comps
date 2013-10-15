@@ -712,7 +712,13 @@ CvSpecialistInfo::CvSpecialistInfo() :
 	m_iCost(0),
 	m_iGreatPeopleUnitClass(NO_UNITCLASS),
 	m_iGreatPeopleRateChange(0),
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCulturePerTurn(0),
+	*/
+	// END Revamped yields
 	m_iMissionType(NO_MISSION),
 	m_bVisible(false),
 	m_piYieldChange(NULL),
@@ -742,10 +748,16 @@ int CvSpecialistInfo::getGreatPeopleRateChange() const
 	return m_iGreatPeopleRateChange;
 }
 //------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// No longer used, use getYieldChange
+// XML tag still kept for backwards compatibility
+/* Original code
 int CvSpecialistInfo::getCulturePerTurn() const
 {
 	return m_iCulturePerTurn;
 }
+*/
+// END Revamped yields
 
 int CvSpecialistInfo::getMissionType() const
 {
@@ -805,7 +817,13 @@ bool CvSpecialistInfo::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	m_iCost = kResults.GetInt("Cost");
 	m_iExperience = kResults.GetInt("Experience");
 	m_iGreatPeopleRateChange = kResults.GetInt("GreatPeopleRateChange");
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCulturePerTurn = kResults.GetInt("CulturePerTurn");
+	*/
+	// END Revamped yields
 
 	setTexture(kResults.GetText("Texture"));
 
@@ -816,6 +834,17 @@ bool CvSpecialistInfo::CacheResults(Database::Results& kResults, CvDatabaseUtili
 	const char* szType = GetType();
 	kUtility.SetFlavors(m_piFlavorValue, "SpecialistFlavors", "SpecialistType", szType);
 	kUtility.SetYields(m_piYieldChange, "SpecialistYields", "SpecialistType", szType);
+
+	// Revamped yields - v0.1, Snarko
+	// m_iCulturePerTurn is no longer used but the XML tag is kept for backwards compatibility.
+	int iCulturePerTurn = kResults.GetInt("CulturePerTurn");
+	if (iCulturePerTurn != 0)
+	{
+		if (m_piYieldChange == NULL)
+			kUtility.InitializeArray(m_piYieldChange, NUM_YIELD_TYPES, 0);
+		m_piYieldChange[YIELD_CULTURE] += iCulturePerTurn;
+	}
+	// END Revamped yields
 
 	return true;
 }
@@ -2801,7 +2830,13 @@ CvHandicapInfo::CvHandicapInfo() :
 	m_iPolicyNumOptions(0),
 	m_iTechNumOptions(0),
 	m_iInflationPercent(0),
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	m_iFreeCulturePerTurn(0),
+	*/
+	// END Revamped yields
 	m_iAttitudeChange(0),
 	m_iNoTechTradeModifier(0),
 	m_iTechTradeKnownModifier(0),
@@ -2962,10 +2997,16 @@ int CvHandicapInfo::getInflationPercent() const
 	return m_iInflationPercent;
 }
 //------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// REMOVED
+// This tag is not used in base civ 5 and there's little reason to keep it.
+/* Original code
 int CvHandicapInfo::getFreeCulturePerTurn() const
 {
 	return m_iFreeCulturePerTurn;
 }
+*/
+// END Revamped yields
 //------------------------------------------------------------------------------
 int CvHandicapInfo::getAttitudeChange() const
 {
@@ -3200,7 +3241,13 @@ bool CvHandicapInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility
 	m_iTechNumOptions = kResults.GetInt("TechNumOptionsConsidered");
 	m_iPolicyNumOptions = kResults.GetInt("PolicyNumOptionsConsidered");
 	m_iInflationPercent = kResults.GetInt("InflationPercent");
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	m_iFreeCulturePerTurn = kResults.GetInt("FreeCulturePerTurn");
+	*/
+	// END Revamped yields
 	m_iAttitudeChange = kResults.GetInt("AttitudeChange");
 	m_iNoTechTradeModifier = kResults.GetInt("NoTechTradeModifier");
 	m_iTechTradeKnownModifier = kResults.GetInt("TechTradeKnownModifier");
@@ -4133,6 +4180,9 @@ CvRouteInfo::CvRouteInfo() :
 	m_piYieldChange(NULL),
 	m_piTechMovementChange(NULL),
 	m_piResourceQuantityRequirements(NULL)
+	// EventEngine - v0.1, Snarko
+	, m_asziFlagPrereqs(NULL)
+	// END EventEngine
 {
 }
 //------------------------------------------------------------------------------
@@ -4193,6 +4243,27 @@ int CvRouteInfo::getResourceQuantityRequirement(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piResourceQuantityRequirements ? m_piResourceQuantityRequirements[i] : -1;
 }
+// EventEngine - v0.1, Snarko
+//------------------------------------------------------------------------------
+int CvRouteInfo::getNumFlagPrereqs() const
+{
+	return m_asziFlagPrereqs.size();
+}
+//------------------------------------------------------------------------------
+std::string CvRouteInfo::getFlagPrereq(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].first;
+}
+//------------------------------------------------------------------------------
+int CvRouteInfo::getFlagPrereqValue(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].second;
+}
+// END EventEngine
 //------------------------------------------------------------------------------
 bool CvRouteInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -4213,6 +4284,27 @@ bool CvRouteInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 
 	kUtility.PopulateArrayByValue(m_piTechMovementChange, "Technologies", "Route_TechMovementChanges", "TechType", "RouteType", szRouteType, "MovementChange");
 	kUtility.PopulateArrayByValue(m_piResourceQuantityRequirements, "Resources", "Route_ResourceQuantityRequirements", "ResourceType", "RouteType", szRouteType, "Cost");
+
+	// EventEngine - v0.1, Snarko
+	{
+		m_asziFlagPrereqs.clear();
+		std::string strKey("Route_PrereqFlags");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from Route_PrereqFlags where RouteType = ?");
+		}
+
+		pResults->Bind(1, szRouteType);
+
+		while(pResults->Step())
+		{
+			std::string szFlag = pResults->GetText("Flag");
+			int iMinimumValue = pResults->GetInt("MinimumValue");
+			m_asziFlagPrereqs.push_back(std::make_pair(szFlag, iMinimumValue));
+		}
+	}
+	// END EventEngine
 
 	return true;
 }
@@ -5081,6 +5173,12 @@ CvYieldInfo::CvYieldInfo() :
 	m_iGoldenAgeYieldThreshold(0),
 	m_iGoldenAgeYieldMod(0),
 	m_iAIWeightPercent(0)
+	// Revamped yields - v0.1, Snarko
+	, m_iGoldenAgePlayerYieldMod(0),
+	m_iCityConnectionBase(0),
+	m_iCityConnectionCapitalPopMultiplier(0),
+	m_iCityConnectionCityPopMultiplier(0)
+	// END Revamped yields
 {
 }
 //------------------------------------------------------------------------------
@@ -5138,6 +5236,34 @@ int CvYieldInfo::getAIWeightPercent() const
 {
 	return m_iAIWeightPercent;
 }
+// Revamped yields - v0.1, Snarko
+//------------------------------------------------------------------------------
+int CvYieldInfo::getGoldenAgePlayerYieldMod() const
+{
+	return m_iGoldenAgePlayerYieldMod;
+}
+//------------------------------------------------------------------------------
+int CvYieldInfo::getCityConnectionBase() const
+{
+	return m_iCityConnectionBase;
+}
+//------------------------------------------------------------------------------
+int CvYieldInfo::getCityConnectionCapitalPopMultiplier() const
+{
+	return m_iCityConnectionCapitalPopMultiplier;
+}
+//------------------------------------------------------------------------------
+int CvYieldInfo::getCityConnectionCityPopMultiplier() const
+{
+	return m_iCityConnectionCityPopMultiplier;
+}
+// END Revamped yields
+// EventEngine - v0.1, Snarko
+const char* CvYieldInfo::getIconString() const
+{
+	return m_strIconString;
+}
+// END EventEngine
 //------------------------------------------------------------------------------
 bool CvYieldInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
@@ -5155,6 +5281,15 @@ bool CvYieldInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	kResults.GetValue("GoldenAgeYieldThreshold", m_iGoldenAgeYieldThreshold);
 	kResults.GetValue("GoldenAgeYieldMod", m_iGoldenAgeYieldMod);
 	kResults.GetValue("AIWeightPercent", m_iAIWeightPercent);
+	// Revamped yields - v0.1, Snarko
+	kResults.GetValue("GoldenAgePlayerYieldMod", m_iGoldenAgePlayerYieldMod);
+	kResults.GetValue("CityConnectionBase", m_iCityConnectionBase);
+	kResults.GetValue("CityConnectionCapitalPopMultiplier", m_iCityConnectionCapitalPopMultiplier);
+	kResults.GetValue("CityConnectionCityPopMultiplier", m_iCityConnectionCityPopMultiplier);
+	// END Revamped yields
+	// EventEngine - v0.1, Snarko
+	m_strIconString = kResults.GetText("IconString");
+	// END EventEngine
 
 	return true;
 
@@ -6810,28 +6945,33 @@ CvEventInfo::CvEventInfo() :
 
 bool CvEventInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
-	gDLL->netMessageDebugLog("Loading from XML 0 \n");
+
 	if(!CvBaseInfo::CacheResults(kResults, kUtility))
 		return false;
 
 	std::string str(GetType());
-	gDLL->netMessageDebugLog("Loading from XML Type " + str + "\n");
 	m_iMeanTimeToHappen = kResults.GetInt("MeanTimeToHappen");
-	gDLL->netMessageDebugLog("Loading from XML MTTH " + FSerialization::toString(m_iMeanTimeToHappen) + "\n");
 	m_eEventType = GC.getEventTypeType(kResults.GetText("EventType"));
-	gDLL->netMessageDebugLog("Loading from XML EventType " + FSerialization::toString((int)m_eEventType) + "\n");
-	m_szImage = kResults.GetText("Image");
 
-	//Requirements
+	const char* szNotificationText = kResults.GetText("NotificationText");
+	if(szNotificationText)
+	{
+		m_szNotificationText = GetLocalizedText(szNotificationText);
+	}
+	else
+	{
+		m_szNotificationText = "ERROR";
+	}
+
+	// Requirements
 	{
 		m_aeEventRequirements.clear();
 
 		std::string strKey = "Event_Requirements";
 		Database::Results* pResults = kUtility.GetResults(strKey);
-		gDLL->netMessageDebugLog("Loading from XML Requirements 1 \n");
 		if(pResults == NULL)
 		{
-			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Requirements where EventType = ? order by ID_Scope");
+			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Requirements where EventType = ? order by ID_Set");
 		}
 		if(pResults != NULL)
 		{
@@ -6839,31 +6979,22 @@ bool CvEventInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 
 			while(pResults->Step())
 			{
-				gDLL->netMessageDebugLog("Loading from XML Requirements 2 \n");
 				m_aeEventRequirements.push_back((EventRequirementTypes)pResults->GetInt(0));
-				/*
-				CvEventModifierInfo pNewEvent;
-				pNewEvent.CacheResults(*pResults, kUtility);
-				m_pEventRequirements.push_back(pNewEvent);
-				*/
-				gDLL->netMessageDebugLog("Loading from XML Requirements 3 \n");
 			}
 
 			pResults->Reset();
 		}
-		gDLL->netMessageDebugLog("Loading from XML Requirements 4 \n");
 	}
 
-	//Modifiers
+	// Modifiers
 	{
 		m_aeEventModifiers.clear();
 
 		std::string strKey = "Event_Modifiers";
 		Database::Results* pResults = kUtility.GetResults(strKey);
-		gDLL->netMessageDebugLog("Loading from XML Modifiers 1 \n");
 		if(pResults == NULL)
 		{
-			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Modifiers where EventType = ? order by ID_Scope");
+			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Modifiers where EventType = ? order by ID_Set");
 		}
 		if(pResults != NULL)
 		{
@@ -6871,31 +7002,22 @@ bool CvEventInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 
 			while(pResults->Step())
 			{
-				gDLL->netMessageDebugLog("Loading from XML Modifiers 2 \n");
 				m_aeEventModifiers.push_back((EventModifierTypes)pResults->GetInt(0));
-				/*
-				CvEventModifierInfo pNewEvent;
-				pNewEvent.CacheResults(*pResults, kUtility);
-				m_pEventModifiers.push_back(pNewEvent);
-				*/
-				gDLL->netMessageDebugLog("Loading from XML Modifiers 3 \n");
 			}
 
 			pResults->Reset();
 		}
-		gDLL->netMessageDebugLog("Loading from XML Modifiers 4 \n");
 	}
 
-	//Actions
+	// Options
 	{
 		m_aeEventOptions.clear();
 
 		std::string strKey = "Event_Options";
 		Database::Results* pResults = kUtility.GetResults(strKey);
-		gDLL->netMessageDebugLog("Loading from XML Options 1 \n");
 		if(pResults == NULL)
 		{
-			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Options where EventType = ? order by ID_Scope");
+			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Options where EventType = ? order by ID_Set");
 		}
 		if(pResults != NULL)
 		{
@@ -6903,67 +7025,64 @@ bool CvEventInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 
 			while(pResults->Step())
 			{
-				gDLL->netMessageDebugLog("Loading from XML Options 2 \n");
 				m_aeEventOptions.push_back((EventOptionTypes)pResults->GetInt(0));
-				/*
-				CvEventOptionInfo pNewEvent;
-				pNewEvent.CacheResults(*pResults, kUtility);
-				m_pEventOptions.push_back(pNewEvent);
-				*/
-				gDLL->netMessageDebugLog("Loading from XML Options 3 \n");
 			}
 
 			pResults->Reset();
 		}
-		gDLL->netMessageDebugLog("Loading from XML Options 4 \n");
 	}
 
 	return true;
 }
-int CvEventInfo::getMTTH()
+int CvEventInfo::getMTTH() const
 {
 	return m_iMeanTimeToHappen;
 }
 
-int CvEventInfo::getNumRequirements()
+int CvEventInfo::getNumRequirements() const
 {
 	return m_aeEventRequirements.size();
 }
 
-EventRequirementTypes CvEventInfo::getRequirement(int i)
+EventRequirementTypes CvEventInfo::getRequirement(int i) const
 {
 	CvAssertMsg(i < m_aeEventRequirements.size(), "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_aeEventRequirements[i];
 }
 
-int CvEventInfo::getNumModifiers()
+int CvEventInfo::getNumModifiers() const
 {
 	return m_aeEventModifiers.size();
 }
 
-EventModifierTypes CvEventInfo::getModifier(int i)
+EventModifierTypes CvEventInfo::getModifier(int i) const
 {
 	CvAssertMsg(i < m_aeEventModifiers.size(), "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_aeEventModifiers[i];
 }
 
-int CvEventInfo::getNumOptions()
+int CvEventInfo::getNumOptions() const
 {
 	return m_aeEventOptions.size();
 }
 
-EventOptionTypes CvEventInfo::getOption(int i)
+EventOptionTypes CvEventInfo::getOption(int i) const
 {
 	CvAssertMsg(i < m_aeEventOptions.size(), "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_aeEventOptions[i];
 }
 
-EventTypeTypes CvEventInfo::getEventType()
+EventTypeTypes CvEventInfo::getEventType() const
 {
 	return m_eEventType;
+}
+
+const char* CvEventInfo::getNotificationText() const
+{
+	return m_szNotificationText.c_str();
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -6980,53 +7099,45 @@ CvEventModifierInfo::CvEventModifierInfo() :
 
 bool CvEventModifierInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
-	gDLL->netMessageDebugLog("Loading modifier XML 0 \n");
 	if(!CvBaseInfo::CacheResults(kResults, kUtility))
 		return false;
-	gDLL->netMessageDebugLog("Loading modifier XML 1 \n");
 
 	m_eModifier = GC.getEventModifierType(kResults.GetText("EventModifierType"));
-	gDLL->netMessageDebugLog("Loading modifier XML EventModifierType " + FSerialization::toString((int)m_eModifier) + "\n");
 	m_eCompare = GC.getCompareType(kResults.GetText("EventCompareType"));
-	gDLL->netMessageDebugLog("Loading modifier XML CompareType " + FSerialization::toString((int)m_eCompare) + "\n");
 	m_iTypeToCompare = GC.getInfoTypeForString(kResults.GetText("CompareItem"));
-	gDLL->netMessageDebugLog("Loading modifier XML CompareItem " + FSerialization::toString(m_iTypeToCompare) + "\n");
 	m_iNumberToCompare = kResults.GetInt("iNumberToCompare");
-	gDLL->netMessageDebugLog("Loading modifier XML CompareNumber " + FSerialization::toString(m_iNumberToCompare) + "\n");
 	m_iFactor = (int)(kResults.GetFloat("fFactor") * 100); //We divide with 100 later on. The final chance is an int, 1 in X chance, so floats don't really make sense.
-	gDLL->netMessageDebugLog("Loading modifier XML Factor " + FSerialization::toString(m_iFactor) + "\n");
-	m_szScope = kResults.GetText("sScope");
-	gDLL->netMessageDebugLog("Loading modifier XML Scope " + m_szScope + "\n");
+	m_szSet = kResults.GetText("SetName");
 
 	return true;
 }
 
-EventModifierTypeTypes CvEventModifierInfo::getModifierType()
+EventModifierTypeTypes CvEventModifierInfo::getModifierType() const
 {
 	return m_eModifier;
 }
 
-CompareTypes CvEventModifierInfo::getCompareType()
+CompareTypes CvEventModifierInfo::getCompareType() const
 {
 	return m_eCompare;
 }
 
-std::string CvEventModifierInfo::getScope()
+std::string CvEventModifierInfo::getSet() const
 {
-	return m_szScope;
+	return m_szSet;
 }
 
-int CvEventModifierInfo::getTypeToCompare()
+int CvEventModifierInfo::getTypeToCompare() const
 {
 	return m_iTypeToCompare;
 }
 
-int CvEventModifierInfo::getNumberToCompare()
+int CvEventModifierInfo::getNumberToCompare() const
 {
 	return m_iNumberToCompare;
 }
 
-int CvEventModifierInfo::getFactor()
+int CvEventModifierInfo::getFactor() const
 {
 	return m_iFactor;
 }
@@ -7042,24 +7153,20 @@ CvEventOptionInfo::CvEventOptionInfo() :
 
 bool CvEventOptionInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
-	gDLL->netMessageDebugLog("Loading option 0 \n");
 	if(!CvBaseInfo::CacheResults(kResults, kUtility))
 		return false;
-	gDLL->netMessageDebugLog("Loading option 1 \n");
 
 	bOverrideTooltip = kResults.GetBool("bOverrideTooltip");
 
 	//Actions
 	{
-		gDLL->netMessageDebugLog("Loading option actions 1 \n");
 		m_aeEventActions.clear();
 
 		std::string strKey = "Event_Actions";
 		Database::Results* pResults = kUtility.GetResults(strKey);
-		gDLL->netMessageDebugLog("Loading option actions 2 \n");
 		if(pResults == NULL)
 		{
-			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Actions where EventOptionType = ? order by ID_Scope");
+			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Actions where EventOptionType = ? order by ID_Set");
 		}
 		if(pResults != NULL)
 		{
@@ -7067,30 +7174,27 @@ bool CvEventOptionInfo::CacheResults(Database::Results& kResults, CvDatabaseUtil
 
 			while(pResults->Step())
 			{
-				gDLL->netMessageDebugLog("Loading option actions 3 \n");
 				m_aeEventActions.push_back((EventActionTypes)pResults->GetInt(0));
 				/*
 				CvEventActionInfo pNewEvent;
 				pNewEvent.CacheResults(*pResults, kUtility);
 				m_pEventActions.push_back(pNewEvent);
 				*/
-				gDLL->netMessageDebugLog("Loading option actions 4 \n");
 			}
 
 			pResults->Reset();
-			gDLL->netMessageDebugLog("Loading option actions 5 \n");
 		}
 	}
 
 	return true;
 }
 
-int CvEventOptionInfo::getNumActions()
+int CvEventOptionInfo::getNumActions() const
 {
 	return m_aeEventActions.size();
 }
 
- EventActionTypes CvEventOptionInfo::getAction(int i)
+ EventActionTypes CvEventOptionInfo::getAction(int i) const
 {
 	CvAssertMsg(i < m_aeEventActions.size(), "Index out of bounds");
 	CvAssertMsg(i > -1, "Index out of bounds");
@@ -7112,85 +7216,76 @@ CvEventActionInfo::CvEventActionInfo() :
 
 bool CvEventActionInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
 {
-	gDLL->netMessageDebugLog("Loading actions 0 \n");
 	if(!CvBaseInfo::CacheResults(kResults, kUtility))
 		return false;
-	gDLL->netMessageDebugLog("Loading actions 1 \n");
 
 	m_eAction = GC.getEventActionType(kResults.GetText("EventActionType"));
-	gDLL->netMessageDebugLog("Loading actions EventActionType " + FSerialization::toString((int)m_eAction) + "\n");
+
 	//ints
 	m_iTurns = kResults.GetInt("iTurns");
-	gDLL->netMessageDebugLog("Loading actions iTurns " + FSerialization::toString(m_iTurns) + "\n");
 	m_iChance = kResults.GetInt("iChance");
-	gDLL->netMessageDebugLog("Loading actions Chance " + FSerialization::toString(m_iChance) + "\n");
 	m_iTypeToAction = GC.getInfoTypeForString(kResults.GetText("ActionItem"));
-	gDLL->netMessageDebugLog("Loading actions ActionItem " + FSerialization::toString(m_iTypeToAction) + "\n");
 	m_AIWeight = kResults.GetInt("AIWeight");
-	gDLL->netMessageDebugLog("Loading actions AI weight " + FSerialization::toString(m_AIWeight) + "\n");
 	m_iValue1 = kResults.GetInt("iValue");
-	gDLL->netMessageDebugLog("Loading actions iValue1 " + FSerialization::toString(m_iValue1) + "\n");
 	m_iValue2 = kResults.GetInt("iValue2");
-	gDLL->netMessageDebugLog("Loading actions iValue2 " + FSerialization::toString(m_iValue2) + "\n");
+
 	//bools
 	m_bBool1 = kResults.GetBool("bBool");
-	gDLL->netMessageDebugLog("Loading actions Bool1 " + FSerialization::toString(m_bBool1) + "\n");
+
 	//strings
 	m_szString1 = kResults.GetText("sString");
-	gDLL->netMessageDebugLog("Loading actions String1 " + m_szString1 + "\n");
-	m_szScope = kResults.GetText("sScope");
-	gDLL->netMessageDebugLog("Loading actions Scope " + m_szScope + "\n");
+	m_szSet = kResults.GetText("SetName");
 
 	return true;
 }
 
-EventActionTypeTypes CvEventActionInfo::getActionType()
+EventActionTypeTypes CvEventActionInfo::getActionType() const
 {
 	return m_eAction;
 }
 
-int CvEventActionInfo::getTurns()
+int CvEventActionInfo::getNumTurns() const
 {
 	return m_iTurns;
 }
 
-int CvEventActionInfo::getChance()
+int CvEventActionInfo::getChance() const
 {
 	return m_iChance;
 }
 
-int CvEventActionInfo::getTypeToAction()
+int CvEventActionInfo::getTypeToAction() const
 {
 	return m_iTypeToAction;
 }
 
-int CvEventActionInfo::getAIWeight()
+int CvEventActionInfo::getAIWeight() const
 {
 	return m_AIWeight;
 }
 
-int CvEventActionInfo::getValue1()
+int CvEventActionInfo::getValue1() const
 {
 	return m_iValue1;
 }
 
-int CvEventActionInfo::getValue2()
+int CvEventActionInfo::getValue2() const
 {
 	return m_iValue2;
 }
 
-bool CvEventActionInfo::getBool1()
+bool CvEventActionInfo::getBool1() const
 {
 	return m_bBool1;
 }
 
-std::string CvEventActionInfo::getString1()
+std::string CvEventActionInfo::getString1() const
 {
 	return m_szString1;
 }
 
-std::string CvEventActionInfo::getScope()
+std::string CvEventActionInfo::getSet() const
 {
-	return m_szScope;
+	return m_szSet;
 }
 // END EventEngine

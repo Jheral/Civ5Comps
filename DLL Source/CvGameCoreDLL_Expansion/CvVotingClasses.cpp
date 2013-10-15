@@ -174,19 +174,34 @@ CvResolutionEffects::CvResolutionEffects(void)
 {
 	bDiplomaticVictory = false;
 	bChangeLeagueHost = false;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	iOneTimeGold = 0;
+	*/
+	// END Revamped yields
 	iOneTimeGoldPercent = 0;
 	bRaiseCityStateInfluenceToNeutral = false;
 	eLeagueProjectEnabled = NO_LEAGUE_PROJECT;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	iGoldPerTurn = 0;
+	*/
+	// END Revamped yields
 	iResourceQuantity = 0;
 	bEmbargoCityStates = false;
 	bEmbargoPlayer = false;
 	bNoResourceHappiness = false;
 	iUnitMaintenanceGoldPercent = 0;
 	iMemberDiscoveredTechMod = 0;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	iCulturePerWonder = 0;
 	iCulturePerNaturalWonder = 0;
+	*/
+	// END Revamped yields
 	bNoTrainingNuclearWeapons = false;
 	iVotesForFollowingReligion = 0;
 	iHolyCityTourism = 0;
@@ -195,8 +210,13 @@ CvResolutionEffects::CvResolutionEffects(void)
 	iOtherIdeologyRebellionMod = 0;
 	iArtsyGreatPersonRateMod = 0;
 	iScienceyGreatPersonRateMod = 0;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	iGreatPersonTileImprovementCulture = 0;
 	iLandmarkCulture = 0;
+	*/
+	// END Revamped yields
 }
 
 CvResolutionEffects::CvResolutionEffects(ResolutionTypes eType)
@@ -207,19 +227,34 @@ CvResolutionEffects::CvResolutionEffects(ResolutionTypes eType)
 	{
 		bDiplomaticVictory					= pInfo->IsDiplomaticVictory();
 		bChangeLeagueHost					= pInfo->IsChangeLeagueHost();
+		// Revamped yields - v0.1, Snarko
+		// No longer used
+		/* Original code
 		iOneTimeGold						= pInfo->GetOneTimeGold();
+		*/
+		// END Revamped yields
 		iOneTimeGoldPercent					= pInfo->GetOneTimeGoldPercent();
 		bRaiseCityStateInfluenceToNeutral	= pInfo->IsRaiseCityStateInfluenceToNeutral();
 		eLeagueProjectEnabled				= pInfo->GetLeagueProjectEnabled();
+		// Revamped yields - v0.1, Snarko
+		// No longer used
+		/* Original code
 		iGoldPerTurn						= pInfo->GetGoldPerTurn();
+		*/
+		// END Revamped yields
 		iResourceQuantity					= pInfo->GetResourceQuantity();
 		bEmbargoCityStates					= pInfo->IsEmbargoCityStates();
 		bEmbargoPlayer						= pInfo->IsEmbargoPlayer();
 		bNoResourceHappiness				= pInfo->IsNoResourceHappiness();
 		iUnitMaintenanceGoldPercent			= pInfo->GetUnitMaintenanceGoldPercent();
 		iMemberDiscoveredTechMod			= pInfo->GetMemberDiscoveredTechMod();
+		// Revamped yields - v0.1, Snarko
+		// No longer used
+		/* Original code
 		iCulturePerWonder					= pInfo->GetCulturePerWonder();
 		iCulturePerNaturalWonder			= pInfo->GetCulturePerNaturalWonder();
+		*/
+		// END Revamped yields
 		bNoTrainingNuclearWeapons			= pInfo->IsNoTrainingNuclearWeapons();
 		iVotesForFollowingReligion			= pInfo->GetVotesForFollowingReligion();
 		iHolyCityTourism					= pInfo->GetHolyCityTourism();
@@ -228,8 +263,60 @@ CvResolutionEffects::CvResolutionEffects(ResolutionTypes eType)
 		iOtherIdeologyRebellionMod			= pInfo->GetOtherIdeologyRebellionMod();
 		iArtsyGreatPersonRateMod			= pInfo->GetArtsyGreatPersonRateMod();
 		iScienceyGreatPersonRateMod			= pInfo->GetScienceyGreatPersonRateMod();
+		// Revamped yields - v0.1, Snarko
+		// No longer used
+		/* Original code
 		iGreatPersonTileImprovementCulture	= pInfo->GetGreatPersonTileImprovementCulture();
 		iLandmarkCulture					= pInfo->GetLandmarkCulture();
+		*/
+		m_aiOneTimeYield.clear();
+		m_aiOneTimeYield.resize(NUM_YIELD_TYPES);
+
+		m_aiYieldPerTurn.clear();
+		m_aiYieldPerTurn.resize(NUM_YIELD_TYPES);
+
+		m_aiYieldPerWonder.clear();
+		m_aiYieldPerWonder.resize(NUM_YIELD_TYPES);
+
+		m_aiYieldPerNaturalWonder.clear();
+		m_aiYieldPerNaturalWonder.resize(NUM_YIELD_TYPES);
+
+		m_aiYieldGPTileImprovement.clear();
+		m_aiYieldGPTileImprovement.resize(NUM_YIELD_TYPES);
+
+		m_aiYieldPerLandmark.clear();
+		m_aiYieldPerLandmark.resize(NUM_YIELD_TYPES);
+
+		if (pInfo->GetOneTimeYield())
+		{
+			m_aiOneTimeYield.insert(m_aiOneTimeYield.begin(), &pInfo->GetOneTimeYield()[0], &pInfo->GetOneTimeYield()[NUM_YIELD_TYPES]);
+		}
+
+		if (pInfo->GetYieldPerTurn())
+		{
+			m_aiYieldPerTurn.insert(m_aiYieldPerTurn.begin(), &pInfo->GetYieldPerTurn()[0], &pInfo->GetYieldPerTurn()[NUM_YIELD_TYPES]);
+		}
+
+		if (pInfo->GetYieldPerWonder())
+		{
+			m_aiYieldPerWonder.insert(m_aiYieldPerWonder.begin(), &pInfo->GetYieldPerWonder()[0], &pInfo->GetYieldPerWonder()[NUM_YIELD_TYPES]);
+		}
+
+		if (pInfo->GetYieldPerNaturalWonder())
+		{
+			m_aiYieldPerNaturalWonder.insert(m_aiYieldPerNaturalWonder.begin(), &pInfo->GetYieldPerNaturalWonder()[0], &pInfo->GetYieldPerNaturalWonder()[NUM_YIELD_TYPES]);
+		}
+
+		if (pInfo->GetYieldGPTileImprovement())
+		{
+			m_aiYieldGPTileImprovement.insert(m_aiYieldGPTileImprovement.begin(), &pInfo->GetYieldGPTileImprovement()[0], &pInfo->GetYieldGPTileImprovement()[NUM_YIELD_TYPES]);
+		}
+
+		if (pInfo->GetYieldPerLandmark())
+		{
+			m_aiYieldPerLandmark.insert(m_aiYieldPerLandmark.begin(), &pInfo->GetYieldPerLandmark()[0], &pInfo->GetYieldPerLandmark()[NUM_YIELD_TYPES]);
+		}
+		// END Revamped yields
 	}
 }
 
@@ -239,8 +326,13 @@ CvResolutionEffects::~CvResolutionEffects(void)
 
 bool CvResolutionEffects::HasOngoingEffects() const
 {
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	if (iGoldPerTurn != 0)
 		return true;
+	*/
+	// END Revamped yields
 
 	if (iResourceQuantity != 0)
 		return true;
@@ -260,11 +352,16 @@ bool CvResolutionEffects::HasOngoingEffects() const
 	if (iMemberDiscoveredTechMod != 0)
 		return true;
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	if (iCulturePerWonder != 0)
 		return true;
 
 	if (iCulturePerNaturalWonder != 0)
 		return true;
+	*/
+	// END Revamped yields
 
 	if (bNoTrainingNuclearWeapons)
 		return true;
@@ -290,11 +387,29 @@ bool CvResolutionEffects::HasOngoingEffects() const
 	if (iScienceyGreatPersonRateMod != 0)
 		return true;
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	if (iGreatPersonTileImprovementCulture != 0)
 		return true;
 
 	if (iLandmarkCulture != 0)
 		return true;
+	*/
+	for (int i = 0; i < NUM_YIELD_TYPES; i++)
+	{
+		if (m_aiYieldPerTurn[i] != 0)
+			return true;
+		if (m_aiYieldPerWonder[i] != 0)
+			return true;
+		if (m_aiYieldPerNaturalWonder[i] != 0)
+			return true;
+		if (m_aiYieldGPTileImprovement[i] != 0)
+			return true;
+		if (m_aiYieldPerLandmark[i] != 0)
+			return true;
+	}
+	// END Revamped yields
 
 	return false;
 }
@@ -307,15 +422,25 @@ void CvResolutionEffects::AddOngoingEffects(const CvResolutionEffects* pOtherEff
 	if (!pOtherEffects->HasOngoingEffects())
 		return;
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	iGoldPerTurn							+= pOtherEffects->iOneTimeGold;
+	*/
+	// END Revamped yields
 	iResourceQuantity						+= pOtherEffects->iResourceQuantity; // target resource
 	bEmbargoCityStates						|= pOtherEffects->bEmbargoCityStates;
 	bEmbargoPlayer							|= pOtherEffects->bEmbargoPlayer; // target player
 	bNoResourceHappiness					|= pOtherEffects->bNoResourceHappiness; // target resource
 	iUnitMaintenanceGoldPercent				+= pOtherEffects->iUnitMaintenanceGoldPercent;
 	iMemberDiscoveredTechMod				+= pOtherEffects->iMemberDiscoveredTechMod;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	iCulturePerWonder						+= pOtherEffects->iCulturePerWonder;
 	iCulturePerNaturalWonder				+= pOtherEffects->iCulturePerNaturalWonder;
+	*/
+	// END Revamped yields
 	bNoTrainingNuclearWeapons				|= pOtherEffects->bNoTrainingNuclearWeapons;
 	iVotesForFollowingReligion				+= pOtherEffects->iVotesForFollowingReligion; // target religion
 	iHolyCityTourism						+= pOtherEffects->iHolyCityTourism; // target religion
@@ -324,8 +449,21 @@ void CvResolutionEffects::AddOngoingEffects(const CvResolutionEffects* pOtherEff
 	iOtherIdeologyRebellionMod				+= pOtherEffects->iOtherIdeologyRebellionMod; // target ideology
 	iArtsyGreatPersonRateMod				+= pOtherEffects->iArtsyGreatPersonRateMod;
 	iScienceyGreatPersonRateMod				+= pOtherEffects->iScienceyGreatPersonRateMod;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	iGreatPersonTileImprovementCulture		+= pOtherEffects->iGreatPersonTileImprovementCulture;
 	iLandmarkCulture						+= pOtherEffects->iLandmarkCulture;
+	*/
+	for (int i = 0; i < NUM_YIELD_TYPES; i++)
+	{
+		m_aiYieldPerTurn[i] += pOtherEffects->m_aiYieldPerTurn[i];
+		m_aiYieldPerWonder[i] += pOtherEffects->m_aiYieldPerWonder[i];
+		m_aiYieldPerNaturalWonder[i] += pOtherEffects->m_aiYieldPerNaturalWonder[i];
+		m_aiYieldGPTileImprovement[i] += pOtherEffects->m_aiYieldGPTileImprovement[i];
+		m_aiYieldPerLandmark[i] += pOtherEffects->m_aiYieldPerLandmark[i];
+	}
+	// END Revamped yields
 }
 
 // Serialization Read
@@ -334,6 +472,12 @@ FDataStream& operator>>(FDataStream& loadFrom, CvResolutionEffects& writeTo)
 	uint uiVersion;
 
 	loadFrom >> uiVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem! Well, except mod versions created before using our modcomp(s)...
+	uint modVersion;
+	loadFrom >> modVersion;
+	// END modVersion
 	loadFrom >> writeTo.bDiplomaticVictory;
 	if (uiVersion >= 2)
 	{
@@ -343,7 +487,13 @@ FDataStream& operator>>(FDataStream& loadFrom, CvResolutionEffects& writeTo)
 	{
 		writeTo.bChangeLeagueHost = false;
 	}
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// We do not need to make a special check for modVersion, because this was changed in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	loadFrom >> writeTo.iOneTimeGold;
+	*/
+	// END Revamped yields
 	loadFrom >> writeTo.iOneTimeGoldPercent;
 	loadFrom >> writeTo.bRaiseCityStateInfluenceToNeutral;
 	if (uiVersion >= 3)
@@ -354,13 +504,23 @@ FDataStream& operator>>(FDataStream& loadFrom, CvResolutionEffects& writeTo)
 	{
 		writeTo.eLeagueProjectEnabled = NO_LEAGUE_PROJECT;
 	}
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// We do not need to make a special check for modVersion, because this was changed in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	loadFrom >> writeTo.iGoldPerTurn;
+	*/
+	// END Revamped yields
 	loadFrom >> writeTo.iResourceQuantity;
 	loadFrom >> writeTo.bEmbargoCityStates;
 	loadFrom >> writeTo.bEmbargoPlayer;
 	loadFrom >> writeTo.bNoResourceHappiness;
 	loadFrom >> writeTo.iUnitMaintenanceGoldPercent;
 	loadFrom >> writeTo.iMemberDiscoveredTechMod;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// We do not need to make a special check for modVersion, because this was changed in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	if (uiVersion >= 4)
 	{
 		loadFrom >> writeTo.iCulturePerWonder;
@@ -371,6 +531,8 @@ FDataStream& operator>>(FDataStream& loadFrom, CvResolutionEffects& writeTo)
 		writeTo.iCulturePerWonder = 0;
 		writeTo.iCulturePerNaturalWonder = 0;
 	}
+	*/
+	// END Revamped yields
 	if (uiVersion >= 5)
 	{
 		loadFrom >> writeTo.bNoTrainingNuclearWeapons;
@@ -417,6 +579,10 @@ FDataStream& operator>>(FDataStream& loadFrom, CvResolutionEffects& writeTo)
 		writeTo.iArtsyGreatPersonRateMod = 0;
 		writeTo.iScienceyGreatPersonRateMod = 0;
 	}
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// We do not need to make a special check for modVersion, because this was changed in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	if (uiVersion >= 8)
 	{
 		loadFrom >> writeTo.iGreatPersonTileImprovementCulture;
@@ -427,6 +593,14 @@ FDataStream& operator>>(FDataStream& loadFrom, CvResolutionEffects& writeTo)
 		writeTo.iGreatPersonTileImprovementCulture = 0;
 		writeTo.iLandmarkCulture = 0;
 	}
+	*/
+	loadFrom >> writeTo.m_aiOneTimeYield;
+	loadFrom >> writeTo.m_aiYieldGPTileImprovement;
+	loadFrom >> writeTo.m_aiYieldPerLandmark;
+	loadFrom >> writeTo.m_aiYieldPerNaturalWonder;
+	loadFrom >> writeTo.m_aiYieldPerTurn;
+	loadFrom >> writeTo.m_aiYieldPerWonder;
+	// END Revamped yields
 	
 	return loadFrom;
 }
@@ -437,21 +611,46 @@ FDataStream& operator<<(FDataStream& saveTo, const CvResolutionEffects& readFrom
 	uint uiVersion = 9;
 
 	saveTo << uiVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem! Well, except mod versions created before using our modcomp(s)...
+	uint modVersion = 1;
+	saveTo << modVersion;
+	// END modVersion
+
 	saveTo << readFrom.bDiplomaticVictory;
 	saveTo << readFrom.bChangeLeagueHost;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// We do not need to make a special check for modVersion, because this was changed in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	saveTo << readFrom.iOneTimeGold;
+	*/
+	// END Revamped yields
 	saveTo << readFrom.iOneTimeGoldPercent;
 	saveTo << readFrom.bRaiseCityStateInfluenceToNeutral;
 	saveTo << readFrom.eLeagueProjectEnabled;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// We do not need to make a special check for modVersion, because this was changed in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	saveTo << readFrom.iGoldPerTurn;
+	*/
+	// END Revamped yields
 	saveTo << readFrom.iResourceQuantity;
 	saveTo << readFrom.bEmbargoCityStates;
 	saveTo << readFrom.bEmbargoPlayer;
 	saveTo << readFrom.bNoResourceHappiness;
 	saveTo << readFrom.iUnitMaintenanceGoldPercent;
 	saveTo << readFrom.iMemberDiscoveredTechMod;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// We do not need to make a special check for modVersion, because this was changed in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	saveTo << readFrom.iCulturePerWonder;
 	saveTo << readFrom.iCulturePerNaturalWonder;
+	*/
+	// END Revamped yields
 	saveTo << readFrom.bNoTrainingNuclearWeapons;
 	saveTo << readFrom.iVotesForFollowingReligion;
 	saveTo << readFrom.iHolyCityTourism;
@@ -460,8 +659,20 @@ FDataStream& operator<<(FDataStream& saveTo, const CvResolutionEffects& readFrom
 	saveTo << readFrom.iOtherIdeologyRebellionMod;
 	saveTo << readFrom.iArtsyGreatPersonRateMod;
 	saveTo << readFrom.iScienceyGreatPersonRateMod;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// We do not need to make a special check for modVersion, because this was changed in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	saveTo << readFrom.iGreatPersonTileImprovementCulture;
 	saveTo << readFrom.iLandmarkCulture;
+	*/
+	saveTo << readFrom.m_aiOneTimeYield;
+	saveTo << readFrom.m_aiYieldGPTileImprovement;
+	saveTo << readFrom.m_aiYieldPerLandmark;
+	saveTo << readFrom.m_aiYieldPerNaturalWonder;
+	saveTo << readFrom.m_aiYieldPerTurn;
+	saveTo << readFrom.m_aiYieldPerWonder;
+	// END Revamped yields
 
 	return saveTo;
 }
@@ -1286,10 +1497,46 @@ void CvActiveResolution::DoEffects(PlayerTypes ePlayer)
 			pLeague->SetHostMember(ePlayer);
 		}
 	}
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	if (GetEffects()->iOneTimeGold != 0)
 	{
 		pPlayer->GetTreasury()->ChangeGold(GetEffects()->iOneTimeGold);
 	}
+	*/
+	// Food and production are city specific, so handled differently
+	if (GetEffects()->m_aiOneTimeYield[YIELD_FOOD] != 0)
+	{
+		int iLoop;
+		CvCity* pLoopCity;
+		for(pLoopCity = pPlayer->firstCity(&iLoop); pLoopCity != NULL; pLoopCity = pPlayer->nextCity(&iLoop))
+		{
+			pLoopCity->changeFood(GetEffects()->m_aiOneTimeYield[YIELD_FOOD]);
+		}
+	}
+
+	if (GetEffects()->m_aiOneTimeYield[YIELD_PRODUCTION] != 0)
+	{
+		int iLoop;
+		CvCity* pLoopCity;
+		for(pLoopCity = pPlayer->firstCity(&iLoop); pLoopCity != NULL; pLoopCity = pPlayer->nextCity(&iLoop))
+		{
+			if (pLoopCity->isProduction())
+				pLoopCity->changeProduction(GetEffects()->m_aiOneTimeYield[YIELD_PRODUCTION]);
+			else
+				pLoopCity->changeOverflowProduction(GetEffects()->m_aiOneTimeYield[YIELD_PRODUCTION]);
+		}
+	}
+	for (int iI = (int)YIELD_GOLD; iI < NUM_YIELD_TYPES; iI++)
+	{
+		if (GetEffects()->m_aiOneTimeYield[iI] != 0)
+		{
+			pPlayer->ChangeImmediateYield((YieldTypes)iI, GetEffects()->m_aiOneTimeYield[iI]);
+		}
+	}
+	// END Revamped yields
 	if (GetEffects()->iOneTimeGoldPercent != 0)
 	{
 		int iGold = pPlayer->GetTreasury()->GetGold();
@@ -1316,10 +1563,22 @@ void CvActiveResolution::DoEffects(PlayerTypes ePlayer)
 	}
 
 	// == Ongoing Effects ==
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	if (GetEffects()->iGoldPerTurn != 0)
 	{
 		pPlayer->GetTreasury()->ChangeGoldPerTurnFromDiplomacy(GetEffects()->iGoldPerTurn);
 	}
+	*/
+	for (int i = 0; i < NUM_YIELD_TYPES; i++)
+	{
+		if (GetEffects()->m_aiYieldPerTurn[i] != 0)
+		{
+			pPlayer->ChangeYieldFromResolutions(i, GetEffects()->m_aiYieldPerTurn[i]);
+		}
+	}
+	// END Revamped yields
 	if (GetEffects()->iResourceQuantity != 0)
 	{
 		CvAssertMsg(eTargetLuxury != NO_RESOURCE, "Adding NO_RESOURCE for a player. Please send Anton your save file and version.");
@@ -1349,6 +1608,8 @@ void CvActiveResolution::DoEffects(PlayerTypes ePlayer)
 	{
 		// Refresh research
 	}
+	// Revamped yields - v0.1, Snarko
+	/* Original code
 	if (GetEffects()->iCulturePerWonder != 0)
 	{
 		// Refresh yields
@@ -1357,6 +1618,10 @@ void CvActiveResolution::DoEffects(PlayerTypes ePlayer)
 	{
 		// Refresh yields
 	}
+	*/
+	//if (GetEffects()->m_aiYieldPerWonder != NULL)
+	//if (GetEffects()->m_aiYieldPerNaturalWonder != NULL)
+	// END Revamped yields
 	if (GetEffects()->bNoTrainingNuclearWeapons)
 	{
 	}
@@ -1418,6 +1683,8 @@ void CvActiveResolution::DoEffects(PlayerTypes ePlayer)
 	if (GetEffects()->iScienceyGreatPersonRateMod != 0)
 	{
 	}
+	// Revamped yields - v0.1, Snarko
+	/* Original code
 	if (GetEffects()->iGreatPersonTileImprovementCulture != 0)
 	{
 		// Loop through all Great Person tile improvements
@@ -1440,6 +1707,30 @@ void CvActiveResolution::DoEffects(PlayerTypes ePlayer)
 		}
 		// Refresh yield
 	}
+	*/
+	// Loop through all Great Person tile improvements
+	for (int i = 0; i < GC.getNumImprovementInfos(); i++)
+	{
+		CvImprovementEntry* pInfo = GC.getImprovementInfo((ImprovementTypes)i);
+		if (pInfo != NULL && pInfo->IsCreatedByGreatPerson())
+		{
+			for (int i = 0; i < NUM_YIELD_TYPES; i++)
+			{
+				GET_PLAYER(ePlayer).changeImprovementYieldChange((ImprovementTypes)pInfo->GetID(), (YieldTypes)i, GetEffects()->m_aiYieldGPTileImprovement[i]);
+			}
+		}
+	}
+	// Refresh yield
+	CvImprovementEntry* pLandmarkInfo = GC.getImprovementInfo((ImprovementTypes)GC.getInfoTypeForString("IMPROVEMENT_LANDMARK"));
+	if (pLandmarkInfo != NULL)
+	{
+		for (int i = 0; i < NUM_YIELD_TYPES; i++)
+		{
+			GET_PLAYER(ePlayer).changeImprovementYieldChange((ImprovementTypes)pLandmarkInfo->GetID(), (YieldTypes)i, GetEffects()->m_aiYieldPerLandmark[i]);
+		}
+	}
+	// Refresh yield
+	// END Revamped yields
 
 	m_iTurnEnacted = GC.getGame().getGameTurn();
 }
@@ -1496,10 +1787,22 @@ void CvActiveResolution::RemoveEffects(PlayerTypes ePlayer)
 	// == One Time Effects are not removed ==
 
 	// == Ongoing Effects ==
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	if (GetEffects()->iGoldPerTurn != 0)
 	{
 		pPlayer->GetTreasury()->ChangeGoldPerTurnFromDiplomacy(-1 * GetEffects()->iGoldPerTurn);
 	}
+	*/
+	for (int i = 0; i < NUM_YIELD_TYPES; i++)
+	{
+		if (GetEffects()->m_aiYieldPerTurn[i] != 0)
+		{
+			pPlayer->ChangeYieldFromResolutions(i, -1 * GetEffects()->m_aiYieldPerTurn[i]);
+		}
+	}
+	// END Revamped yields
 	if (GetEffects()->iResourceQuantity != 0)
 	{
 		CvAssertMsg(eTargetLuxury != NO_RESOURCE, "Subtracting NO_RESOURCE for a player. Please send Anton your save file and version.");
@@ -1527,6 +1830,8 @@ void CvActiveResolution::RemoveEffects(PlayerTypes ePlayer)
 	{
 		// Refresh research
 	}
+	// Revamped yields - v0.1, Snarko
+	/* Original code
 	if (GetEffects()->iCulturePerWonder != 0)
 	{
 		// Refresh yields
@@ -1535,6 +1840,10 @@ void CvActiveResolution::RemoveEffects(PlayerTypes ePlayer)
 	{
 		// Refresh yields
 	}
+	*/
+	//if (GetEffects()->m_aiYieldPerWonder != NULL)
+	//if (GetEffects()->m_aiYieldPerNaturalWonder != NULL)
+	// END Revamped yields
 	if (GetEffects()->bNoTrainingNuclearWeapons)
 	{
 	}
@@ -1594,6 +1903,9 @@ void CvActiveResolution::RemoveEffects(PlayerTypes ePlayer)
 	if (GetEffects()->iScienceyGreatPersonRateMod != 0)
 	{
 	}
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	if (GetEffects()->iGreatPersonTileImprovementCulture != 0)
 	{
 		// Loop through all Great Person tile improvements
@@ -1616,6 +1928,30 @@ void CvActiveResolution::RemoveEffects(PlayerTypes ePlayer)
 		}
 		// Refresh yield
 	}
+	*/
+	// Loop through all Great Person tile improvements
+	for (int i = 0; i < GC.getNumImprovementInfos(); i++)
+	{
+		CvImprovementEntry* pInfo = GC.getImprovementInfo((ImprovementTypes)i);
+		if (pInfo != NULL && pInfo->IsCreatedByGreatPerson())
+		{
+			for (int i = 0; i < NUM_YIELD_TYPES; i++)
+			{
+				GET_PLAYER(ePlayer).changeImprovementYieldChange((ImprovementTypes)pInfo->GetID(), (YieldTypes)i, -1 * GetEffects()->m_aiYieldGPTileImprovement[i]);
+			}
+		}
+	}
+	// Refresh yield
+	CvImprovementEntry* pLandmarkInfo = GC.getImprovementInfo((ImprovementTypes)GC.getInfoTypeForString("IMPROVEMENT_LANDMARK"));
+	if (pLandmarkInfo != NULL)
+	{
+		for (int i = 0; i < NUM_YIELD_TYPES; i++)
+		{
+			GET_PLAYER(ePlayer).changeImprovementYieldChange((ImprovementTypes)pLandmarkInfo->GetID(), (YieldTypes)i, -1 * GetEffects()->m_aiYieldPerLandmark[i]);
+		}
+	}
+	// Refresh yield
+	// END Revamped yields
 
 	m_iTurnEnacted = -1;
 }
@@ -3884,7 +4220,7 @@ int CvLeague::GetFeatureYieldChange(FeatureTypes eFeature, YieldTypes eYield)
 {
 	CvAssertMsg(eFeature != NO_FEATURE, "Looking for yield changes to NO_FEATURE. Please send Anton your save file and version.");
 	int iValue = 0;
-
+	// TODO make this able to handle any feature(s).
 	CvFeatureInfo* pInfo = GC.getFeatureInfo(eFeature);
 	if (pInfo)
 	{
@@ -3892,6 +4228,8 @@ int CvLeague::GetFeatureYieldChange(FeatureTypes eFeature, YieldTypes eYield)
 		if (pInfo->IsNaturalWonder())
 		{
 			int iNaturalWonderMod = 0;
+			// Revamped yields - v0.1, Snarko
+			/* Original code
 			if (eYield == YIELD_CULTURE)
 			{
 				for (ActiveResolutionList::iterator it = m_vActiveResolutions.begin(); it != m_vActiveResolutions.end(); it++)
@@ -3902,6 +4240,12 @@ int CvLeague::GetFeatureYieldChange(FeatureTypes eFeature, YieldTypes eYield)
 					}
 				}
 			}
+			*/
+			for (ActiveResolutionList::iterator it = m_vActiveResolutions.begin(); it != m_vActiveResolutions.end(); it++)
+			{
+				iNaturalWonderMod += it->GetEffects()->m_aiYieldPerNaturalWonder[eYield];
+			}
+			// END Revamped yields
 			iValue += iNaturalWonderMod;
 		}
 	}
@@ -3913,6 +4257,8 @@ int CvLeague::GetWorldWonderYieldChange(YieldTypes eYield)
 {
 	int iValue = 0;
 
+	// Revamped yields - v0.1, Snarko
+	/* Original code
 	if (eYield == YIELD_CULTURE)
 	{
 		for (ActiveResolutionList::iterator it = m_vActiveResolutions.begin(); it != m_vActiveResolutions.end(); it++)
@@ -3923,6 +4269,12 @@ int CvLeague::GetWorldWonderYieldChange(YieldTypes eYield)
 			}
 		}
 	}
+	*/
+	for (ActiveResolutionList::iterator it = m_vActiveResolutions.begin(); it != m_vActiveResolutions.end(); it++)
+	{
+		iValue += it->GetEffects()->m_aiYieldPerWonder[eYield];
+	}
+	// END Revamped yields
 
 	return iValue;
 }
@@ -4820,12 +5172,52 @@ std::vector<CvString> CvLeague::GetCurrentEffectsSummary(PlayerTypes /*eObserver
 			vsEffects.push_back(sTemp.toUTF8());
 		}
 	}
+	// Revamped yields - v0.1, Snarko
+	/* Original code
 	if (effects.iGoldPerTurn != 0)
 	{
 		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GPT");
 		sTemp << effects.iGoldPerTurn;
 		vsEffects.push_back(sTemp.toUTF8());
 	}
+	*/
+	if (effects.m_aiYieldPerTurn[YIELD_FOOD] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_FPT");
+		sTemp << effects.m_aiYieldPerTurn[YIELD_FOOD];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerTurn[YIELD_PRODUCTION] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_PPT");
+		sTemp << effects.m_aiYieldPerTurn[YIELD_PRODUCTION];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerTurn[YIELD_GOLD] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GPT");
+		sTemp << effects.m_aiYieldPerTurn[YIELD_GOLD];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerTurn[YIELD_SCIENCE] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_SPT");
+		sTemp << effects.m_aiYieldPerTurn[YIELD_SCIENCE];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerTurn[YIELD_CULTURE] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_CPT");
+		sTemp << effects.m_aiYieldPerTurn[YIELD_CULTURE];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerTurn[YIELD_FAITH] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_FAITHPT");
+		sTemp << effects.m_aiYieldPerTurn[YIELD_FAITH];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	// END Revamped yields
 	if (effects.iResourceQuantity != 0)
 	{
 		//antonjs: todo: for modders
@@ -4893,6 +5285,8 @@ std::vector<CvString> CvLeague::GetCurrentEffectsSummary(PlayerTypes /*eObserver
 		sTemp << effects.iMemberDiscoveredTechMod;
 		vsEffects.push_back(sTemp.toUTF8());
 	}
+	// Revamped yields - v0.1, Snarko
+	/* Original code
 	if (effects.iCulturePerWonder != 0)
 	{
 		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_CULTURE_FROM_WONDERS");
@@ -4905,6 +5299,81 @@ std::vector<CvString> CvLeague::GetCurrentEffectsSummary(PlayerTypes /*eObserver
 		sTemp << effects.iCulturePerNaturalWonder;
 		vsEffects.push_back(sTemp.toUTF8());
 	}
+	*/
+	if (effects.m_aiYieldPerWonder[YIELD_FOOD] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_FOOD_FROM_WONDERS");
+		sTemp << effects.m_aiYieldPerWonder[YIELD_FOOD];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerWonder[YIELD_PRODUCTION] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_PRODUCTION_FROM_WONDERS");
+		sTemp << effects.m_aiYieldPerWonder[YIELD_PRODUCTION];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerWonder[YIELD_GOLD] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GOLD_FROM_WONDERS");
+		sTemp << effects.m_aiYieldPerWonder[YIELD_GOLD];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerWonder[YIELD_SCIENCE] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_SCIENCE_FROM_WONDERS");
+		sTemp << effects.m_aiYieldPerWonder[YIELD_SCIENCE];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerWonder[YIELD_CULTURE] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_CULTURE_FROM_WONDERS");
+		sTemp << effects.m_aiYieldPerWonder[YIELD_CULTURE];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerWonder[YIELD_FAITH] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_FAITH_FROM_WONDERS");
+		sTemp << effects.m_aiYieldPerWonder[YIELD_FAITH];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+
+	if (effects.m_aiYieldPerNaturalWonder[YIELD_FOOD] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_FOOD_FROM_NATURAL_WONDERS");
+		sTemp << effects.m_aiYieldPerNaturalWonder[YIELD_FOOD];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerNaturalWonder[YIELD_PRODUCTION] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_PRODUCTION_FROM_NATURAL_WONDERS");
+		sTemp << effects.m_aiYieldPerNaturalWonder[YIELD_PRODUCTION];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerNaturalWonder[YIELD_GOLD] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GOLD_FROM_NATURAL_WONDERS");
+		sTemp << effects.m_aiYieldPerNaturalWonder[YIELD_GOLD];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerNaturalWonder[YIELD_SCIENCE] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_SCIENCE_FROM_NATURAL_WONDERS");
+		sTemp << effects.m_aiYieldPerNaturalWonder[YIELD_SCIENCE];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerNaturalWonder[YIELD_CULTURE] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_CULTURE_FROM_NATURAL_WONDERS");
+		sTemp << effects.m_aiYieldPerNaturalWonder[YIELD_CULTURE];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerNaturalWonder[YIELD_FAITH] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_FAITH_FROM_NATURAL_WONDERS");
+		sTemp << effects.m_aiYieldPerNaturalWonder[YIELD_FAITH];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	// END Revamped yields
 	if (effects.iArtsyGreatPersonRateMod != 0)
 	{
 		int iMod = effects.iArtsyGreatPersonRateMod;
@@ -4979,6 +5448,8 @@ std::vector<CvString> CvLeague::GetCurrentEffectsSummary(PlayerTypes /*eObserver
 		sTemp << sList;
 		vsEffects.push_back(sTemp.toUTF8());
 	}
+	// Revamped yields - v0.1, Snarko
+	/* Original code
 	if (effects.iGreatPersonTileImprovementCulture != 0)
 	{
 		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GREAT_PERSON_TILE_IMPROVEMENT_CULTURE");
@@ -4991,6 +5462,84 @@ std::vector<CvString> CvLeague::GetCurrentEffectsSummary(PlayerTypes /*eObserver
 		sTemp << effects.iLandmarkCulture;
 		vsEffects.push_back(sTemp.toUTF8());
 	}
+	*/
+	if (effects.m_aiYieldGPTileImprovement[YIELD_FOOD] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GREAT_PERSON_TILE_IMPROVEMENT_FOOD");
+		sTemp << effects.m_aiYieldGPTileImprovement[YIELD_FOOD];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldGPTileImprovement[YIELD_PRODUCTION] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GREAT_PERSON_TILE_IMPROVEMENT_PRODUCTION");
+		sTemp << effects.m_aiYieldGPTileImprovement[YIELD_PRODUCTION];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldGPTileImprovement[YIELD_GOLD] != 0)
+	{
+
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GREAT_PERSON_TILE_IMPROVEMENT_GOLD");
+		sTemp << effects.m_aiYieldGPTileImprovement[YIELD_GOLD];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldGPTileImprovement[YIELD_SCIENCE] != 0)
+	{
+
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GREAT_PERSON_TILE_IMPROVEMENT_SCIENCE");
+		sTemp << effects.m_aiYieldGPTileImprovement[YIELD_SCIENCE];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldGPTileImprovement[YIELD_CULTURE] != 0)
+	{
+
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GREAT_PERSON_TILE_IMPROVEMENT_CULTURE");
+		sTemp << effects.m_aiYieldGPTileImprovement[YIELD_CULTURE];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldGPTileImprovement[YIELD_FAITH] != 0)
+	{
+
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GREAT_PERSON_TILE_IMPROVEMENT_FAITH");
+		sTemp << effects.m_aiYieldGPTileImprovement[YIELD_FAITH];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerLandmark[YIELD_FOOD] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_LANDMARK_FOOD");
+		sTemp << effects.m_aiYieldPerLandmark[YIELD_FOOD];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerLandmark[YIELD_PRODUCTION] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_LANDMARK_PRODUCTION");
+		sTemp << effects.m_aiYieldPerLandmark[YIELD_PRODUCTION];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerLandmark[YIELD_GOLD] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_LANDMARK_GOLD");
+		sTemp << effects.m_aiYieldPerLandmark[YIELD_GOLD];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerLandmark[YIELD_SCIENCE] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_LANDMARK_SCIENCE");
+		sTemp << effects.m_aiYieldPerLandmark[YIELD_SCIENCE];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerLandmark[YIELD_CULTURE] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_LANDMARK_CULTURE");
+		sTemp << effects.m_aiYieldPerLandmark[YIELD_CULTURE];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	if (effects.m_aiYieldPerLandmark[YIELD_FAITH] != 0)
+	{
+		Localization::String sTemp = Localization::Lookup("TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_LANDMARK_FAITH");
+		sTemp << effects.m_aiYieldPerLandmark[YIELD_FAITH];
+		vsEffects.push_back(sTemp.toUTF8());
+	}
+	// END Revamped yields
 
 	if (vsEffects.empty())
 	{
@@ -6163,10 +6712,19 @@ void CvLeague::DoProjectReward(PlayerTypes ePlayer, LeagueProjectTypes eLeaguePr
 		}
 
 		// Temporary Culture Modifier
+		// Revamped yields - v0.1, Snarko
+		// No longer used
+		/* Original code
 		if (pRewardInfo->GetCultureBonusTurns() > 0)
 		{
 			GET_PLAYER(ePlayer).ChangeCultureBonusTurns(pRewardInfo->GetCultureBonusTurns());
 		}
+		*/
+		if (pRewardInfo->GetNumYieldModifiers() > 0)
+		{
+			GET_PLAYER(ePlayer).ChangeYieldBonusTurns(pRewardInfo->GetYieldModifiers());
+		}
+		// END Revamped yields
 
 		// Temporary Tourism Modifier
 		if (pRewardInfo->GetTourismBonusTurns() > 0)
@@ -9153,6 +9711,8 @@ int CvLeagueAI::ScoreVoteChoiceYesNo(CvProposal* pProposal, int iChoice, bool bE
 			}
 		}
 	}
+	// Revamped yields - v0.1, Snarko
+	/* Original code
 	// Cultural Heritage Sites
 	if (pProposal->GetEffects()->iCulturePerWonder != 0)
 	{
@@ -9179,6 +9739,46 @@ int CvLeagueAI::ScoreVoteChoiceYesNo(CvProposal* pProposal, int iChoice, bool bE
 		iScore += iTempScore;
 		iScore = MIN(70, iScore);
 	}
+	*/
+	// TODO make values for other yields here
+	if (pProposal->GetEffects()->m_aiYieldPerWonder[YIELD_CULTURE] != 0)
+	{
+		int iNumWonders = GetPlayer()->GetNumWonders();
+		int iTempScore = -50;
+		if (iNumWonders > 0)
+		{
+			int iFactor = 20;
+			// Original code value culture less if going for cultural victory...
+			// Sounds backwards, but since culture is the counter to tourism I suppose it makes sense.
+			// Since this can now give any yield only apply the decrease if it actually gives culture.
+			if (bSeekingCultureVictory && pProposal->GetEffects()->m_aiYieldPerWonder[YIELD_CULTURE] > 0)
+			{
+				iFactor -= 5;
+			}
+			iTempScore += iNumWonders * iFactor;
+		}
+		iScore += iTempScore;
+		iScore = MIN(70, iScore);
+	}
+
+	// TODO make values for other yields here
+	if (pProposal->GetEffects()->m_aiYieldPerNaturalWonder[YIELD_CULTURE] != 0)
+	{
+		int iNumNaturalWonders = GetPlayer()->GetNumNaturalWondersInOwnedPlots();
+		int iTempScore = -35;
+		if (iNumNaturalWonders > 0)
+		{
+			int iFactor = 20;
+			if (bSeekingCultureVictory && pProposal->GetEffects()->m_aiYieldPerNaturalWonder[YIELD_CULTURE] > 0)
+			{
+				iFactor -= 5;
+			}
+			iTempScore += iNumNaturalWonders * iFactor;
+		}
+		iScore += iTempScore;
+		iScore = MIN(70, iScore);
+	}
+	// END Revamped yields
 	// Nuclear Non-Proliferation
 	if (pProposal->GetEffects()->bNoTrainingNuclearWeapons)
 	{
@@ -9345,9 +9945,17 @@ int CvLeagueAI::ScoreVoteChoiceYesNo(CvProposal* pProposal, int iChoice, bool bE
 			iScore += 60;
 		}
 	}
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	// Historical Landmarks
 	if (pProposal->GetEffects()->iGreatPersonTileImprovementCulture != 0 ||
 		pProposal->GetEffects()->iLandmarkCulture != 0)
+	*/
+	// TODO make values for other yields here
+	if (pProposal->GetEffects()->m_aiYieldGPTileImprovement[YIELD_CULTURE] != 0 ||
+		pProposal->GetEffects()->m_aiYieldPerLandmark[YIELD_CULTURE] != 0)
+	// END Revamped yields
 	{
 		int iNumGPImprovements = GetPlayer()->getGreatPersonImprovementCount();
 		int iNumLandmarks = 0;
@@ -10029,7 +10637,13 @@ CvLeagueProjectRewardEntry::CvLeagueProjectRewardEntry(void)
 	m_eBuilding							= NO_BUILDING;
 	m_iHappiness						= 0;
 	m_iFreeSocialPolicies				= 0;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piYieldBonusTurns
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCultureBonusTurns				= 0;
+	*/
+	// END Revamped yields
 	m_iTourismBonusTurns				= 0;
 	m_iGoldenAgePoints					= 0;
 	m_iCityStateInfluenceBoost			= 0;
@@ -10051,7 +10665,46 @@ bool CvLeagueProjectRewardEntry::CacheResults(Database::Results& kResults, CvDat
 	m_eBuilding							= (BuildingTypes) GC.getInfoTypeForString(kResults.GetText("Building"), true);
 	m_iHappiness						= kResults.GetInt("Happiness");
 	m_iFreeSocialPolicies				= kResults.GetInt("FreeSocialPolicies");
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piYieldBonusTurns
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCultureBonusTurns				= kResults.GetInt("CultureBonusTurns");
+	*/
+	{
+		std::string strKey = "LeagueProjectRewards_YieldTurnChanges";
+		Database::Results* pResults = kUtility.GetResults(strKey);
+
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from LeagueProjectRewards_YieldTurnChanges where LeagueProjectRewardType = ?");
+		}
+		if(pResults != NULL)
+		{
+			pResults->Bind(1, GetType(), -1, false);
+
+			while(pResults->Step())
+			{
+				LeagueRewardYieldModifier kYields;
+				kYields.eYield = (YieldTypes)pResults->GetInt("YieldType");
+				kYields.iChange = pResults->GetInt("iBonusValue");
+				kYields.iTurns = pResults->GetInt("iTurns");
+				m_aYieldBonusTurns.push_back(kYields);
+			}
+		}
+
+		
+		int iBonusTurns = kResults.GetInt("CultureBonusTurns");
+		if (iBonusTurns != 0)
+		{
+			LeagueRewardYieldModifier kYields;
+			kYields.eYield = YIELD_CULTURE;
+			kYields.iChange = 100;
+			kYields.iTurns = iBonusTurns;
+			m_aYieldBonusTurns.push_back(kYields);
+		}
+	}
+	// END Revamped yields
 	m_iTourismBonusTurns				= kResults.GetInt("TourismBonusTurns");
 	m_iGoldenAgePoints					= kResults.GetInt("GoldenAgePoints");
 	m_iCityStateInfluenceBoost			= kResults.GetInt("CityStateInfluenceBoost");
@@ -10076,10 +10729,25 @@ int CvLeagueProjectRewardEntry::GetFreeSocialPolicies() const
 	return m_iFreeSocialPolicies;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used, use GetYieldBonusTurns
+// XML tag still kept for backwards compatibility
+/* Original code
 int CvLeagueProjectRewardEntry::GetCultureBonusTurns() const
 {
 	return m_iCultureBonusTurns;
 }
+*/
+int CvLeagueProjectRewardEntry::GetNumYieldModifiers() const
+{
+	return m_aYieldBonusTurns.size();
+}
+
+std::vector<LeagueRewardYieldModifier> CvLeagueProjectRewardEntry::GetYieldModifiers() const
+{
+	return m_aYieldBonusTurns;
+}
+// END Revamped yields
 
 int CvLeagueProjectRewardEntry::GetTourismBonusTurns() const
 {
@@ -10264,19 +10932,37 @@ CvResolutionEntry::CvResolutionEntry(void)
 	m_iLeadersVoteBonusOnFail			= 0;
 	m_bDiplomaticVictory				= false;
 	m_bChangeLeagueHost					= false;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iOneTimeGold						= 0;
+	*/
+	// END Revamped yields
 	m_iOneTimeGoldPercent				= 0;
 	m_bRaiseCityStateInfluenceToNeutral	= false;
 	m_eLeagueProjectEnabled				= NO_LEAGUE_PROJECT;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iGoldPerTurn						= 0;
+	*/
+	// END Revamped yields
 	m_iResourceQuantity					= 0;
 	m_bEmbargoCityStates				= false;
 	m_bEmbargoPlayer					= false;
 	m_bNoResourceHappiness				= false;
 	m_iUnitMaintenanceGoldPercent		= 0;
 	m_iMemberDiscoveredTechMod			= 0;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCulturePerWonder					= 0;
 	m_iCulturePerNaturalWonder			= 0;
+	*/
+	// END Revamped yields
 	m_bNoTrainingNuclearWeapons			= false;
 	m_iVotesForFollowingReligion		= 0;
 	m_iHolyCityTourism					= 0;
@@ -10285,12 +10971,30 @@ CvResolutionEntry::CvResolutionEntry(void)
 	m_iOtherIdeologyRebellionMod		= 0;
 	m_iArtsyGreatPersonRateMod			= 0;
 	m_iScienceyGreatPersonRateMod		= 0;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iGreatPersonTileImprovementCulture= 0;
 	m_iLandmarkCulture					= 0;
+	*/
+	m_aiOneTimeYield					= NULL;
+	m_aiYieldPerTurn					= NULL;
+	m_aiYieldPerWonder					= NULL;
+	m_aiYieldPerNaturalWonder			= NULL;
+	m_aiYieldGPTileImprovement			= NULL;
+	m_aiYieldPerLandmark				= NULL;
+	// END Revamped yields
 }
 
 CvResolutionEntry::~CvResolutionEntry(void)
 {
+	SAFE_DELETE_ARRAY(m_aiOneTimeYield);
+	SAFE_DELETE_ARRAY(m_aiYieldPerTurn);
+	SAFE_DELETE_ARRAY(m_aiYieldPerWonder);
+	SAFE_DELETE_ARRAY(m_aiYieldPerNaturalWonder);
+	SAFE_DELETE_ARRAY(m_aiYieldPerLandmark);
+	SAFE_DELETE_ARRAY(m_aiYieldGPTileImprovement);
 }
 
 bool CvResolutionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
@@ -10310,19 +11014,37 @@ bool CvResolutionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtil
 	m_iLeadersVoteBonusOnFail			= kResults.GetInt("LeadersVoteBonusOnFail");
 	m_bDiplomaticVictory				= kResults.GetBool("DiplomaticVictory");
 	m_bChangeLeagueHost					= kResults.GetBool("ChangeLeagueHost");
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iOneTimeGold						= kResults.GetInt("OneTimeGold");
+	*/
+	// END Revamped yields
 	m_iOneTimeGoldPercent				= kResults.GetInt("OneTimeGoldPercent");
 	m_bRaiseCityStateInfluenceToNeutral	= kResults.GetBool("RaiseCityStateInfluenceToNeutral");
 	m_eLeagueProjectEnabled				= (LeagueProjectTypes) GC.getInfoTypeForString(kResults.GetText("LeagueProjectEnabled"), true);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iGoldPerTurn						= kResults.GetInt("GoldPerTurn");
+	*/
+	// END Revamped yields
 	m_iResourceQuantity					= kResults.GetInt("ResourceQuantity");
 	m_bEmbargoCityStates				= kResults.GetBool("EmbargoCityStates");
 	m_bEmbargoPlayer					= kResults.GetBool("EmbargoPlayer");
 	m_bNoResourceHappiness				= kResults.GetBool("NoResourceHappiness");
 	m_iUnitMaintenanceGoldPercent		= kResults.GetInt("UnitMaintenanceGoldPercent");
 	m_iMemberDiscoveredTechMod			= kResults.GetInt("MemberDiscoveredTechMod");
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCulturePerWonder					= kResults.GetInt("CulturePerWonder");
 	m_iCulturePerNaturalWonder			= kResults.GetInt("CulturePerNaturalWonder");
+	*/
+	// END Revamped yields
 	m_bNoTrainingNuclearWeapons			= kResults.GetBool("NoTrainingNuclearWeapons");
 	m_iVotesForFollowingReligion		= kResults.GetInt("VotesForFollowingReligion");
 	m_iHolyCityTourism					= kResults.GetInt("HolyCityTourism");
@@ -10331,8 +11053,80 @@ bool CvResolutionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtil
 	m_iOtherIdeologyRebellionMod		= kResults.GetInt("OtherIdeologyRebellionMod");
 	m_iArtsyGreatPersonRateMod			= kResults.GetInt("ArtsyGreatPersonRateMod");
 	m_iScienceyGreatPersonRateMod		= kResults.GetInt("ScienceyGreatPersonRateMod");
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iGreatPersonTileImprovementCulture= kResults.GetInt("GreatPersonTileImprovementCulture");
 	m_iLandmarkCulture					= kResults.GetInt("LandmarkCulture");
+	*/
+	const char* szType = GetType();
+	kUtility.SetYields(m_aiOneTimeYield, "Resolutions_OneTimeYieldChanges", "ResolutionType", szType);
+	kUtility.SetYields(m_aiYieldPerTurn, "Resolutions_YieldPerTurn", "ResolutionType", szType);
+	kUtility.SetYields(m_aiYieldPerWonder, "Resolutions_YieldPerWonder", "ResolutionType", szType);
+	kUtility.SetYields(m_aiYieldPerNaturalWonder, "Resolutions_YieldPerNaturalWonder", "ResolutionType", szType);
+	kUtility.SetYields(m_aiYieldPerLandmark, "Resolutions_YieldPerLandmark", "ResolutionType", szType);
+
+	int iOneTimeGold = kResults.GetInt("OneTimeGold");
+	if (iOneTimeGold != 0)
+	{
+		if (m_aiOneTimeYield == NULL)
+		{
+			kUtility.InitializeArray(m_aiOneTimeYield, NUM_YIELD_TYPES);
+		}
+		m_aiOneTimeYield[YIELD_GOLD] += iOneTimeGold;
+	}
+
+	int iGoldPerTurn = kResults.GetInt("GoldPerTurn");
+	if (iGoldPerTurn != 0)
+	{
+		if (m_aiYieldPerTurn == NULL)
+		{
+			kUtility.InitializeArray(m_aiYieldPerTurn, NUM_YIELD_TYPES);
+		}
+		m_aiYieldPerTurn[YIELD_GOLD] += iGoldPerTurn;
+	}
+
+	int iCulturePerWonder = kResults.GetInt("CulturePerWonder");
+	if (iCulturePerWonder != 0)
+	{
+		if (m_aiYieldPerWonder == NULL)
+		{
+			kUtility.InitializeArray(m_aiYieldPerWonder, NUM_YIELD_TYPES);
+		}
+		m_aiYieldPerWonder[YIELD_CULTURE] += iCulturePerWonder;
+	}
+
+	int iCulturePerNaturalWonder = kResults.GetInt("CulturePerNaturalWonder");
+	if (iCulturePerNaturalWonder != 0)
+	{
+		if (m_aiYieldPerNaturalWonder == NULL)
+		{
+			kUtility.InitializeArray(m_aiYieldPerNaturalWonder, NUM_YIELD_TYPES);
+		}
+		m_aiYieldPerNaturalWonder[YIELD_CULTURE] += iCulturePerNaturalWonder;
+	}
+
+	int iCulturePerGPTileImprovement = kResults.GetInt("GreatPersonTileImprovementCulture");
+	if (iCulturePerGPTileImprovement != 0)
+	{
+		if (m_aiYieldGPTileImprovement == NULL)
+		{
+			kUtility.InitializeArray(m_aiYieldGPTileImprovement, NUM_YIELD_TYPES);
+		}
+		m_aiYieldGPTileImprovement[YIELD_CULTURE] += iCulturePerGPTileImprovement;
+	}
+
+	int iCulturePerLandmark = kResults.GetInt("LandmarkCulture");
+	if (iCulturePerLandmark != 0)
+	{
+		if (m_aiYieldPerLandmark == NULL)
+		{
+			kUtility.InitializeArray(m_aiYieldPerLandmark, NUM_YIELD_TYPES);
+		}
+		m_aiYieldPerLandmark[YIELD_CULTURE] += iCulturePerLandmark;
+	}
+	// END Revamped yields
 
 	return true;
 }
@@ -10387,15 +11181,22 @@ bool CvResolutionEntry::IsChangeLeagueHost() const
 	return m_bChangeLeagueHost;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+// XML tag still kept for backwards compatibility
+/* Original code
 int CvResolutionEntry::GetOneTimeGold() const
 {
 	return m_iOneTimeGold;
 }
+*/
+// END Revamped yields
 
 int CvResolutionEntry::GetOneTimeGoldPercent() const
 {
 	return m_iOneTimeGoldPercent;
 }
+
 
 bool CvResolutionEntry::IsRaiseCityStateInfluenceToNeutral() const
 {
@@ -10407,10 +11208,16 @@ LeagueProjectTypes CvResolutionEntry::GetLeagueProjectEnabled() const
 	return m_eLeagueProjectEnabled;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+// XML tag still kept for backwards compatibility
+/* Original code
 int CvResolutionEntry::GetGoldPerTurn() const
 {
 	return m_iGoldPerTurn;
 }
+*/
+// END Revamped yields
 
 int CvResolutionEntry::GetResourceQuantity() const
 {
@@ -10442,6 +11249,10 @@ int CvResolutionEntry::GetMemberDiscoveredTechMod() const
 	return m_iMemberDiscoveredTechMod;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+// XML tag still kept for backwards compatibility
+/* Original code
 int CvResolutionEntry::GetCulturePerWonder() const
 {
 	return m_iCulturePerWonder;
@@ -10451,6 +11262,8 @@ int CvResolutionEntry::GetCulturePerNaturalWonder() const
 {
 	return m_iCulturePerNaturalWonder;
 }
+*/
+// END Revamped yields
 
 bool CvResolutionEntry::IsNoTrainingNuclearWeapons() const
 {
@@ -10492,6 +11305,10 @@ int CvResolutionEntry::GetScienceyGreatPersonRateMod() const
 	return m_iScienceyGreatPersonRateMod;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+// XML tag still kept for backwards compatibility
+/* Original code
 int CvResolutionEntry::GetGreatPersonTileImprovementCulture() const
 {
 	return m_iGreatPersonTileImprovementCulture;
@@ -10501,6 +11318,38 @@ int CvResolutionEntry::GetLandmarkCulture() const
 {
 	return m_iLandmarkCulture;
 }
+*/
+
+int* CvResolutionEntry::GetOneTimeYield() const
+{
+	return m_aiOneTimeYield;
+}
+
+int* CvResolutionEntry::GetYieldPerTurn() const
+{
+	return m_aiYieldPerTurn;
+}
+
+int* CvResolutionEntry::GetYieldPerWonder() const
+{
+	return m_aiYieldPerWonder;
+}
+
+int* CvResolutionEntry::GetYieldPerNaturalWonder() const
+{
+	return m_aiYieldPerNaturalWonder;
+}
+
+int* CvResolutionEntry::GetYieldGPTileImprovement() const
+{
+	return m_aiYieldGPTileImprovement;
+}
+
+int* CvResolutionEntry::GetYieldPerLandmark() const
+{
+	return m_aiYieldPerLandmark;
+}
+// END Revamped yields
 
 
 // ================================================================================

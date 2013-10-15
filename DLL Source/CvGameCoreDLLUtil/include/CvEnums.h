@@ -3234,18 +3234,18 @@ enum EventRequirementTypes
 };
 
 // any additions need to be reflected in xml
-//This is so that we can have string<->enum conversion.
-//It also makes it easier to look up which ones exist, without having to check the source code or a manual.
-//So while we could do a wholly c++ solution having an XML file for it isn't such a bad thing.
+// This is so that we can have string<->enum conversion.
+// It also makes it easier to look up which ones exist, without having to check the source code or a manual.
+// So while we could do a wholly c++ solution having an XML file for it isn't such a bad thing.
 enum EventTypeTypes
 {
 	NO_EVENTTYPE = -1,
 	EVENT_PLAYER,
-	EVENT_GLOBAL,	//TODO
+	EVENT_GLOBAL,	// TODO
 	EVENT_CITY,
 	EVENT_UNIT,
-	EVENT_POSTCOMBAT,	//TODO (postcombat)
-	NUM_EVENTTYPE_TYPES //Included only for RegisterDynamicEnums (to lua). Probably isn't needed.
+	EVENT_POSTCOMBAT,	// TODO (postcombat)
+	NUM_EVENTTYPE_TYPES // Included only for RegisterDynamicEnums (to lua). Probably isn't needed.
 };
 
 // any additions need to be reflected in xml
@@ -3256,7 +3256,7 @@ enum CompareTypes
 	COMPARE_NOTEQUAL,
 	COMPARE_MORETHAN,
 	COMPARE_LESSTHAN,
-	NUM_COMPARE_TYPES //Included only for RegisterDynamicEnums (to lua). Probably isn't needed.
+	NUM_COMPARE_TYPES // Included only for RegisterDynamicEnums (to lua). Probably isn't needed.
 };
 
 
@@ -3266,8 +3266,8 @@ enum EventModifierTypeTypes
 {
 	NO_EVENTMOD = -1,
 
-	//Player modifiers/requirements
-	//These can be used for city events, unit events etc as well.
+	// Player modifiers/requirements
+	// These can be used for city events, unit events etc as well.
 	EVENTMOD_PLAYER_START,
 
 	EVENTMOD_GOLD,
@@ -3293,6 +3293,7 @@ enum EventModifierTypeTypes
 
 	EVENTMOD_NUMUNITS,
 	EVENTMOD_NUMDOMAINUNITS,
+	EVENTMOD_NUMUNITCOMBATUNITS,
 	EVENTMOD_HIGHESTUNITLEVEL,
 	EVENTMOD_UNITCLASS,
 
@@ -3333,26 +3334,30 @@ enum EventModifierTypeTypes
 
 	EVENTMOD_GREATPEOPLECREATED,
 
-	EVENTMOD_TILES_BOUGHT, //TODO
+	EVENTMOD_TILES_BOUGHT, // TODO
 
 	EVENTMOD_PLAYER_END,
 
 	//City modifiers/requirements
 	EVENTMOD_CITY_START,
 
-	//EVENTMOD_CITY_HEALTH //What is this? Why did we discuss adding this?
+	//EVENTMOD_CITY_HEALTH // What is this? Why did we discuss adding this?
 	EVENTMOD_CITY_HAPPINESS,
 
 	EVENTMOD_CITY_STRENGTH,
 
-	EVENTMOD_CITY_YIELD,
+	EVENTMOD_CITY_BASE_YIELD,
 	EVENTMOD_CITY_MODIFIEDYIELD,
 
 	EVENTMOD_CITY_CULTURE_LEVEL,
 
 	EVENTMOD_CITY_POPULATION,
 
-	EVENTMOD_CITY_SPY_PRESENT,
+	EVENTMOD_CITY_OWN_SPY_PRESENT,
+	EVENTMOD_CITY_SPY_RANK,
+	EVENTMOD_CITY_NUM_SPY,
+	EVENTMOD_CITY_NUM_DIPLOMAT,
+	EVENTMOD_CITY_NUM_SPY_TOTAL,
 
 	EVENTMOD_CITY_IS_CAPITAL,
 
@@ -3361,6 +3366,7 @@ enum EventModifierTypeTypes
 	EVENTMOD_CITY_SPECIALIST,
 
 	EVENTMOD_CITY_BUILDING,
+	EVENTMOD_CITY_BUILDINGCLASS,
 	EVENTMOD_CITY_NATIONAL_WONDERS,
 	EVENTMOD_CITY_TEAM_WONDERS,
 	EVENTMOD_CITY_WORLD_WONDERS,
@@ -3368,24 +3374,75 @@ enum EventModifierTypeTypes
 	EVENTMOD_CITY_WORKING_RESOURCE,
 	EVENTMOD_CITY_HAS_RESOURCE,
 
-	EVENTMOD_CITY_HAS_RELIGION,
+	EVENTMOD_CITY_RELIGION_PRESSURE,
 	EVENTMOD_CITY_FOLLOWERS_RELIGION,
+	EVENTMOD_CITY_RELIGION_HOLY,
 
-	EVENTMOD_CITY_CONQUERED,
+	EVENTMOD_CITY_EVER_OWNED,
+	EVENTMOD_CITY_EVER_CONQUERED,
 	EVENTMOD_CITY_ORIGINAL_OWNER,
 
 	EVENTMOD_CITY_EVENT,
 
-	EVENTMOD_CITY_FEATURE_IN_RANGE,
-	EVENTMOD_CITY_IMPROVEMENT_IN_RANGE,
-	EVENTMOD_CITY_RESOURCE_IN_RANGE,
-	EVENTMOD_CITY_TERRAIN_IN_RANGE,
+	// WARNING!!!
+	// Be careful when using these.
+	// Improper usages can and will slow down your game.
+	// Keep range low and if they are a requirement make sure they are the last one tested.
+	EVENTMOD_CITY_NUM_FEATURE_IN_RANGE,
+	EVENTMOD_CITY_NUM_IMPROVEMENT_IN_RANGE,
+	EVENTMOD_CITY_NUM_RESOURCE_IN_RANGE,
+	EVENTMOD_CITY_NUM_TERRAIN_IN_RANGE,
 
 	EVENTMOD_CITY_END,
 
-	//Unit modifiers/requirements
-	//TODO
+	// Unit modifiers/requirements
 	EVENTMOD_UNIT_START,
+
+	EVENTMOD_UNIT_TYPE,
+	EVENTMOD_UNIT_CLASS,
+	EVENTMOD_UNIT_COMBAT,
+	EVENTMOD_UNIT_DOMAIN,
+
+	EVENTMOD_UNIT_CIVILIAN,
+
+	EVENTMOD_UNIT_GARRISONED,
+
+	EVENTMOD_UNIT_REQ_RESOURCE,
+
+	EVENTMOD_UNIT_FORTIFIED,
+
+	EVENTMOD_UNIT_LEVEL,
+	EVENTMOD_UNIT_EXPERIENCE,
+
+	EVENTMOD_UNIT_MOVES,
+
+	EVENTMOD_UNIT_DAMAGE,
+
+	EVENTMOD_UNIT_BASE_STRENGTH,
+	EVENTMOD_UNIT_ATTACK_STRENGTH,
+	EVENTMOD_UNIT_DEFENSE_STRENGTH,
+	EVENTMOD_UNIT_COMBAT_LIMIT,
+
+	EVENTMOD_UNIT_RANGED_BASE_STRENGTH,
+	EVENTMOD_UNIT_RANGED_ATTACK_STRENGTH,
+	EVENTMOD_UNIT_RANGED_DEFENSE_STRENGTH,
+	EVENTMOD_UNIT_RANGE,
+	EVENTMOD_UNIT_RANGED_COMBAT_LIMIT,
+
+	EVENTMOD_UNIT_INTERCEPT_CHANCE,
+	EVENTMOD_UNIT_INTERCEPT_RANGE,
+	
+	EVENTMOD_UNIT_PROMOTION,
+
+	// WARNING!!!
+	// Be careful when using these.
+	// Improper usages can and will slow down your game.
+	// Keep range low and if they are a requirement make sure they are the last one tested.
+	EVENTMOD_UNIT_NUM_FEATURE_IN_RANGE,
+	EVENTMOD_UNIT_NUM_IMPROVEMENT_IN_RANGE,
+	EVENTMOD_UNIT_NUM_RESOURCE_IN_RANGE,
+	EVENTMOD_UNIT_NUM_TERRAIN_IN_RANGE,
+
 	EVENTMOD_UNIT_END,
 
 	NUM_EVENTMOD_TYPES
@@ -3397,10 +3454,10 @@ enum EventActionTypeTypes
 {
 	NO_EVENTACTION = -1,
 
-	//Can be caused by any event
-	EVENTACTION_EVENT,						//Event causing another event
+	// Can be caused by any event
+	EVENTACTION_EVENT,						// Event causing another event
 
-	//Player actions
+	// Player actions
 	EVENTACTION_PLAYER_START,
 	EVENTACTION_YIELD,
 	EVENTACTION_YIELDMOD,
@@ -3410,34 +3467,36 @@ enum EventActionTypeTypes
 	EVENTACTION_BELIEF,
 	EVENTACTION_REVEAL_TILE,
 	EVENTACTION_SET_FLAG,
+	EVENTACTION_SPECIALIST_YIELD,
 	EVENTACTION_EVENT_FOR_CAPITAL,
 	EVENTACTION_EVENT_FOR_ALL_CITIES,
 	EVENTACTION_EVENT_FOR_ALL_UNITS,
 	EVENTACTION_PLAYER_END,
 
-	//City actions
+	// City actions
 	EVENTACTION_CITY_START,
-	EVENTACTION_ADD_BUILDING,
-	EVENTACTION_REM_BUILDING,
+	EVENTACTION_CITY_ADD_BUILDING,
 	EVENTACTION_CITY_YIELD,
 	EVENTACTION_CITY_YIELDMOD,
-	EVENTACTION_POPULATION,
-	EVENTACTION_LOCAL_HAPPY,
-	EVENTACTION_SPECIALIST,
+	EVENTACTION_CITY_POPULATION,
+	EVENTACTION_CITY_LOCAL_HAPPY,
+	EVENTACTION_CITY_FREE_SPECIALIST,
+	EVENTACTION_CITY_SPECIALIST_YIELD,
+	EVENTACTION_CITY_SET_FLAG,
 	EVENTACTION_CITY_END,
 
-	//Unit actions
+	// Unit actions
 	EVENTACTION_UNIT_START,
-	EVENTACTION_EXPERIENCE,
-	EVENTACTION_ADD_PROMOTION,
-	EVENTACTION_REM_PROMOTION,
-	EVENTACTION_CLASS,
-	EVENTACTION_DAMAGE,
-	EVENTACTION_SPAWN_UNIT,
-	EVENTACTION_JUMP_TO_NEAREST_PLOT,
+	EVENTACTION_UNIT_EXPERIENCE,
+	EVENTACTION_UNIT_PROMOTION,
+	EVENTACTION_UNIT_CLASS,
+	EVENTACTION_UNIT_DAMAGE,
+	EVENTACTION_UNIT_SPAWN_UNIT,
+	EVENTACTION_UNIT_SET_FLAG,
 	EVENTACTION_UNIT_END,
 
-	//Global actions
+	// Global actions
+	// TODO
 	EVENTACTION_EVENT_FOR_ALL_PLAYERS,
 	//EVENTACTION_CHANGE_TERRAIN,			//Disabled until Firaxis fixes the engine
 	//EVENTACTION_CHANGE_HEIGHT,			//Disabled until Firaxis fixes the engine

@@ -62,6 +62,31 @@
         <Type>UpdateDatabase</Type>
         <FileName>Events/Examples/EventTypes.xml</FileName>
       </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>Events/Examples/EventFlagPrereqTables.xml</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>Shared Assets/XML/Softcoded_Defines.xml</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>Shared Assets/XML/SoftcodedYieldChanges.xml</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>Shared Assets/XML/SoftcodedTEXT.xml</FileName>
+      </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>Shared Assets/XML/SoftcodedYieldChanges.sql</FileName>
+      </Action>
     </ModActions>
     <ModContent>
       <Content xmlns="">
@@ -91,14 +116,17 @@
     <Folder Include="AdvancementsScreen\UI\Text" />
     <Folder Include="CityView Local Happiness\UI\" />
     <Folder Include="CityView Local Happiness\XML" />
+    <Folder Include="AIMod\XML" />
     <Folder Include="Events" />
     <Folder Include="Events\Examples" />
     <Folder Include="Events\Examples\Resources" />
     <Folder Include="Events\Examples\Text" />
     <Folder Include="Events\UI" />
     <Folder Include="Events\UI\Text" />
-    <Folder Include="CityView Local Happiness" />
+    <Folder Include="AIMod" />
     <Folder Include="Shared Assets" />
+    <Folder Include="Shared Assets\UI" />
+    <Folder Include="Shared Assets\XML" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="AdvancementsScreen\SQL\Vanilla_Changes.sql">
@@ -145,6 +173,10 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
+    <Content Include="AIMod\XML\AIMod_Defines.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
     <Content Include="CvGameCore_Expansion2.dll">
       <SubType>Lua</SubType>
       <ImportIntoVFS>True</ImportIntoVFS>
@@ -152,6 +184,10 @@
     <Content Include="CvGameCore_Expansion2.pdb">
       <SubType>Lua</SubType>
       <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="Events\Examples\EventFlagPrereqTables.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
     <Content Include="Events\Examples\Events.xml">
       <SubType>Lua</SubType>
@@ -185,9 +221,41 @@
       <SubType>Lua</SubType>
       <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
-    <Content Include="Events\UI\TopPanel.lua">
+    <Content Include="Shared Assets\UI\EconomicGeneralInfo.lua">
       <SubType>Lua</SubType>
       <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="Shared Assets\UI\InfoTooltipInclude.lua">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="Shared Assets\UI\ReligionOverview.lua">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="Shared Assets\UI\TopPanel.lua">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="Shared Assets\UI\YieldHelpers.lua">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>True</ImportIntoVFS>
+    </Content>
+    <Content Include="Shared Assets\XML\SoftcodedTEXT.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="Shared Assets\XML\SoftcodedYieldChanges.sql">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="Shared Assets\XML\SoftcodedYieldChanges.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
+    </Content>
+    <Content Include="Shared Assets\XML\Softcoded_Defines.xml">
+      <SubType>Lua</SubType>
+      <ImportIntoVFS>False</ImportIntoVFS>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Firaxis\ModBuddy\Civ5Mod.targets" />

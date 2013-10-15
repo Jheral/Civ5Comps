@@ -155,6 +155,12 @@ public:
 
 	UnitMoveRate GetMoveRate(int numHexes) const;
 
+	// EventEngine - v0.1, Snarko
+	int getNumFlagPrereqs() const;
+	std::string getFlagPrereq(int i) const;
+	int getFlagPrereqValue(int i) const;
+	// END EventEngine
+
 private:
 
 	int m_iProductionCost;
@@ -279,6 +285,10 @@ private:
 	CvString* m_paszMiddleArtDefineTags;
 	CvString* m_paszUnitNames;
 	GreatWorkType* m_paeGreatWorks;
+
+	// EventEngine - v0.1, Snarko
+	std::vector<std::pair<std::string, int > > m_asziFlagPrereqs;
+	// END EventEngine
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

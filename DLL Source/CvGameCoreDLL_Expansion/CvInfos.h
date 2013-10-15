@@ -192,7 +192,13 @@ public:
 
 	int getGreatPeopleUnitClass() const;
 	int getGreatPeopleRateChange() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int getCulturePerTurn() const;
+	*/
+	// END Revamped yields
 	int getMissionType() const;
 	void setMissionType(int iNewType);
 	int getExperience() const;
@@ -214,7 +220,13 @@ protected:
 
 	int m_iGreatPeopleUnitClass;
 	int m_iGreatPeopleRateChange;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iCulturePerTurn;
+	*/
+	// END Revamped yields
 	int m_iMissionType;
 	int m_iExperience;
 
@@ -832,7 +844,13 @@ public:
 	int GetTechNumOptions() const;
 	int GetPolicyNumOptions() const;
 	int getInflationPercent() const;
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	int getFreeCulturePerTurn() const;
+	*/
+	// END Revamped yields
 	int getAttitudeChange() const;
 	int getNoTechTradeModifier() const;
 	int getTechTradeKnownModifier() const;
@@ -902,7 +920,13 @@ protected:
 	int m_iTechNumOptions;
 	int m_iPolicyNumOptions;
 	int m_iInflationPercent;
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	int m_iFreeCulturePerTurn;
+	*/
+	// END Revamped yields
 	int m_iAttitudeChange;
 	int m_iNoTechTradeModifier;
 	int m_iTechTradeKnownModifier;
@@ -1240,6 +1264,12 @@ public:
 	int getTechMovementChange(int i) const;
 	int getResourceQuantityRequirement(int i) const;
 
+	// EventEngine - v0.1, Snarko
+	int getNumFlagPrereqs() const;
+	std::string getFlagPrereq(int i) const;
+	int getFlagPrereqValue(int i) const;
+	// END EventEngine
+
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
 protected:
@@ -1255,6 +1285,10 @@ protected:
 	int* m_piYieldChange;
 	int* m_piTechMovementChange;
 	int* m_piResourceQuantityRequirements;
+
+	// EventEngine - v0.1, Snarko
+	std::vector<std::pair<std::string, int > > m_asziFlagPrereqs;
+	// END EventEngine
 
 private:
 	CvRouteInfo(const CvRouteInfo&);
@@ -1557,6 +1591,15 @@ public:
 	int getGoldenAgeYieldThreshold() const;
 	int getGoldenAgeYieldMod() const;
 	int getAIWeightPercent() const;
+	// Revamped yields - v0.1, Snarko
+	int getGoldenAgePlayerYieldMod() const;
+	int getCityConnectionBase() const;
+	int getCityConnectionCapitalPopMultiplier() const;
+	int getCityConnectionCityPopMultiplier() const;
+	// END Revamped yields
+	// EventEngine - v0.1, Snarko
+	const char* getIconString() const;
+	// END EventEngine
 
 	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
@@ -1572,6 +1615,15 @@ protected:
 	int m_iGoldenAgeYieldThreshold;
 	int m_iGoldenAgeYieldMod;
 	int m_iAIWeightPercent;
+	// Revamped yields - v0.1, Snarko
+	int m_iGoldenAgePlayerYieldMod;
+	int m_iCityConnectionBase;
+	int m_iCityConnectionCapitalPopMultiplier;
+	int m_iCityConnectionCityPopMultiplier;
+	// END Revamped yields
+	// EventEngine - v0.1, Snarko
+	CvString m_strIconString;
+	// END EventEngine
 };
 
 
@@ -2272,19 +2324,19 @@ public:
 
 	bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
-	EventModifierTypeTypes getModifierType();
-	CompareTypes getCompareType();
+	EventModifierTypeTypes getModifierType() const;
+	CompareTypes getCompareType() const;
 
-	std::string getScope();
+	std::string getSet() const;
 
 	//Generalist function for resourcetypes, unitclasstypes etc.
 	//Convert to the appropriate enum when needed.
 	//It's an int here to make this class more simple, instead of having one variable for each kind of type.
-	int getTypeToCompare();
+	int getTypeToCompare() const;
 
-	int getNumberToCompare();
+	int getNumberToCompare() const;
 
-	int getFactor();
+	int getFactor() const;
 
 private:
 	EventModifierTypeTypes m_eModifier;
@@ -2293,7 +2345,7 @@ private:
 	int m_iTypeToCompare;
 	int m_iNumberToCompare;
 	int m_iFactor;
-	std::string m_szScope;
+	std::string m_szSet;
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -2306,19 +2358,19 @@ public:
 
 	bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
-	EventActionTypeTypes getActionType();
+	EventActionTypeTypes getActionType() const;
 	//ints
-	int getTurns();
-	int getChance();
-	int getTypeToAction();
-	int getAIWeight();
-	int getValue1();
-	int getValue2();
+	int getNumTurns() const;
+	int getChance() const;
+	int getTypeToAction() const;
+	int getAIWeight() const;
+	int getValue1() const;
+	int getValue2() const;
 	//bools
-	bool getBool1();
+	bool getBool1() const;
 	//strings
-	std::string getString1();
-	std::string getScope();
+	std::string getString1() const;
+	std::string getSet() const;
 
 private:
 
@@ -2335,7 +2387,7 @@ private:
 	bool m_bBool1; //For example if a player should get, or lose, a tech
 	//Strings
 	std::string m_szString1;
-	std::string m_szScope;
+	std::string m_szSet;
 };
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //  class : CvEventOptionInfo
@@ -2347,8 +2399,8 @@ public:
 
 	bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
-	int getNumActions();
-	EventActionTypes getAction(int i);
+	int getNumActions() const;
+	EventActionTypes getAction(int i) const;
 
 private:
 
@@ -2365,23 +2417,25 @@ public:
 
 	bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
 
-	int getMTTH();
+	int getMTTH() const;
 
-	EventTypeTypes getEventType();
+	EventTypeTypes getEventType() const;
 
-	int getNumRequirements();
-	EventRequirementTypes getRequirement(int i);
-	int getNumModifiers();
-	EventModifierTypes getModifier(int i);
+	const char* getNotificationText() const;
 
-	int getNumOptions();
-	EventOptionTypes getOption(int i);
+	int getNumRequirements() const;
+	EventRequirementTypes getRequirement(int i) const;
+	int getNumModifiers() const;
+	EventModifierTypes getModifier(int i) const;
+
+	int getNumOptions() const;
+	EventOptionTypes getOption(int i) const;
 
 
 private:
 	int m_iMeanTimeToHappen;
 	EventTypeTypes m_eEventType;
-	const char* m_szImage;
+	CvString m_szNotificationText;
 
 	std::vector<EventModifierTypes> m_aeEventModifiers;
 	std::vector<EventRequirementTypes> m_aeEventRequirements;

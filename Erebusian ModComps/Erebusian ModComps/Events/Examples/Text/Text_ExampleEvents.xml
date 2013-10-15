@@ -54,5 +54,8 @@
 		<Row Tag="TXT_KEY_LOREM_IPSUM">
 			<Text>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque quis purus ut turpis aliquam egestas. Integer euismod metus quis porttitor eleifend. Vivamus eleifend at felis sed vestibulum. Vestibulum a leo pellentesque tellus mollis elementum.</Text>
 		</Row>
+		<Row Tag="TXT_KEY_TEST_EVENT_NOTIFICATION">
+			<Text>Experiment succesfull!</Text>
+		</Row>
 	</Language_en_US>
 </GameData>

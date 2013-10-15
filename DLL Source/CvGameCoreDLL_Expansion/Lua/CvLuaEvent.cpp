@@ -15,7 +15,8 @@ void CvLuaEvent::PushMethods(lua_State* L, int t)
 	Method(GetNumOptions);
 	Method(GetOption);
 	Method(Trigger);
-	Method(ProcessEventOption);
+	Method(GetToolTip);
+	Method(GetToolTipByOptionID);
 }
 
 //------------------------------------------------------------------------------
@@ -71,9 +72,36 @@ int CvLuaEvent::lTrigger(lua_State* L)
 	return BasicLuaMethod(L, &CvEvent::trigger);
 }
 
-int CvLuaEvent::lProcessEventOption(lua_State* L)
+int CvLuaEvent::lGetToolTip(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvEvent::processEventOption);
+	CvString toolTip;
+	CvEvent* pkEvent = GetInstance(L);
+	const int iOption = lua_tointeger(L, 2);
+
+	pkEvent->getToolTip(iOption, &toolTip);
+
+	lua_pushstring(L, toolTip.c_str());
+	return 1;
+}
+
+int CvLuaEvent::lGetToolTipByOptionID(lua_State* L)
+{
+	CvString toolTip;
+	CvEvent* pkEvent = GetInstance(L);
+	const int iOption = lua_tointeger(L, 2);
+
+	for (int iI = 0; iI < pkEvent->getNumOptions(); iI++)
+	{
+		if (pkEvent->getOption(iI) == iOption)
+		{
+			pkEvent->getToolTip(iI, &toolTip);
+			break;
+		}
+	}
+		
+
+	lua_pushstring(L, toolTip.c_str());
+	return 1;
 }
 
 //------------------------------------------------------------------------------
@@ -83,12 +111,9 @@ void CvLuaEventEffects::PushMethods(lua_State* L, int t)
 {
 	Method(GetEventType);
 	Method(GetOption);
+	Method(GetEventAction);
 	Method(GetAction);
-	Method(SetAction);
-	Method(SetType);
 	Method(GetType);
-	Method(GetValue);
-	Method(SetValue);
 	Method(GetNumTurns);
 	Method(SetNumTurns);
 	Method(ChangeNumTurns);
@@ -107,55 +132,39 @@ const char* CvLuaEventEffects::GetTypeName()
 
 int CvLuaEventEffects::lGetEventType(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvEventEffects::getEventType);
+	return BasicLuaMethod(L, &CvEventEffect::getEventType);
 }
 
 int CvLuaEventEffects::lGetOption(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvEventEffects::getOption);
+	return BasicLuaMethod(L, &CvEventEffect::getOption);
+}
+
+int CvLuaEventEffects::lGetEventAction(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvEventEffect::getEventAction);
 }
 
 int CvLuaEventEffects::lGetAction(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvEventEffects::getAction);
-}
-
-int CvLuaEventEffects::lSetAction(lua_State* L)
-{
-	return BasicLuaMethod(L, &CvEventEffects::setAction);
-}
-
-int CvLuaEventEffects::lSetType(lua_State* L)
-{
-	return BasicLuaMethod(L, &CvEventEffects::setType);
+	return BasicLuaMethod(L, &CvEventEffect::getAction);
 }
 
 int CvLuaEventEffects::lGetType(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvEventEffects::getType);
+	return BasicLuaMethod(L, &CvEventEffect::getTypeToAction);
 }
-
-int CvLuaEventEffects::lGetValue(lua_State* L)
-{
-	return BasicLuaMethod(L, &CvEventEffects::getValue);
-}
-
-int CvLuaEventEffects::lSetValue(lua_State* L)
-{
-	return BasicLuaMethod(L, &CvEventEffects::setValue);
-}
-
 int CvLuaEventEffects::lGetNumTurns(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvEventEffects::getNumTurns);
+	return BasicLuaMethod(L, &CvEventEffect::getNumTurns);
 }
 
 int CvLuaEventEffects::lSetNumTurns(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvEventEffects::setNumTurns);
+	return BasicLuaMethod(L, &CvEventEffect::setNumTurns);
 }
 
 int CvLuaEventEffects::lChangeNumTurns(lua_State* L)
 {
-	return BasicLuaMethod(L, &CvEventEffects::changeNumTurns);
+	return BasicLuaMethod(L, &CvEventEffect::changeNumTurns);
 }

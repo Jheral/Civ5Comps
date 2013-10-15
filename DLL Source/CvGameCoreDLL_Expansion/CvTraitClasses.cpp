@@ -12,6 +12,10 @@
 #include "CvInfosSerializationHelper.h"
 #include "CvDiplomacyAI.h"
 #include "CvGrandStrategyAI.h"
+// Revamped yields - v0.1, Snarko
+// For TraitYieldFromFeatures
+#include "CvGameCoreEnumSerialization.h"
+// END Revamped yields
 
 #include "LintFree.h"
 
@@ -41,10 +45,23 @@ CvTraitEntry::CvTraitEntry() :
 	m_iPlotBuyCostModifier(0),
 	m_iPlotCultureCostModifier(0),
 	m_iCultureFromKills(0),
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_iFreeCityYield
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCityCultureBonus(0),
+	*/
+	// END Revamped yields
 	m_iCapitalThemingBonusModifier(0),
 	m_iPolicyCostModifier(0),
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_paiCityConnectionYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCityConnectionTradeRouteChange(0),
+	*/
+	m_paiCityConnectionYieldChange(NULL),
+	// END Revamped yields
 	m_iWonderProductionModifier(0),
 	m_iPlunderModifier(0),
 	m_iImprovementMaintenanceModifier(0),
@@ -65,7 +82,13 @@ CvTraitEntry::CvTraitEntry() :
 	m_iNaturalWonderHappinessModifier(0),
 	m_iNearbyImprovementCombatBonus(0),
 	m_iNearbyImprovementBonusRange(0),
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it, as it is in no way compatible with culture being normal yields.
+	/* Original code
 	m_iCultureBuildingYieldChange(0),
+	*/
+	// END Revamped yields
 	m_iCombatBonusVsHigherTech(0),
 	m_iCombatBonusVsLargerCiv(0),
 	m_iLandUnitMaintenanceModifier(0),
@@ -95,7 +118,15 @@ CvTraitEntry::CvTraitEntry() :
 	m_bNoHillsImprovementMaintenance(false),
 	m_bTechBoostFromCapitalScienceBuildings(false),
 	m_bStaysAliveZeroCities(false),
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is a pain to keep with how substantially yield from features have changed
+	// The Celts have been updated to use the new system
+	/* Original code
 	m_bFaithFromUnimprovedForest(false),
+	*/
+	m_aTraitYieldFromFeatures(NULL),
+	// END Revamped yields
 	m_bBonusReligiousBelief(false),
 	m_bAbleToAnnexCityStates(false),
 	m_bCrossesMountainsAfterGreatGeneral(false),
@@ -125,6 +156,21 @@ CvTraitEntry::~CvTraitEntry()
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiImprovementYieldChanges);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiSpecialistYieldChanges);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppiUnimprovedFeatureYieldChanges);
+	// Revamped yields - v0.1, Snarko
+	SAFE_DELETE_ARRAY(m_paiCityConnectionYieldChange);
+	// These should probably be here too...
+	SAFE_DELETE_ARRAY(m_paiExtraYieldThreshold);
+	SAFE_DELETE_ARRAY(m_paiYieldChange);
+	SAFE_DELETE_ARRAY(m_paiYieldChangeStrategicResources);
+	SAFE_DELETE_ARRAY(m_paiYieldChangeNaturalWonder);
+	SAFE_DELETE_ARRAY(m_paiYieldChangePerTradePartner);
+	SAFE_DELETE_ARRAY(m_paiYieldChangeIncomingTradeRoute);
+	SAFE_DELETE_ARRAY(m_paiYieldModifier);
+	SAFE_DELETE_ARRAY(m_piStrategicResourceQuantityModifier);
+	SAFE_DELETE_ARRAY(m_piResourceQuantityModifiers);
+	SAFE_DELETE_ARRAY(m_piMovesChangeUnitCombats);
+	SAFE_DELETE_ARRAY(m_piMaintenanceModifierUnitCombats);
+	// END Revamped yields
 }
 
 /// Accessor:: Modifier to experience needed for new level
@@ -253,11 +299,17 @@ int CvTraitEntry::GetCultureFromKills() const
 	return m_iCultureFromKills;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used, use GetYieldChange
+// XML tag still kept for backwards compatibility
+/* Original code
 /// Accessor:: extra culture from buildings that provide culture
 int CvTraitEntry::GetCityCultureBonus() const
 {
 	return m_iCityCultureBonus;
 }
+*/
+// END Revamped yields
 
 /// Accessor:: boost to theming bonuses in capital
 int CvTraitEntry::GetCapitalThemingBonusModifier() const
@@ -271,11 +323,20 @@ int CvTraitEntry::GetPolicyCostModifier() const
 	return m_iPolicyCostModifier;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 /// Accessor:: extra money from trade routes
 int CvTraitEntry::GetCityConnectionTradeRouteChange() const
 {
 	return m_iCityConnectionTradeRouteChange;
 }
+*/
+int CvTraitEntry::GetCityConnectionTradeRouteChange(int i) const
+{
+	return m_paiCityConnectionYieldChange ? m_paiCityConnectionYieldChange[i] : 0;
+}
+// END Revamped yields
 
 /// Accessor:: boost in wonder building speed
 int CvTraitEntry::GetWonderProductionModifier() const
@@ -385,11 +446,17 @@ int CvTraitEntry::GetNearbyImprovementBonusRange() const
 	return m_iNearbyImprovementBonusRange;
 }
 
+// Revamped yields - v0.1, Snarko
+// REMOVED
+// This tag is not used in base civ 5 and there's little reason to keep it, as it is in no way compatible with culture being normal yields.
+/* Original code
 /// Accessor: extra yield for culture buildings
 int CvTraitEntry::GetCultureBuildingYieldChange() const
 {
 	return m_iCultureBuildingYieldChange;
 }
+*/
+// END Revamped yields
 
 /// Accessor: combat bonus in own territory vs. higher tech units
 int CvTraitEntry::GetCombatBonusVsHigherTech() const
@@ -579,11 +646,29 @@ bool CvTraitEntry::IsStaysAliveZeroCities() const
 	return m_bStaysAliveZeroCities;
 }
 
+// Revamped yields - v0.1, Snarko
+// REMOVED
+// This tag is a pain to keep with how substantially yield from features have changed
+// The Celts have been updated to use the new system
+/* Original code
 /// Accessor: does this civ get Faith from settling cities near Forest?
 bool CvTraitEntry::IsFaithFromUnimprovedForest() const
 {
 	return m_bFaithFromUnimprovedForest;
 }
+*/
+/// Accessor: how many yield from features entries does this trait have?
+int CvTraitEntry::NumYieldFromFeatures() const
+{
+	return m_aTraitYieldFromFeatures.size();
+}
+
+/// Accessor: get a specific yield from feature entry
+CvTraitYieldFromFeatures& CvTraitEntry::GetYieldFromFeatures(int i)
+{
+	return m_aTraitYieldFromFeatures[i];
+}
+// END Revamped yields
 
 /// Accessor: does this civ get a bonus religious belief?
 bool CvTraitEntry::IsBonusReligiousBelief() const
@@ -867,10 +952,22 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iPlotBuyCostModifier					= kResults.GetInt("PlotBuyCostModifier");
 	m_iPlotCultureCostModifier              = kResults.GetInt("PlotCultureCostModifier");
 	m_iCultureFromKills						= kResults.GetInt("CultureFromKills");
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_paiYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCityCultureBonus						= kResults.GetInt("CityCultureBonus");
+	*/
+	// END Revamped yields
 	m_iCapitalThemingBonusModifier          = kResults.GetInt("CapitalThemingBonusModifier");
 	m_iPolicyCostModifier					= kResults.GetInt("PolicyCostModifier");
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_paiCityConnectionYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCityConnectionTradeRouteChange		= kResults.GetInt("CityConnectionTradeRouteChange");
+	*/
+	// END Revamped yields
 	m_iWonderProductionModifier				= kResults.GetInt("WonderProductionModifier");
 	m_iPlunderModifier						= kResults.GetInt("PlunderModifier");
 	m_iImprovementMaintenanceModifier       = kResults.GetInt("ImprovementMaintenanceModifier");
@@ -888,7 +985,13 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iNaturalWonderHappinessModifier       = kResults.GetInt("NaturalWonderHappinessModifier");
 	m_iNearbyImprovementCombatBonus			= kResults.GetInt("NearbyImprovementCombatBonus");
 	m_iNearbyImprovementBonusRange			= kResults.GetInt("NearbyImprovementBonusRange");
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it, as it is in no way compatible with culture being normal yields.
+	/* Original code
 	m_iCultureBuildingYieldChange			= kResults.GetInt("CultureBuildingYieldChange");
+	*/
+	// END Revamped yields
 	m_iCombatBonusVsHigherTech				= kResults.GetInt("CombatBonusVsHigherTech");
 	m_iCombatBonusVsLargerCiv				= kResults.GetInt("CombatBonusVsLargerCiv");
 	m_iLandUnitMaintenanceModifier          = kResults.GetInt("LandUnitMaintenanceModifier");
@@ -962,7 +1065,14 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_bNoHillsImprovementMaintenance = kResults.GetBool("NoHillsImprovementMaintenance");
 	m_bTechBoostFromCapitalScienceBuildings = kResults.GetBool("TechBoostFromCapitalScienceBuildings");
 	m_bStaysAliveZeroCities = kResults.GetBool("StaysAliveZeroCities");
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is a pain to keep with how substantially yield from features have changed
+	// The Celts have been updated to use the new system
+	/* Original code
 	m_bFaithFromUnimprovedForest = kResults.GetBool("FaithFromUnimprovedForest");
+	*/
+	// END Revamped yields
 	m_bBonusReligiousBelief = kResults.GetBool("BonusReligiousBelief");
 	m_bAbleToAnnexCityStates = kResults.GetBool("AbleToAnnexCityStates");
 	m_bCrossesMountainsAfterGreatGeneral = kResults.GetBool("CrossesMountainsAfterGreatGeneral");
@@ -983,6 +1093,32 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	kUtility.SetYields(m_paiYieldChangePerTradePartner, "Trait_YieldChangesPerTradePartner", "TraitType", szTraitType);
 	kUtility.SetYields(m_paiYieldChangeIncomingTradeRoute, "Trait_YieldChangesIncomingTradeRoute", "TraitType", szTraitType);
 	kUtility.SetYields(m_paiYieldModifier, "Trait_YieldModifiers", "TraitType", szTraitType);
+
+	// Revamped yields - v0.1, Snarko
+	kUtility.SetYields(m_paiCityConnectionYieldChange, "Trait_CityConnectionYieldChanges", "TraitType", szTraitType);
+	int iCityConnectionTradeRouteChange = kResults.GetInt("CityConnectionTradeRouteChange");
+	if (iCityConnectionTradeRouteChange != 0)
+	{
+		if (!m_paiCityConnectionYieldChange)
+		{
+			kUtility.InitializeArray(m_paiCityConnectionYieldChange, NUM_YIELD_TYPES, 0);
+		}
+
+		m_paiCityConnectionYieldChange[YIELD_GOLD] += iCityConnectionTradeRouteChange;
+	}
+
+	// m_iCityCultureBonus is no longer used, use m_paiYieldChange
+	// XML tag still kept for backwards compatibility
+	int iCultureChange = kResults.GetInt("CityCultureBonus");
+	if (iCultureChange != 0)
+	{
+		if (!m_paiYieldChange)
+		{
+			kUtility.InitializeArray(m_paiYieldChange, NUM_YIELD_TYPES, 0);
+		}
+		m_paiYieldChange[YIELD_CULTURE] += iCultureChange;
+	}
+	// END Revamped yields
 
 	const int iNumTerrains = GC.getNumTerrainInfos();
 
@@ -1216,8 +1352,190 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 		}
 	}
 
+	// Revamped yields - v0.1, Snarko
+	{
+		std::string strKey("Trait_YieldFromFeatures");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from Trait_YieldFromFeatures where TraitType = ?");
+		}
+
+		pResults->Bind(1, szTraitType);
+
+		while(pResults->Step())
+		{
+			CvTraitYieldFromFeatures temp;
+			temp.CacheResults(kResults, kUtility);
+			m_aTraitYieldFromFeatures.push_back(temp);
+		}
+	}
+	// END Revamped yields
+
 	return true;
 }
+
+// Revamped yields - v0.1, Snarko
+//=====================================
+// TraitYieldFromFeatures
+//=====================================
+FDataStream& operator>>(FDataStream& kStream, TraitYieldFromFeatures& writeTo)
+{
+	kStream >> writeTo.eYield;
+	kStream >> writeTo.iChange;
+	kStream >> writeTo.iFeaturesRequired;
+	return kStream;
+}
+FDataStream& operator<<(FDataStream& kStream, const TraitYieldFromFeatures& readFrom)
+{
+	kStream << (YieldTypes)readFrom.eYield;
+	kStream << readFrom.iChange;
+	kStream << readFrom.iFeaturesRequired;
+	return kStream;
+}
+//=====================================
+// CvTraitYieldFromFeatures
+//=====================================
+CvTraitYieldFromFeatures::CvTraitYieldFromFeatures(void) :
+	m_iRange(0),
+	m_bRequiresImprovement(false),
+	m_bRequiresNoImprovement(false)
+{
+}
+CvTraitYieldFromFeatures::~CvTraitYieldFromFeatures(void)
+{
+	SAFE_DELETE_ARRAY(m_abFeatures);
+}
+
+bool CvTraitYieldFromFeatures::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
+{
+	m_iRange				= kResults.GetInt("Range");
+	m_bRequiresImprovement				= kResults.GetBool("bRequiresImprovement");
+	m_bRequiresNoImprovement				= kResults.GetBool("bRequiresNoImprovement");
+
+	const char* szType = kResults.GetText("Type");
+
+	{
+		kUtility.InitializeArray(m_abFeatures, "Features", false);
+
+		std::string strKey = "Trait_YieldFromFeature_Features";
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Features.ID as FeatureID from Trait_YieldFromFeature_Features inner join Features on Features.Type = FeatureType where Trait_YieldFromFeaturesType = ?");
+		}
+
+		pResults->Bind(1, szType);
+
+		while(pResults->Step())
+		{
+			m_abFeatures[kResults.GetInt(0)] = true;
+		}
+	}
+
+	{
+		std::string strKey = "Trait_YieldFromFeature_Yields";
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select Yields.ID as YieldID, Yield, NumFeaturesRequired from Trait_YieldFromFeature_Yields inner join Yields on Yields.Type = YieldType where Trait_YieldFromFeaturesType = ?");
+		}
+
+		pResults->Bind(1, szType);
+
+		while(pResults->Step())
+		{
+			TraitYieldFromFeatures temp;
+
+			temp.eYield = (YieldTypes)pResults->GetInt(0);
+			temp.iChange = pResults->GetInt(1);
+			temp.iFeaturesRequired = pResults->GetInt(2);
+
+			m_aYieldChanges.push_back(temp);
+		}
+	}
+
+	return true;
+}
+
+int CvTraitYieldFromFeatures::GetRange() const
+{
+	return m_iRange;
+}
+bool CvTraitYieldFromFeatures::IsRequiresImprovement() const
+{
+	return m_bRequiresImprovement;
+}
+bool CvTraitYieldFromFeatures::IsRequiresNoImprovement() const
+{
+	return m_bRequiresNoImprovement;
+}
+
+int CvTraitYieldFromFeatures::IsFeature(int i) const
+{
+	CvAssertMsg(i < GC.getNumFeatureInfos(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_abFeatures[i];
+}
+
+int CvTraitYieldFromFeatures::NumYieldChanges() const
+{
+	return m_aYieldChanges.size();
+}
+TraitYieldFromFeatures& CvTraitYieldFromFeatures::GetYieldChange(int i)
+{
+	return m_aYieldChanges[i];
+}
+
+/// Serialization write
+void CvTraitYieldFromFeatures::Write(FDataStream& kStream)
+{
+	uint uiVersion = 1;
+	kStream << uiVersion;
+
+	kStream << m_iRange;
+	kStream << m_bRequiresImprovement;
+	kStream << m_bRequiresNoImprovement;
+
+	for (int iI = 0; iI < GC.getNumFeatureInfos(); iI++)
+	{
+		kStream << m_abFeatures[iI];
+	}
+
+	int iNumYieldChanges = m_aYieldChanges.size();
+	kStream << iNumYieldChanges;
+	for (int iI = 0; iI < (int)m_aYieldChanges.size(); iI++)
+	{
+		kStream << m_aYieldChanges;
+	}
+}
+
+/// Serialization read
+void CvTraitYieldFromFeatures::Read(FDataStream& kStream)
+{
+	// Version number to maintain backwards compatibility
+	uint uiVersion;
+	kStream >> uiVersion;
+
+	kStream >> m_iRange;
+	kStream >> m_bRequiresImprovement;
+	kStream >> m_bRequiresNoImprovement;
+
+	for (int iI = 0; iI < GC.getNumFeatureInfos(); iI++)
+	{
+		kStream >> m_abFeatures[iI];
+	}
+
+	int iNumYieldChanges;
+	kStream >> iNumYieldChanges;
+	for (int iI = 0; iI < iNumYieldChanges; iI++)
+	{
+		TraitYieldFromFeatures temp;
+		kStream >> temp;
+		m_aYieldChanges.push_back(temp);
+	}
+}
+// END Revamped yields
 
 //=====================================
 // CvTraitXMLEntries
@@ -1329,10 +1647,24 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iPlotBuyCostModifier += trait->GetPlotBuyCostModifier();
 			m_iPlotCultureCostModifier += trait->GetPlotCultureCostModifier();
 			m_iCultureFromKills += trait->GetCultureFromKills();
+			// Revamped yields - v0.1, Snarko
+			// No longer used
+			/* Original code
 			m_iCityCultureBonus += trait->GetCityCultureBonus();
+			*/
+			// END Revamped yields
 			m_iCapitalThemingBonusModifier += trait->GetCapitalThemingBonusModifier();
 			m_iPolicyCostModifier += trait->GetPolicyCostModifier();
+			// Revamped yields - v0.1, Snarko
+			// No longer used
+			/* Original code
 			m_iCityConnectionTradeRouteChange += trait->GetCityConnectionTradeRouteChange();
+			*/
+			for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+			{
+				m_aiCityConnectionTradeRouteChange[iI] += trait->GetCityConnectionTradeRouteChange(iI);
+			}
+			// END Revamped yields
 			m_iWonderProductionModifier += trait->GetWonderProductionModifier();
 			m_iPlunderModifier += trait->GetPlunderModifier();
 			m_iImprovementMaintenanceModifier += trait->GetImprovementMaintenanceModifier();
@@ -1350,7 +1682,13 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iNaturalWonderHappinessModifier += trait->GetNaturalWonderHappinessModifier();
 			m_iNearbyImprovementCombatBonus += trait->GetNearbyImprovementCombatBonus();
 			m_iNearbyImprovementBonusRange += trait->GetNearbyImprovementBonusRange();
+			// Revamped yields - v0.1, Snarko
+			// REMOVED
+			// This tag is not used in base civ 5 and there's little reason to keep it, as it is in no way compatible with culture being normal yields.
+			/* Original code
 			m_iCultureBuildingYieldChange += trait->GetCultureBuildingYieldChange();
+			*/
+			// END Revamped yields
 			m_iCombatBonusVsHigherTech += trait->GetCombatBonusVsHigherTech();
 			m_iCombatBonusVsLargerCiv += trait->GetCombatBonusVsLargerCiv();
 			m_iLandUnitMaintenanceModifier += trait->GetLandUnitMaintenanceModifier();
@@ -1411,10 +1749,22 @@ void CvPlayerTraits::InitPlayerTraits()
 			{
 				m_bStaysAliveZeroCities = true;
 			}
+			// Revamped yields - v0.1, Snarko
+			// No longer used
+			/* Original code
 			if(trait->IsFaithFromUnimprovedForest())
 			{
 				m_bFaithFromUnimprovedForest = true;
 			}
+			*/
+			if (trait->NumYieldFromFeatures() > 0)
+			{
+				for (int iI = 0; iI < trait->NumYieldFromFeatures(); iI++)
+				{
+					m_aTraitYieldFromFeatures.push_back(trait->GetYieldFromFeatures(iI));
+				}
+			}
+			// END Revamped yields
 			if(trait->IsBonusReligiousBelief())
 			{
 				m_bBonusReligiousBelief = true;
@@ -1498,6 +1848,7 @@ void CvPlayerTraits::InitPlayerTraits()
 					}
 				}
 			}
+
 			CvAssert(GC.getNumTerrainInfos() <= NUM_TERRAIN_TYPES);
 			for(int iTerrain = 0; iTerrain < GC.getNumTerrainInfos(); iTerrain++)
 			{
@@ -1546,6 +1897,9 @@ void CvPlayerTraits::InitPlayerTraits()
 /// Deallocate memory created in initialize
 void CvPlayerTraits::Uninit()
 {
+	// Revamped yields - v0.1, Snarko
+	m_aiCityConnectionTradeRouteChange.clear();
+	// END Revamped yields
 	m_aiResourceQuantityModifier.clear();
 	m_abNoTrain.clear();
 	m_paiMovesChangeUnitCombat.clear();
@@ -1582,10 +1936,24 @@ void CvPlayerTraits::Reset()
 	m_iPlotBuyCostModifier = 0;
 	m_iPlotCultureCostModifier = 0;
 	m_iCultureFromKills = 0;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_iFreeCityYield
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCityCultureBonus = 0;
+	*/
+	// END Revamped yields
 	m_iCapitalThemingBonusModifier = 0;
 	m_iPolicyCostModifier = 0;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_aiCityConnectionTradeRouteChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCityConnectionTradeRouteChange = 0;
+	*/
+	m_aiCityConnectionTradeRouteChange.clear();
+	m_aiCityConnectionTradeRouteChange.resize(NUM_YIELD_TYPES);
+	// END Revamped yields
 	m_iWonderProductionModifier = 0;
 	m_iPlunderModifier = 0;
 	m_iImprovementMaintenanceModifier = 0;
@@ -1603,7 +1971,13 @@ void CvPlayerTraits::Reset()
 	m_iNaturalWonderHappinessModifier = 0;
 	m_iNearbyImprovementCombatBonus = 0;
 	m_iNearbyImprovementBonusRange = 0;
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it, as it is in no way compatible with culture being normal yields.
+	/* Original code
 	m_iCultureBuildingYieldChange = 0;
+	*/
+	// END Revamped yields
 	m_iCombatBonusVsHigherTech = 0;
 	m_iCombatBonusVsLargerCiv = 0;
 	m_iLandUnitMaintenanceModifier = 0;
@@ -1634,7 +2008,13 @@ void CvPlayerTraits::Reset()
 	m_bNoHillsImprovementMaintenance = false;
 	m_bTechBoostFromCapitalScienceBuildings = false;
 	m_bStaysAliveZeroCities = false;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	m_bFaithFromUnimprovedForest = false;
+	*/
+	m_aTraitYieldFromFeatures.clear();
+	// END Revamped yields
 	m_bBonusReligiousBelief = false;
 	m_bAbleToAnnexCityStates = false;
 	m_bCrossesMountainsAfterGreatGeneral = false;
@@ -2061,6 +2441,21 @@ bool CvPlayerTraits::NoTrain(UnitClassTypes eUnitClassType)
 	}
 }
 
+// Revamped yields - v0.1, Snarko
+int CvPlayerTraits::GetCityConnectionTradeRouteChange(int i) const
+{
+	return m_aiCityConnectionTradeRouteChange[i];
+}
+int CvPlayerTraits::NumYieldFromFeatures() const
+{
+	return m_aTraitYieldFromFeatures.size();
+}
+
+CvTraitYieldFromFeatures& CvPlayerTraits::GetYieldFromFeatures(int i)
+{
+	return m_aTraitYieldFromFeatures[i];
+}
+// END Revamped yields
 
 // MAYA TRAIT SPECIAL METHODS
 
@@ -2408,6 +2803,12 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	// Version number to maintain backwards compatibility
 	uint uiVersion;
 	kStream >> uiVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem! Well, except mod versions created before using our modcomp(s)...
+	uint modVersion;
+	kStream >> modVersion;
+	// END modVersion
 
 	kStream >> m_iGreatPeopleRateModifier;
 	kStream >> m_iGreatScientistRateModifier;
@@ -2432,7 +2833,13 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	kStream >> m_iPlotBuyCostModifier;
 	kStream >> m_iPlotCultureCostModifier;
 	kStream >> m_iCultureFromKills;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_iFreeCityYield
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	kStream >> m_iCityCultureBonus;
+	*/
+	// END Revamped yields
 
 	if (uiVersion >= 17)
 	{
@@ -2444,7 +2851,18 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	}
 
 	kStream >> m_iPolicyCostModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_aiCityConnectionTradeRouteChange
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	kStream >> m_iCityConnectionTradeRouteChange;
+	*/
+	kStream >> iNumEntries;
+	for (int iI = 0; iI < iNumEntries; iI++)
+	{
+		kStream >> m_aiCityConnectionTradeRouteChange[iI];
+	}
+	// END Revamped yields
 	kStream >> m_iWonderProductionModifier;
 	kStream >> m_iPlunderModifier;
 
@@ -2481,7 +2899,14 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	kStream >> m_iNearbyImprovementCombatBonus;
 	kStream >> m_iNearbyImprovementBonusRange;
 
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it, as it is in no way compatible with culture being normal yields.
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	kStream >> m_iCultureBuildingYieldChange;
+	*/
+	// END Revamped yields
 
 	kStream >> m_iCombatBonusVsHigherTech;
 
@@ -2610,7 +3035,19 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	kStream >> m_bTechBoostFromCapitalScienceBuildings;
 	kStream >> m_bStaysAliveZeroCities;
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	kStream >> m_bFaithFromUnimprovedForest;
+	*/
+	kStream >> iNumEntries;
+	for (int iI = 0; iI < iNumEntries; iI++)
+	{
+		CvTraitYieldFromFeatures temp;
+		temp.Read(kStream);
+		m_aTraitYieldFromFeatures.push_back(temp);
+	}
+	// END Revamped yields
 
 	kStream >> m_bBonusReligiousBelief;
 
@@ -2782,6 +3219,12 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	// Current version number
 	uint uiVersion = 18;
 	kStream << uiVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem! Well, except mod versions created before using our modcomp(s)...
+	uint modVersion = 1;
+	kStream << modVersion;
+	// END modVersion
 
 	kStream << m_iGreatPeopleRateModifier;
 	kStream << m_iGreatScientistRateModifier;
@@ -2804,10 +3247,27 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iPlotBuyCostModifier;
 	kStream << m_iPlotCultureCostModifier;
 	kStream << m_iCultureFromKills;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_iFreeCityYield
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	kStream << m_iCityCultureBonus;
+	*/
+	// END Revamped yields
 	kStream << m_iCapitalThemingBonusModifier;
 	kStream << m_iPolicyCostModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_aiCityConnectionTradeRouteChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	kStream << m_iCityConnectionTradeRouteChange;
+	*/
+	kStream << (int)m_aiCityConnectionTradeRouteChange.size();
+	for (int iI = 0; iI < (int)m_aiCityConnectionTradeRouteChange.size(); iI++)
+	{
+		kStream << m_aiCityConnectionTradeRouteChange[iI];
+	}
+	// END Revamped yields
 	kStream << m_iWonderProductionModifier;
 	kStream << m_iPlunderModifier;
 	kStream << m_iImprovementMaintenanceModifier;
@@ -2825,7 +3285,13 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iNaturalWonderHappinessModifier;
 	kStream << m_iNearbyImprovementCombatBonus;
 	kStream << m_iNearbyImprovementBonusRange;
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it, as it is in no way compatible with culture being normal yields.
+	/* Original code
 	kStream << m_iCultureBuildingYieldChange;
+	*/
+	// END Revamped yields
 	kStream << m_iCombatBonusVsHigherTech;
 	kStream << m_iCombatBonusVsLargerCiv;
 	kStream << m_iLandUnitMaintenanceModifier;
@@ -2857,7 +3323,17 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_bNoHillsImprovementMaintenance;
 	kStream << m_bTechBoostFromCapitalScienceBuildings;
 	kStream << m_bStaysAliveZeroCities;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	kStream << m_bFaithFromUnimprovedForest;
+	*/
+	kStream << m_aTraitYieldFromFeatures.size();
+	for (int iI = 0; iI < (int)m_aTraitYieldFromFeatures.size(); iI++)
+	{
+		m_aTraitYieldFromFeatures[iI].Write(kStream);
+	}
+	// END Revamped yields
 	kStream << m_bBonusReligiousBelief;
 	kStream << m_bAbleToAnnexCityStates;
 	kStream << m_bCrossesMountainsAfterGreatGeneral;

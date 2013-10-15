@@ -3640,6 +3640,9 @@ void CvCityReligions::CityConvertsReligion(ReligionTypes eMajority, ReligionType
 		// Pay adoption bonuses (if any)
 		if(!m_bHasPaidAdoptionBonus)
 		{
+			// Revamped yields - v0.1, Snarko
+			// No longer used
+			/* Original code
 			int iGoldBonus = pNewReligion->m_Beliefs.GetGoldWhenCityAdopts();
 			iGoldBonus *= GC.getGame().getGameSpeedInfo().getTrainPercent();;
 			iGoldBonus /= 100;
@@ -3656,6 +3659,19 @@ void CvCityReligions::CityConvertsReligion(ReligionTypes eMajority, ReligionType
 					GC.GetEngineUserInterface()->AddPopupText(m_pCity->getX(), m_pCity->getY(), text, 0.5f);
 				}
 			}
+			*/
+			for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+			{
+				int iYieldBonus = pNewReligion->m_Beliefs.GetYieldWhenCityAdopts((YieldTypes)iI);
+				iYieldBonus *= GC.getGame().getGameSpeedInfo().getTrainPercent();;
+				iYieldBonus /= 100;
+				if (iYieldBonus != 0)
+				{
+					GET_PLAYER(pNewReligion->m_eFounder).ChangeImmediateYield((YieldTypes)iI, iYieldBonus, pNewReligion->m_eFounder == GC.getGame().getActivePlayer(), m_pCity->getX(), m_pCity->getY());
+					SetPaidAdoptionBonus(true);
+				}
+			}
+			// END Revamped yields
 		}
 
 		// Notification if active player's city was converted to a religion you didn't found
@@ -5399,7 +5415,18 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 	// UNUSED
 	//-------
 	iRtnValue += pEntry->GetPlayerHappiness() * iFlavorHappiness;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	iRtnValue += pEntry->GetPlayerCultureModifier() * iFlavorCulture;
+	*/
+	// TODO: unhardcode all these AI flavor things
+	int iFlavorFaith = pFlavorManager->GetPersonalityIndividualFlavor((FlavorTypes)GC.getInfoTypeForString("FLAVOR_RELIGION"));
+	iRtnValue += pEntry->GetPlayerYieldModifier(YIELD_GOLD) * iFlavorGold;
+	iRtnValue += pEntry->GetPlayerYieldModifier(YIELD_SCIENCE) * iFlavorScience;
+	iRtnValue += pEntry->GetPlayerYieldModifier(YIELD_CULTURE) * iFlavorCulture;
+	iRtnValue += pEntry->GetPlayerYieldModifier(YIELD_FAITH) * iFlavorFaith;
+	// END Revamped yields
 
 	//-----------------
 	// FOLLOWER BELIEFS
@@ -5452,13 +5479,51 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 	{
 		iRtnValue += (iFlavorHappiness * 10 * iFlavorDefense) / (pEntry->GetHappinessPerXPeacefulForeignFollowers() * iFlavorDefense);
 	}
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	iRtnValue += iFlavorScience * pEntry->GetSciencePerOtherReligionFollower() / 5;
+	
 	iRtnValue += pEntry->GetGoldPerFollowingCity() * iFlavorGold;
+
 	if(pEntry->GetGoldPerXFollowers() > 0)
 	{
 		iRtnValue += (iFlavorGold * 4 / pEntry->GetGoldPerXFollowers());
 	}
 	iRtnValue += iFlavorGold * pEntry->GetGoldWhenCityAdopts() / 50;
+	*/
+	iRtnValue += iFlavorScience * pEntry->GetYieldPerOtherReligionFollower((int)YIELD_SCIENCE) / 5;
+	iRtnValue += iFlavorGold * pEntry->GetYieldPerOtherReligionFollower((int)YIELD_GOLD) / 5;
+	iRtnValue += iFlavorCulture * pEntry->GetYieldPerOtherReligionFollower((int)YIELD_CULTURE) / 5;
+	iRtnValue += iFlavorFaith * pEntry->GetYieldPerOtherReligionFollower((int)YIELD_FAITH) / 5;
+
+	iRtnValue += pEntry->GetYieldPerFollowingCity((int)YIELD_GOLD) * iFlavorGold;
+	iRtnValue += pEntry->GetYieldPerFollowingCity((int)YIELD_CULTURE) * iFlavorCulture;
+	iRtnValue += pEntry->GetYieldPerFollowingCity((int)YIELD_SCIENCE) * iFlavorScience;
+	iRtnValue += pEntry->GetYieldPerFollowingCity((int)YIELD_FAITH) * iFlavorFaith;
+
+	if(pEntry->GetYieldPerXFollowers((int)YIELD_GOLD) > 0)
+	{
+		iRtnValue += (iFlavorGold * 4 / pEntry->GetYieldPerXFollowers((int)YIELD_GOLD));
+	}
+	if(pEntry->GetYieldPerXFollowers((int)YIELD_CULTURE) > 0)
+	{
+		iRtnValue += (iFlavorCulture * 4 / pEntry->GetYieldPerXFollowers((int)YIELD_CULTURE));
+	}
+	if(pEntry->GetYieldPerXFollowers((int)YIELD_SCIENCE) > 0)
+	{
+		iRtnValue += (iFlavorScience * 4 / pEntry->GetYieldPerXFollowers((int)YIELD_SCIENCE));
+	}
+	if(pEntry->GetYieldPerXFollowers((int)YIELD_FAITH) > 0)
+	{
+		iRtnValue += (iFlavorFaith * 4 / pEntry->GetYieldPerXFollowers((int)YIELD_FAITH));
+	}
+
+	iRtnValue += iFlavorGold * pEntry->GetYieldWhenCityAdopts((int)YIELD_GOLD) / 50;
+	iRtnValue += iFlavorCulture * pEntry->GetYieldWhenCityAdopts((int)YIELD_CULTURE) / 50;
+	iRtnValue += iFlavorScience * pEntry->GetYieldWhenCityAdopts((int)YIELD_SCIENCE) / 50;
+	iRtnValue += iFlavorFaith * pEntry->GetYieldWhenCityAdopts((int)YIELD_FAITH) / 50;
+	// END Revamped yields
 
 	// Minimum influence with city states
 	iRtnValue += iFlavorDiplomacy * pEntry->GetCityStateMinimumInfluence() / 7;
@@ -5487,7 +5552,18 @@ int CvReligionAI::ScoreBeliefForPlayer(CvBeliefEntry* pEntry)
 	//-----------------
 	// ENHANCER BELIEFS
 	//-----------------
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	iRtnValue += iFlavorGP * pEntry->GetGreatPersonExpendedFaith() / 10;
+	*/
+	int iTemp = 0;
+	for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+	{
+		iTemp += iFlavorGP * pEntry->GetGreatPersonExpendedYield(iI);
+	}
+	iRtnValue += iTemp / 10;
+	// END Revamped yields
 	iRtnValue += iFlavorDiplomacy * pEntry->GetFriendlyCityStateSpreadModifier() / 20;
 	iRtnValue += iFlavorDefense * pEntry->GetCombatModifierFriendlyCities() / 4;
 	iRtnValue += iFlavorOffense * pEntry->GetCombatModifierEnemyCities() / 4;

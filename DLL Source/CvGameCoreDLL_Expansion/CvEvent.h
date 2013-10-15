@@ -1,6 +1,14 @@
 #pragma once
 
 #define NOTIFICATION_EVENT (NotificationTypes)0x27EA083 //FString::Hash("NOTIFICATION_EVENT")
+#define BUTTONPOPUP_EVENT (ButtonPopupTypes)0xD8C95AE6 //FString::Hash("BUTTONPOPUP_EVENT")
+
+// This is the base modifier number for the item for Sets
+// We modify this later on and then compare it to the other numbers in that Set
+// We need a reasonably large number since modifiers are multiplicative 
+// We don't want to have to worry about issues due to rounding
+// When multiplying the chance with the item's modifier we take into account that we started with this number
+#define BASE_MODIFIER_CHANCE_SETS 1000
 
 #ifndef CV_EVENTS_H
 #define CV_EVENTS_H
@@ -19,11 +27,12 @@ class CvEvent
 public:
 	CvEvent();
 	virtual ~CvEvent();
-	void init(int iID, EventTypes eEvent, std::map< std::string, std::vector<int> > *asziScopes, CvPlayer* pPlayer, CvCity* pCity = NULL, CvUnit* pUnit = NULL);
+	void init(int iID, EventTypes eEvent, std::map< std::string, int >& asziSets, PlayerTypes ePlayer, CvCity* pCity = NULL, CvUnit* pUnit = NULL);
 	void uninit();
 
 	void read(FDataStream& kStream);
 	void write(FDataStream& kStream) const;
+	void WriteSetInfo(FDataStream& kStream) const;
 
 	int GetID();
 	void SetID(int iID);
@@ -31,21 +40,26 @@ public:
 	EventTypes getEventType() const;
 	CvEventInfo& getEventInfo() const;
 
-	//These functions are for lua. We need to be certain we are checking the right options.
 	int getNumOptions() const;
 	int getOption(int iOption) const;
+
+	int getNotificationID() const;
 
 	void trigger();
 	void processEventOption(int iOption);
 	void processEventAction(EventActionTypes eAction, EventOptionTypes eOption);
 
+	void getToolTip(int iOption, CvString* toolTipSink);
+	void buildActionTooltip(EventActionTypes eAction, CvString* toolTipSink);
+
 private:
-	CvPlayer* m_pPlayer;
+	PlayerTypes m_ePlayer;
 	CvCity* m_pCity;
 	CvUnit* m_pUnit;
 	EventTypes m_eEventType;
-	std::map<std::string, std::vector<int> > m_asziScopes;
+	std::map<std::string, int > m_asziSets;
 	int m_iID;
+	int m_iNotificationIndex;
 };
 
 FDataStream& operator<<(FDataStream&, const CvEvent&);
@@ -59,32 +73,33 @@ FDataStream& operator>>(FDataStream&, CvEvent&);
 //!  - This object is created inside the relevant objects and accessed through them
 //!  - Handles temporary event effects
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-class CvEventEffects
+class CvEventEffect
 {
 public:
-	CvEventEffects();
-	virtual ~CvEventEffects();
+	CvEventEffect();
+	virtual ~CvEventEffect();
 
-	void init(EventTypes eEvent, EventOptionTypes eOption, EventActionTypeTypes eEventAction = NO_EVENTACTION, int iNumTurns = 1, int iType = -1, int iValue = 0);
+	void init(EventTypes eEvent, EventOptionTypes eOption, EventActionTypeTypes eEventAction, int iNumTurns, int iTypeToAction, EventActionTypes eAction);
 	EventTypes getEventType() const;
 	EventOptionTypes getOption() const;
-	EventActionTypeTypes getAction() const;
-	void setAction(EventActionTypeTypes eAction);
-	void setType(int iType);
-	int getType() const;
-	int getValue() const;
-	void setValue(int iNewValue);
+	EventActionTypeTypes getEventAction() const;
+	EventActionTypes getAction() const;
+	int getTypeToAction() const;
 	int getNumTurns() const;
 	void setNumTurns(int iNewValue);
 	void changeNumTurns(int iChange);
+
+	void Read(FDataStream& kStream);
+	void Write(FDataStream& kStream) const;
 
 private:
 
 	EventActionTypeTypes m_eEventAction;
 	EventTypes m_eEventType;
 	EventOptionTypes m_eOption;
-	int m_iType;
-	int m_iValue;
+	EventActionTypes m_eAction;
+
+	int m_iTypeToAction;
 	int m_iNumTurns;
 };
 

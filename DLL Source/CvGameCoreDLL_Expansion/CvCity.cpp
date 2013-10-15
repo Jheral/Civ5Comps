@@ -126,6 +126,9 @@ CvCity::CvCity() :
 	, m_iGreatPeopleRateModifier("CvCity::m_iGreatPeopleRateModifier", m_syncArchive)
 	, m_iJONSCultureStored("CvCity::m_iJONSCultureStored", m_syncArchive, true)
 	, m_iJONSCultureLevel("CvCity::m_iJONSCultureLevel", m_syncArchive)
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	, m_iJONSCulturePerTurnFromBuildings("CvCity::m_iJONSCulturePerTurnFromBuildings", m_syncArchive)
 	, m_iJONSCulturePerTurnFromPolicies("CvCity::m_iJONSCulturePerTurnFromPolicies", m_syncArchive)
 	, m_iJONSCulturePerTurnFromSpecialists("CvCity::m_iJONSCulturePerTurnFromSpecialists", m_syncArchive)
@@ -134,6 +137,8 @@ CvCity::CvCity() :
 	, m_iFaithPerTurnFromPolicies(0)
 	, m_iFaithPerTurnFromReligion(0)
 	, m_iCultureRateModifier("CvCity::m_iCultureRateModifier", m_syncArchive)
+	*/
+	// END Revamped yields
 	, m_iNumWorldWonders("CvCity::m_iNumWorldWonders", m_syncArchive)
 	, m_iNumTeamWonders("CvCity::m_iNumTeamWonders", m_syncArchive)
 	, m_iNumNationalWonders("CvCity::m_iNumNationalWonders", m_syncArchive)
@@ -203,10 +208,16 @@ CvCity::CvCity() :
 	, m_aiPowerYieldRateModifier("CvCity::m_aiPowerYieldRateModifier", m_syncArchive)
 	, m_aiResourceYieldRateModifier("CvCity::m_aiResourceYieldRateModifier", m_syncArchive)
 	, m_aiExtraSpecialistYield("CvCity::m_aiExtraSpecialistYield", m_syncArchive)
+	// EventEngine - v0.1, Snarko
+	, m_ppaaiSpecialistExtraYield("CvCity::m_ppaaiSpecialistExtraYield", m_syncArchive)
+	// END EventEngine
 	, m_aiProductionToYieldModifier("CvCity::m_aiProductionToYieldModifier", m_syncArchive)
 	, m_aiDomainFreeExperience("CvCity::m_aiDomainFreeExperience", m_syncArchive)
 	, m_aiDomainProductionModifier("CvCity::m_aiDomainProductionModifier", m_syncArchive)
 	, m_abEverOwned("CvCity::m_abEverOwned", m_syncArchive)
+	// EventEngine - v0.1, Snarko
+	, m_abEverConquered("CvCity::m_abEverConquered", m_syncArchive)
+	// END EventEngine
 	, m_abRevealed("CvCity::m_abRevealed", m_syncArchive, true)
 	, m_strScriptData("CvCity::m_strScriptData", m_syncArchive)
 	, m_paiNoResource("CvCity::m_paiNoResource", m_syncArchive)
@@ -226,6 +237,9 @@ CvCity::CvCity() :
 	, m_paiFreePromotionCount("CvCity::m_paiFreePromotionCount", m_syncArchive)
 	, m_iBaseHappinessFromBuildings(0)
 	, m_iUnmoddedHappinessFromBuildings(0)
+	// EventEngine - v0.1, Snarko
+	, m_iHappinessFromEvents(0)
+	// END EventEngine
 	, m_bRouteToCapitalConnectedLastTurn(false)
 	, m_bRouteToCapitalConnectedThisTurn(false)
 	, m_strName("")
@@ -442,6 +456,10 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits)
 	}
 	owningPlayer.DoUpdateHappiness();
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use ChangeCityYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	// Policy changes
 	PolicyTypes ePolicy;
 	for(int iPoliciesLoop = 0; iPoliciesLoop < GC.getNumPolicyInfos(); iPoliciesLoop++)
@@ -454,6 +472,8 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits)
 			ChangeJONSCulturePerTurnFromPolicies(GC.getPolicyInfo(ePolicy)->GetCulturePerCity());
 		}
 	}
+	*/
+	// END Revamped yields
 
 	// Add Resource Quantity to total
 	if(plot()->getResourceType() != NO_RESOURCE)
@@ -559,11 +579,16 @@ void CvCity::init(int iID, PlayerTypes eOwner, int iX, int iY, bool bBumpUnits)
 
 	DLLUI->setDirty(NationalBorders_DIRTY_BIT, true);
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	// Garrisoned?
 	if (GetGarrisonedUnit())
 	{
 		ChangeJONSCulturePerTurnFromPolicies(GET_PLAYER(getOwner()).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_CULTURE_FROM_GARRISON));
 	}
+	*/
+	// END Revamped yields
 
 	AI_init();
 }
@@ -617,6 +642,10 @@ void CvCity::uninit()
 	m_pEmphases->Uninit();
 	m_pCityEspionage->Uninit();
 
+	// EventEngine - v0.1, Snarko
+	m_ppaaiSpecialistExtraYield.clear();
+	// END EventEngine
+
 	m_orderQueue.clear();
 }
 
@@ -649,6 +678,9 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iGreatPeopleRateModifier = 0;
 	m_iJONSCultureStored = 0;
 	m_iJONSCultureLevel = 0;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	m_iJONSCulturePerTurnFromBuildings = 0;
 	m_iJONSCulturePerTurnFromPolicies = 0;
 	m_iJONSCulturePerTurnFromSpecialists = 0;
@@ -657,6 +689,8 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_iFaithPerTurnFromPolicies = 0;
 	m_iFaithPerTurnFromReligion = 0;
 	m_iCultureRateModifier = 0;
+	*/
+	// END Revamped yields
 	m_iNumWorldWonders = 0;
 	m_iNumTeamWonders = 0;
 	m_iNumNationalWonders = 0;
@@ -729,12 +763,31 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	m_aiBaseYieldRateFromSpecialists.resize(NUM_YIELD_TYPES);
 	m_aiBaseYieldRateFromMisc.resize(NUM_YIELD_TYPES);
 	m_aiBaseYieldRateFromReligion.resize(NUM_YIELD_TYPES);
+	// EventEngine - v0.1, Snarko
+	m_aiBaseYieldRateFromEvents.resize(NUM_YIELD_TYPES);
+	m_aiEventYieldRateModifier.resize(NUM_YIELD_TYPES);
+	// END EventEngine
 	m_aiYieldPerPop.resize(NUM_YIELD_TYPES);
 	m_aiYieldPerReligion.resize(NUM_YIELD_TYPES);
 	m_aiYieldRateModifier.resize(NUM_YIELD_TYPES);
 	m_aiPowerYieldRateModifier.resize(NUM_YIELD_TYPES);
 	m_aiResourceYieldRateModifier.resize(NUM_YIELD_TYPES);
 	m_aiExtraSpecialistYield.resize(NUM_YIELD_TYPES);
+	m_ppaaiSpecialistExtraYield.clear();
+	// EventEngine - v0.1, Snarko
+	Firaxis::Array< int, NUM_YIELD_TYPES > yield;
+	for(unsigned int j = 0; j < NUM_YIELD_TYPES; ++j)
+	{
+		yield[j] = 0;
+	}
+
+	m_ppaaiSpecialistExtraYield.clear();
+	m_ppaaiSpecialistExtraYield.resize(GC.getNumSpecialistInfos());
+	for(unsigned int i = 0; i < m_ppaaiSpecialistExtraYield.size(); ++i)
+	{
+		m_ppaaiSpecialistExtraYield.setAt(i, yield);
+	}
+	// END EventEngine
 	m_aiProductionToYieldModifier.resize(NUM_YIELD_TYPES);
 	for(iI = 0; iI < NUM_YIELD_TYPES; iI++)
 	{
@@ -747,6 +800,10 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aiBaseYieldRateFromSpecialists.setAt(iI, 0);
 		m_aiBaseYieldRateFromMisc.setAt(iI, 0);
 		m_aiBaseYieldRateFromReligion[iI] = 0;
+		// EventEngine - v0.1, Snarko
+		m_aiBaseYieldRateFromEvents[iI] = 0;
+		m_aiEventYieldRateModifier[iI] = 0;
+		// END EventEngine
 		m_aiYieldPerPop.setAt(iI, 0);
 		m_aiYieldPerReligion[iI] = 0;
 		m_aiYieldRateModifier.setAt(iI, 0);
@@ -769,6 +826,14 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 	{
 		m_abEverOwned.setAt(iI, false);
 	}
+
+	// EventEngine - v0.1, Snarko
+	m_abEverConquered.resize(REALLY_MAX_PLAYERS);
+	for (iI = 0; iI < REALLY_MAX_PLAYERS; iI++)
+	{
+		m_abEverConquered.setAt(iI, false);
+	}
+	// END EventEngine
 
 	m_abRevealed.resize(REALLY_MAX_TEAMS);
 	for(iI = 0; iI < REALLY_MAX_TEAMS; iI++)
@@ -794,6 +859,12 @@ void CvCity::reset(int iID, PlayerTypes eOwner, int iX, int iY, bool bConstructo
 		m_aiBaseYieldRank.setAt(iI, -1);
 		m_aiYieldRank.setAt(iI, -1);
 	}
+
+	// EventEngine - v0.1, Snarko
+	m_aEventEffects.clear();
+
+	m_asziFlags.clear();
+	// END EventEngine
 
 	if(!bConstructorCall)
 	{
@@ -1573,6 +1644,12 @@ void CvCity::doTurn()
 			m_bRouteToCapitalConnectedLastTurn = m_bRouteToCapitalConnectedThisTurn;
 		}
 
+		// EventEngine - v0.1, Snarko
+		// doTempEventEffects should be before doEvents, so we do not count down an event we just triggered. The AI pick an option immediately.
+		doTempEventEffects(); 
+		doEvents();
+		// END EventEngine
+
 		// XXX
 #ifdef _DEBUG
 		{
@@ -2305,6 +2382,16 @@ bool CvCity::canTrain(UnitTypes eUnit, bool bContinue, bool bTestVisible, bool b
 		return false;
 	}
 
+	// EventEngine - v0.1, Snarko
+	for (int iI = 0; iI < pkUnitEntry->getNumFlagPrereqs(); iI++)
+	{
+		std::string szFlag = pkUnitEntry->getFlagPrereq(iI);
+		int iRequiredValue = pkUnitEntry->getFlagPrereqValue(iI);
+		if (getFlag(szFlag) < iRequiredValue && GET_PLAYER(getOwner()).getFlag(szFlag) < iRequiredValue)
+			return false;
+	}
+	// END EventEngine
+
 	if(!bTestVisible)
 	{
 		CvUnitEntry& thisUnitInfo = *pkUnitEntry;
@@ -2479,6 +2566,16 @@ bool CvCity::canConstruct(BuildingTypes eBuilding, bool bContinue, bool bTestVis
 		}
 	}
 
+	// EventEngine - v0.1, Snarko
+	for (int iI = 0; iI < pkBuildingInfo->getNumFlagPrereqs(); iI++)
+	{
+		std::string szFlag = pkBuildingInfo->getFlagPrereq(iI);
+		int iRequiredValue = pkBuildingInfo->getFlagPrereqValue(iI);
+		if (getFlag(szFlag) < iRequiredValue && GET_PLAYER(getOwner()).getFlag(szFlag) < iRequiredValue)
+			return false;
+	}
+	// END EventEngine
+
 	///////////////////////////////////////////////////////////////////////////////////
 	// Everything above this is what is checked to see if Building shows up in the list of construction items
 	///////////////////////////////////////////////////////////////////////////////////
@@ -2604,6 +2701,17 @@ bool CvCity::canCreate(ProjectTypes eProject, bool bContinue, bool bTestVisible)
 	{
 		return false;
 	}
+
+	// EventEngine - v0.1, Snarko
+	CvProjectEntry* pkProjectInfo = GC.getProjectInfo(eProject);
+	for (int iI = 0; iI < pkProjectInfo->getNumFlagPrereqs(); iI++)
+	{
+		std::string szFlag = pkProjectInfo->getFlagPrereq(iI);
+		int iRequiredValue = pkProjectInfo->getFlagPrereqValue(iI);
+		if (getFlag(szFlag) < iRequiredValue && GET_PLAYER(getOwner()).getFlag(szFlag) < iRequiredValue)
+			return false;
+	}
+	// END EventEngine
 
 	ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
 	if(pkScriptSystem)
@@ -2932,6 +3040,12 @@ void CvCity::ChangeNumResourceLocal(ResourceTypes eResource, int iChange)
 			}
 		}
 
+		// Revamped yields - v0.1, Snarko
+		// No longer used, use GetResourceYieldChange
+		// XML tag REMOVED because this actually changes what it does
+		// This is a small nerf to buildings that previously used this tag,
+		// but it would be redundant to have a seperate table just for changes to building gains based on local resources.
+		/* Original code
 		// Building Culture change for a local resource
 		for(int iBuildingLoop = 0; iBuildingLoop < GC.getNumBuildingInfos(); iBuildingLoop++)
 		{
@@ -2956,8 +3070,53 @@ void CvCity::ChangeNumResourceLocal(ResourceTypes eResource, int iChange)
 				}
 			}
 		}
+		*/
+		// END Revamped yields
 	}
 }
+
+// EventEngine - v0.1, Snarko
+// Similar to IsHasResourceLocal but this test if we're working the resource.
+bool CvCity::IsWorkingResource(ResourceTypes eResource) const
+{
+	// Loop through all plots near this City to see if we can find eResource - tests are ordered to optimize performance
+	CvPlot* pLoopPlot;
+
+	bool bFoundResource = false;
+	for(int iCityPlotLoop = 0; iCityPlotLoop < NUM_CITY_PLOTS; iCityPlotLoop++)
+	{
+		pLoopPlot = plotCity(getX(), getY(), iCityPlotLoop);
+
+		// Invalid plot
+		if(pLoopPlot == NULL)
+			continue;
+
+		// Doesn't have the resource (ignore team first to save time)
+		if(pLoopPlot->getResourceType() != eResource)
+			continue;
+
+		// Not owned by this player
+		if(pLoopPlot->getOwner() != getOwner())
+			continue;
+
+		// Team can't see the resource here
+		if(pLoopPlot->getResourceType(getTeam()) != eResource)
+			continue;
+
+		// Resource not linked to this city
+		if(pLoopPlot->GetResourceLinkedCity() != this)
+			continue;
+
+		// Resource not worked
+		if(!GetCityCitizens()->IsWorkingPlot(pLoopPlot))
+			continue;
+
+		bFoundResource = true;
+		break;
+	}
+	return bFoundResource;
+}
+// END EventEngine
 
 //	--------------------------------------------------------------------------------
 /// Does eBuilding pass the local resource requirement test?
@@ -5193,12 +5352,18 @@ int CvCity::getProductionDifference(int /*iProductionNeeded*/, int /*iProduction
 
 	int iOverflow = ((bOverflow) ? (getOverflowProduction() + getFeatureProduction()) : 0);
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	// Sum up difference
 	int iBaseProduction = getBaseYieldRate(YIELD_PRODUCTION) * 100;
 	iBaseProduction += (GetYieldPerPopTimes100(YIELD_PRODUCTION) * getPopulation());
 
 	int iModifiedProduction = iBaseProduction * getBaseYieldRateModifier(YIELD_PRODUCTION, iProductionModifier);
 	iModifiedProduction /= 10000;
+	*/
+	int iModifiedProduction = getYieldRate(YIELD_PRODUCTION, true, iProductionModifier);
+	// END Revamped yields
 
 	iModifiedProduction += iOverflow;
 	iModifiedProduction += iFoodProduction;
@@ -5244,18 +5409,29 @@ int CvCity::getProductionDifferenceTimes100(int /*iProductionNeeded*/, int /*iPr
 
 	int iOverflow = ((bOverflow) ? (getOverflowProductionTimes100() + getFeatureProduction() * 100) : 0);
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	// Sum up difference
 	int iBaseProduction = getBaseYieldRate(YIELD_PRODUCTION) * 100;
 	iBaseProduction += (GetYieldPerPopTimes100(YIELD_PRODUCTION) * getPopulation());
 
 	int iModifiedProduction = iBaseProduction * getBaseYieldRateModifier(YIELD_PRODUCTION, iProductionModifier);
 	iModifiedProduction /= 100;
+	*/
+	int iModifiedProduction = getYieldRateTimes100(YIELD_PRODUCTION, false, iProductionModifier);
+	// END Revamped yields
 
 	iModifiedProduction += iOverflow;
 	iModifiedProduction += iFoodProduction;
 
+	// Revamped yields - v0.1, Snarko
+	// Included in getYieldRateTimes100 check above
+	/* Original code
 	int iTradeYield = GET_PLAYER(m_eOwner).GetTrade()->GetTradeValuesAtCityTimes100(this, YIELD_PRODUCTION);
 	iModifiedProduction += iTradeYield;
+	*/
+	// END Revamped yields
 
 	return iModifiedProduction;
 }
@@ -5874,20 +6050,34 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			owningPlayer.ChangeUnhappinessMod(pBuildingInfo->GetUnhappinessModifier() * iChange);
 		}
 
+		// Revamped yields - v0.1, Snarko
+		// GetYieldChange is already included in normal yield calculations
+		// GetCultureBuildingYieldChange has been removed. It is not used and not yield-system friendly.
+		/* Original code
 		int iBuildingCulture = pBuildingInfo->GetYieldChange(YIELD_CULTURE);
 		if(iBuildingCulture > 0)
 		{
 			iBuildingCulture += owningPlayer.GetPlayerTraits()->GetCultureBuildingYieldChange();
 		}
 		ChangeJONSCulturePerTurnFromBuildings(iBuildingCulture * iChange);
+		
 		changeCultureRateModifier(pBuildingInfo->GetCultureRateModifier() * iChange);
+		*/
+		// END Revamped yields
 		changePlotCultureCostModifier(pBuildingInfo->GetPlotCultureCostModifier() * iChange);
 		changePlotBuyCostModifier(pBuildingInfo->GetPlotBuyCostModifier() * iChange);
 
+		// Revamped yields - v0.1, Snarko
+		/* Original code
 		int iBuildingFaith = pBuildingInfo->GetYieldChange(YIELD_FAITH);
 		ChangeFaithPerTurnFromBuildings(iBuildingFaith * iChange);
+		*/
+		// END Revamped yields
 		m_pCityReligions->ChangeReligiousPressureModifier(pBuildingInfo->GetReligiousPressureModifier() * iChange);
 
+		// Revamped yields - v0.1, Snarko
+		// We are calling ChangeBaseYieldRateFromBuildings further down, so no need to put anything else here.
+		/* Original code
 		PolicyTypes ePolicy;
 		for(int iPolicyLoop = 0; iPolicyLoop < GC.getNumPolicyInfos(); iPolicyLoop++)
 		{
@@ -5899,6 +6089,8 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 				ChangeFaithPerTurnFromPolicies(GC.getPolicyInfo(ePolicy)->GetBuildingClassYieldChanges(eBuildingClass, YIELD_FAITH) * iChange);
 			}
 		}
+		*/
+		// END Revamped yields
 
 		changeMaxFoodKeptPercent(pBuildingInfo->GetFoodKept() * iChange);
 		changeMilitaryProductionModifier(pBuildingInfo->GetMilitaryProductionModifier() * iChange);
@@ -5924,6 +6116,12 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			}
 		}
 
+		// Revamped yields - v0.1, Snarko
+		// No longer used, use GetResourceYieldChange
+		// XML tag REMOVED because this actually changes what it does
+		// This is a small nerf to buildings that previously used this tag,
+		// but it would be redundant to have a seperate table just for changes to building gains based on local resources.
+		/* Original code
 		// Resource loop
 		int iCulture, iFaith;
 		ResourceTypes eResource;
@@ -5939,7 +6137,7 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			}
 
 			// Do we have this resource local?
-			if(IsHasResourceLocal(eResource, /*bTestVisible*/ false))
+			if(IsHasResourceLocal(eResource, /*bTestVisible*//* false))
 			{
 				// Our Building does give culture with eResource
 				iCulture = GC.getBuildingInfo(eBuilding)->GetResourceCultureChange(eResource);
@@ -5958,6 +6156,8 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 				}
 			}
 		}
+		*/
+		// END Revamped yields
 
 		if(pBuildingInfo->IsExtraLuxuries())
 		{
@@ -6052,11 +6252,13 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 			{
 				if(owningTeam.GetTeamTechs()->HasTech((TechTypes)pBuildingInfo->GetEnhancedYieldTech()))
 				{
+					// Revamped yields - v0.1, Snarko
+					/* Original code
 					if(eYield == YIELD_CULTURE)
 					{
 						ChangeJONSCulturePerTurnFromBuildings(pBuildingInfo->GetTechEnhancedYieldChange(eYield) * iChange);
 					}
-					else if(eYield == YIELD_FAITH)
+					if(eYield == YIELD_FAITH)
 					{
 						ChangeFaithPerTurnFromBuildings(pBuildingInfo->GetTechEnhancedYieldChange(eYield) * iChange);
 					}
@@ -6064,17 +6266,22 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 					{
 						ChangeBaseYieldRateFromBuildings(eYield, pBuildingInfo->GetTechEnhancedYieldChange(eYield) * iChange);
 					}
+					*/
+					ChangeBaseYieldRateFromBuildings(eYield, pBuildingInfo->GetTechEnhancedYieldChange(eYield) * iChange);
+					// END Revamped yields
 				}
 			}
 
 			int iBuildingClassBonus = owningPlayer.GetBuildingClassYieldChange(eBuildingClass, eYield);
 			if(iBuildingClassBonus > 0)
 			{
+				// Revamped yields - v0.1, Snarko
+				/* Original code
 				if(eYield == YIELD_CULTURE)
 				{
 					ChangeJONSCulturePerTurnFromBuildings(iBuildingClassBonus * iChange);
 				}
-				else if(eYield == YIELD_FAITH)
+				if(eYield == YIELD_FAITH)
 				{
 					ChangeFaithPerTurnFromBuildings(iBuildingClassBonus * iChange);
 				}
@@ -6082,6 +6289,9 @@ void CvCity::processBuilding(BuildingTypes eBuilding, int iChange, bool bFirst, 
 				{
 					ChangeBaseYieldRateFromBuildings(eYield, iBuildingClassBonus * iChange);
 				}
+				*/
+				ChangeBaseYieldRateFromBuildings(eYield, iBuildingClassBonus * iChange);
+				// END Revamped yields
 			}
 		}
 
@@ -6182,9 +6392,14 @@ void CvCity::processSpecialist(SpecialistTypes eSpecialist, int iChange)
 
 	changeSpecialistFreeExperience(pkSpecialist->getExperience() * iChange);
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use getExtraSpecialistYield
+	/* Original code
 	// Culture
 	int iCulturePerSpecialist = GetCultureFromSpecialist(eSpecialist);
 	ChangeJONSCulturePerTurnFromSpecialists(iCulturePerSpecialist * iChange);
+	*/
+	// END Revamped yields
 }
 
 //	--------------------------------------------------------------------------------
@@ -6194,18 +6409,30 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 	updateYield();
 
 	// Reset city level yields
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	m_iJONSCulturePerTurnFromReligion = 0;
 	m_iFaithPerTurnFromReligion = 0;
 	for(int iYield = 0; iYield <= YIELD_SCIENCE; iYield++)
 	{
 		m_aiBaseYieldRateFromReligion[iYield] = 0;
 	}
+	*/
+	for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
+	{
+		m_aiBaseYieldRateFromReligion[iYield] = 0;
+	}
+	// END Revamped yields
 
 	for(int iYield = 0; iYield < NUM_YIELD_TYPES; iYield++)
 	{
 		int iYieldPerReligion = GetYieldPerReligionTimes100((YieldTypes)iYield);
 		if (iYieldPerReligion > 0)
 		{
+			// Revamped yields - v0.1, Snarko
+			// No longer used
+			/* Original code
 			switch(iYield)
 			{
 				case YIELD_CULTURE:
@@ -6218,6 +6445,9 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 					ChangeBaseYieldRateFromReligion((YieldTypes)iYield, (GetCityReligions()->GetNumReligionsWithFollowers() * iYieldPerReligion) / 100);
 					break;
 			}
+			*/
+			ChangeBaseYieldRateFromReligion((YieldTypes)iYield, (GetCityReligions()->GetNumReligionsWithFollowers() * iYieldPerReligion) / 100);
+			// END Revamped yields
 		}
 
 		if(eNewMajority != NO_RELIGION)
@@ -6234,6 +6464,9 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 					iReligionYieldChange += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetCityYieldChange((YieldTypes)iYield);
 				}
 
+				// Revamped yields - v0.1, Snarko
+				// No longer used
+				/* Original code
 				switch(iYield)
 				{
 				case YIELD_CULTURE:
@@ -6246,6 +6479,9 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 					ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iReligionYieldChange);
 					break;
 				}
+				*/
+				ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iReligionYieldChange);
+				// END Revamped yields
 
 				if(IsRouteToCapitalConnected())
 				{
@@ -6256,6 +6492,9 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 						iReligionChange += GC.GetGameBeliefs()->GetEntry(eSecondaryPantheon)->GetYieldChangeTradeRoute((YieldTypes)iYield);
 					}
 
+					// Revamped yields - v0.1, Snarko
+					// No longer used
+					/* Original code
 					switch(iYield)
 					{
 					case YIELD_CULTURE:
@@ -6268,10 +6507,16 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 						ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iReligionChange);
 						break;
 					}
+					*/
+					ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iReligionChange);
+					// END Revamped yields
 				}
 				
 				if (GetCityCitizens()->GetTotalSpecialistCount() > 0)
 				{
+					// Revamped yields - v0.1, Snarko
+					// No longer used
+					/* Original code
 					switch(iYield)
 					{
 					case YIELD_CULTURE:
@@ -6284,6 +6529,9 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 						ChangeBaseYieldRateFromReligion((YieldTypes)iYield, pReligion->m_Beliefs.GetYieldChangeAnySpecialist((YieldTypes)iYield));
 						break;
 					}
+					*/
+					ChangeBaseYieldRateFromReligion((YieldTypes)iYield, pReligion->m_Beliefs.GetYieldChangeAnySpecialist((YieldTypes)iYield));
+					// END Revamped yields
 				}
 
 				// Buildings
@@ -6311,6 +6559,9 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 								iYieldFromBuilding += pReligion->m_Beliefs.GetYieldChangeWorldWonder((YieldTypes)iYield);
 							}
 
+							// Revamped yields - v0.1, Snarko
+							// No longer used
+							/* Original code
 							switch(iYield)
 							{
 							case YIELD_CULTURE:
@@ -6323,6 +6574,9 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 								ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iYieldFromBuilding);
 								break;
 							}
+							*/
+							ChangeBaseYieldRateFromReligion((YieldTypes)iYield, iYieldFromBuilding);
+							// END Revamped yields
 						}
 					}
 				}
@@ -6332,7 +6586,9 @@ void CvCity::UpdateReligion(ReligionTypes eNewMajority)
 
 	GET_PLAYER(getOwner()).UpdateReligion();
 }
-
+// Revamped yields - v0.1, Snarko
+// No longer used, use getExtraSpecialistYield
+/* Original code
 //	--------------------------------------------------------------------------------
 /// Culture from eSpecialist
 int CvCity::GetCultureFromSpecialist(SpecialistTypes eSpecialist) const
@@ -6349,6 +6605,8 @@ int CvCity::GetCultureFromSpecialist(SpecialistTypes eSpecialist) const
 
 	return iCulture;
 }
+*/
+// END Revamped yields
 
 //	--------------------------------------------------------------------------------
 CvHandicapInfo& CvCity::getHandicapInfo() const
@@ -7424,6 +7682,7 @@ int CvCity::GetJONSCultureThreshold() const
 	// -50 = 50% cost
 	int iModifier = GET_PLAYER(getOwner()).GetPlotCultureCostModifier() + m_iPlotCultureCostModifier + iReligionMod;
 	*/
+	// END Bugfix
 	if(iModifier != 0)
 	{
 		iModifier = max(iModifier, /*-85*/ GC.getCULTURE_PLOT_COST_MOD_MINIMUM());	// value cannot reduced by more than 85%
@@ -7448,10 +7707,15 @@ int CvCity::GetJONSCultureThreshold() const
 
 
 //	--------------------------------------------------------------------------------
+// TODO remove this function entirely.
 int CvCity::getJONSCulturePerTurn() const
 {
 	VALIDATE_OBJECT
 
+	// Revamped yields - v0.1, Snarko
+	int iCulture = getYieldRate(YIELD_CULTURE, false);
+	return iCulture;
+	/*Original code
 	// No culture during Resistance
 	if(IsResistance() || IsRazing())
 	{
@@ -7462,6 +7726,7 @@ int CvCity::getJONSCulturePerTurn() const
 
 	int iModifier = 100;
 
+	
 	// City modifier
 	iModifier += getCultureRateModifier();
 	// Player modifier
@@ -7481,8 +7746,13 @@ int CvCity::getJONSCulturePerTurn() const
 	iCulture /= 100;
 
 	return iCulture;
+	*/
+	// END Revamped yields
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 //	--------------------------------------------------------------------------------
 int CvCity::GetBaseJONSCulturePerTurn() const
 {
@@ -7592,12 +7862,19 @@ int CvCity::GetJONSCulturePerTurnFromLeagues() const
 
 	return iValue;
 }
+*/
+// END Revamped yields
 
 //	--------------------------------------------------------------------------------
 int CvCity::GetFaithPerTurn() const
 {
 	VALIDATE_OBJECT
 
+	// Revamped yields - v0.1, Snarko
+	int iFaith = getYieldRate(YIELD_FAITH, false);
+	return iFaith;
+	// No longer used
+	/* Original code
 	// No faith during Resistance
 	if(IsResistance() || IsRazing())
 	{
@@ -7620,8 +7897,15 @@ int CvCity::GetFaithPerTurn() const
 	}
 
 	return iFaith;
+	*/
+	// END Revamped yields
+
+	
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 //	--------------------------------------------------------------------------------
 int CvCity::GetFaithPerTurnFromBuildings() const
 {
@@ -7693,7 +7977,61 @@ int CvCity::GetFaithPerTurnFromTraits() const
 
 	return iRtnValue;
 }
+*/
+// TODO figure out a way to cache this?
+int CvCity::GetYieldPerTurnFromTraits(YieldTypes eYield) const
+{
+	VALIDATE_OBJECT
 
+	int iRtnValue = 0;
+	int iNumFeatures;
+
+	if (GET_PLAYER(m_eOwner).GetPlayerTraits()->NumYieldFromFeatures() > 0)
+	{
+		for (int iI = 0; iI < GET_PLAYER(m_eOwner).GetPlayerTraits()->NumYieldFromFeatures(); iI++)
+		{
+			iNumFeatures = 0;
+			CvTraitYieldFromFeatures* pTraitFeatures = &(GET_PLAYER(m_eOwner).GetPlayerTraits()->GetYieldFromFeatures(iI));
+			int iRange = pTraitFeatures->GetRange();
+			for (int iDX = 0; iDX < iRange; iDX++)
+			{
+				for (int iDY = 0; iDY < iRange; iDY++)
+				{
+					CvPlot* pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, iRange);
+					if (pLoopPlot)
+					{
+						if (pLoopPlot->getFeatureType() != NO_FEATURE)
+						{
+							if (pTraitFeatures->IsFeature((int)pLoopPlot->getFeatureType()))
+							{
+								// Don't use no improvement and requires improvement at the same time. They are mutually exclusive.
+								bool bNoImprovement = (!pTraitFeatures->IsRequiresNoImprovement() || pLoopPlot->getImprovementType() == NO_IMPROVEMENT);
+								bool bIsImprovement = (!pTraitFeatures->IsRequiresImprovement() || pLoopPlot->getImprovementType() != NO_IMPROVEMENT);
+								if (bNoImprovement && bIsImprovement)
+								{
+									iNumFeatures++;
+								}
+							}
+						}
+					}
+				}
+			}
+			for (int iJ = 0; iJ < pTraitFeatures->NumYieldChanges(); iJ++)
+			{
+				TraitYieldFromFeatures* pTraitYields = &(pTraitFeatures->GetYieldChange(iJ));
+				if (pTraitYields->eYield == eYield && iNumFeatures > pTraitYields->iFeaturesRequired)
+				{
+					iRtnValue += pTraitYields->iChange;
+				}
+			}
+		}
+	}
+	
+	return iRtnValue;
+}
+
+// No longer used
+/* Original code
 //	--------------------------------------------------------------------------------
 int CvCity::GetFaithPerTurnFromReligion() const
 {
@@ -7727,6 +8065,8 @@ void CvCity::changeCultureRateModifier(int iChange)
 		m_iCultureRateModifier = (m_iCultureRateModifier + iChange);
 	}
 }
+*/
+// END Revamped yields
 
 
 //	--------------------------------------------------------------------------------
@@ -7746,8 +8086,13 @@ void CvCity::changeNumWorldWonders(int iChange)
 		m_iNumWorldWonders = (m_iNumWorldWonders + iChange);
 		CvAssert(getNumWorldWonders() >= 0);
 
+		// Revamped yields - v0.1, Snarko
+		// No longer used
+		/* Original code
 		// Extra culture for Wonders (Policies, etc.)
 		ChangeJONSCulturePerTurnFromPolicies(GET_PLAYER(getOwner()).GetCulturePerWonder() * iChange);
+		*/
+		// END Revamped yields
 	}
 }
 
@@ -8525,7 +8870,11 @@ int CvCity::GetLocalHappiness() const
 	{
 		if(GetGarrisonedUnit() != NULL)
 		{
-			iLocalHappiness++;
+			// Bugfix - v1.0, Snarko
+			// Allows for a source to give more than one happiness or multiple sources to all work together.
+			//iLocalHappiness++;
+			iLocalHappiness += iHappinessPerGarrison;
+			// END Bugfix
 		}
 	}
 
@@ -8618,6 +8967,10 @@ int CvCity::GetLocalHappiness() const
 	}
 
 	iLocalHappiness += iSpecialPolicyBuildingHappiness;
+
+	// EventEngine - v0.1, Snarko
+	iLocalHappiness += GetHappinessFromEvents();
+	// END EventEngine
 	int iLocalHappinessCap = getPopulation();
 
 	// India has unique way to compute local happiness cap
@@ -8667,6 +9020,20 @@ void CvCity::ChangeUnmoddedHappinessFromBuildings(int iChange)
 {
 	m_iUnmoddedHappinessFromBuildings += iChange;
 }
+
+// EventEngine - v0.1, Snarko
+//	--------------------------------------------------------------------------------
+int CvCity::GetHappinessFromEvents() const
+{
+	return m_iHappinessFromEvents;
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::ChangeHappinessFromEvents(int iChange)
+{
+	m_iHappinessFromEvents += iChange;
+}
+// END EventEngine
 
 //	--------------------------------------------------------------------------------
 /// Used when gathering info for "Annex/Puppet/Raze" popup
@@ -9185,6 +9552,11 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 	iModifier += iTempMod;
 	if(toolTipSink)
 		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_PLAYER_EVENT", iTempMod);
+
+	iTempMod = GetEventYieldRateModifier(eIndex);
+	iModifier += iTempMod;
+	if(toolTipSink)
+		GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_PLAYER_EVENT", iTempMod);
 	// END EventEngine
 
 	// Player Capital Yield Rate Modifier
@@ -9225,6 +9597,17 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 		}
 	}
 
+	// Revamped yields - v0.1, Snarko
+	// Wonder Yield Rate Modifier
+	iTempMod = GET_PLAYER(getOwner()).GetYieldWonderMultiplier(eIndex);
+	if (iTempMod != 0)
+	{
+		iModifier += iTempMod;
+		if (toolTipSink)
+			GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_YIELD_WONDER", iTempMod);
+	}
+	// END Revamped yields
+
 	// Puppet
 	if(IsPuppet())
 	{
@@ -9240,6 +9623,18 @@ int CvCity::getBaseYieldRateModifier(YieldTypes eIndex, int iExtra, CvString* to
 			iModifier += iTempMod;
 			if(iTempMod != 0 && toolTipSink)
 				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
+		// Revamped yields - v0.1, Snarko
+		case YIELD_CULTURE:
+			iTempMod = GC.getPUPPET_CULTURE_MODIFIER();
+			iModifier += iTempMod;
+			if (iTempMod != 0 && toolTipSink)
+				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
+		case YIELD_FAITH:
+			iTempMod = GC.getPUPPET_FAITH_MODIFIER();
+			iModifier += iTempMod;
+			if (iTempMod != 0 && toolTipSink)
+				GC.getGame().BuildProdModHelpText(toolTipSink, "TXT_KEY_PRODMOD_PUPPET", iTempMod);
+		// END Revamped yields
 		}
 	}
 
@@ -9279,24 +9674,46 @@ int CvCity::getHappinessModifier(YieldTypes eIndex) const
 }
 
 //	--------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// To include production
+/* Original code
 int CvCity::getYieldRate(YieldTypes eIndex, bool bIgnoreTrade) const
 {
 	VALIDATE_OBJECT
 	return (getYieldRateTimes100(eIndex, bIgnoreTrade) / 100);
 }
+*/
+int CvCity::getYieldRate(YieldTypes eIndex, bool bIgnoreTrade, int iExtraModifier) const
+{
+	VALIDATE_OBJECT
+	return (getYieldRateTimes100(eIndex, bIgnoreTrade) / 100, iExtraModifier);
+}
+// END Revamped yields
 
 //	--------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// To include production
+/* Original code
 int CvCity::getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade) const
+*/
+int CvCity::getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade, int iExtraModifier) const
+// END Revamped yields
 {
 	VALIDATE_OBJECT
 
 	// Resistance - no Science, Gold or Production (Prod handled in ProductionDifference)
 	if(IsResistance() || IsRazing())
 	{
+		// Revamped yields - v0.1, Snarko
+		// This function is used for all yields now and none of them gives anything in resistance or when being razed.
+		/* Original code
 		if(eIndex == YIELD_GOLD || eIndex == YIELD_SCIENCE)
 		{
 			return 0;
 		}
+		*/
+		return 0;
+		// END Revamped yields
 	}
 
 	int iProcessYield = 0;
@@ -9313,7 +9730,15 @@ int CvCity::getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade) const
 	iBaseYield += (GetYieldPerPopTimes100(eIndex) * getPopulation());
 	iBaseYield += (GetYieldPerReligionTimes100(eIndex) * GetCityReligions()->GetNumReligionsWithFollowers());
 
+	// Revamped yields - v0.1, Snarko
+	if (GetGarrisonedUnit() != NULL)
+		iBaseYield += GET_PLAYER(getOwner()).getYieldFromGarrison(eIndex);
+
+	/* Original code
 	int iModifiedYield = iBaseYield * getBaseYieldRateModifier(eIndex);
+	*/
+	int iModifiedYield = iBaseYield * getBaseYieldRateModifier(eIndex, iExtraModifier);
+	// END Revamped yields
 	iModifiedYield /= 100;
 
 	iModifiedYield += iProcessYield;
@@ -9326,6 +9751,16 @@ int CvCity::getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade) const
 
 	return iModifiedYield;
 }
+
+// Revamped yields - v0.1, Snarko
+int CvCity::getWonderExtraYield(YieldTypes eIndex) const
+{
+	int iValue = 0;
+	iValue += getNumWorldWonders() * GC.getGame().GetGameLeagues()->GetWorldWonderYieldChange(getOwner(), eIndex);
+	iValue += getNumWorldWonders() * GET_PLAYER(getOwner()).GetYieldPerWonder(eIndex);
+	return iValue;
+}
+// END Revamped yields
 
 
 //	--------------------------------------------------------------------------------
@@ -9341,6 +9776,15 @@ int CvCity::getBaseYieldRate(YieldTypes eIndex) const
 	iValue += GetBaseYieldRateFromSpecialists(eIndex);
 	iValue += GetBaseYieldRateFromMisc(eIndex);
 	iValue += GetBaseYieldRateFromReligion(eIndex);
+	// EventEngine - v0.1, Snarko
+	iValue += GetBaseYieldRateFromEvents(eIndex);
+	// END EventEngine
+
+	// Revamped yields - v0.1, Snarko
+	iValue += getWonderExtraYield(eIndex);
+	iValue += GetCityBuildings()->GetYieldFromGreatWorks(eIndex);
+	iValue += GetYieldPerTurnFromTraits(eIndex);
+	// END Revamped yields
 
 	return iValue;
 }
@@ -9516,6 +9960,68 @@ void CvCity::ChangeBaseYieldRateFromReligion(YieldTypes eIndex, int iChange)
 	}
 }
 
+// EventEngine - v0.1, Snarko
+//	--------------------------------------------------------------------------------
+int CvCity::GetBaseYieldRateFromEvents(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	return m_aiBaseYieldRateFromEvents[eIndex];
+}
+//	--------------------------------------------------------------------------------
+void CvCity::ChangeBaseYieldRateFromEvents(YieldTypes eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	if(iChange != 0)
+	{
+		m_aiBaseYieldRateFromEvents[eIndex] = m_aiBaseYieldRateFromEvents[eIndex] + iChange;
+
+		if(getTeam() == GC.getGame().getActiveTeam())
+		{
+			if(isCitySelected())
+			{
+				DLLUI->setDirty(CityScreen_DIRTY_BIT, true);
+			}
+		}
+	}
+}
+
+//	--------------------------------------------------------------------------------
+int CvCity::GetEventYieldRateModifier(YieldTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	return m_aiEventYieldRateModifier[eIndex];
+}
+//	--------------------------------------------------------------------------------
+void CvCity::ChangeEventYieldRateModifier(YieldTypes eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < NUM_YIELD_TYPES, "eIndex expected to be < NUM_YIELD_TYPES");
+
+	if(iChange != 0)
+	{
+		m_aiEventYieldRateModifier[eIndex] = m_aiEventYieldRateModifier[eIndex] + iChange;
+
+		if(getTeam() == GC.getGame().getActiveTeam())
+		{
+			if(isCitySelected())
+			{
+				DLLUI->setDirty(CityScreen_DIRTY_BIT, true);
+			}
+		}
+	}
+}
+// END EventEngine
+
 //	--------------------------------------------------------------------------------
 /// Extra yield for each pop point
 int CvCity::GetYieldPerPopTimes100(YieldTypes eIndex) const
@@ -9618,6 +10124,36 @@ void CvCity::changeResourceYieldRateModifier(YieldTypes eIndex, int iChange)
 }
 
 
+// EventEngine - v0.1, Snarko
+//	--------------------------------------------------------------------------------
+int CvCity::getCitySpecialistExtraYield(SpecialistTypes eIndex1, YieldTypes eIndex2) const
+{
+	CvAssertMsg(eIndex1 >= 0, "eIndex1 expected to be >= 0");
+	CvAssertMsg(eIndex1 < GC.getNumSpecialistInfos(), "eIndex1 expected to be < GC.getNumSpecialistInfos()");
+	CvAssertMsg(eIndex2 >= 0, "eIndex2 expected to be >= 0");
+	CvAssertMsg(eIndex2 < NUM_YIELD_TYPES, "eIndex2 expected to be < NUM_YIELD_TYPES");
+	return m_ppaaiSpecialistExtraYield[eIndex1][eIndex2];
+}
+//	--------------------------------------------------------------------------------
+void CvCity::changeCitySpecialistExtraYield(SpecialistTypes eIndex1, YieldTypes eIndex2, int iChange)
+{
+	CvAssertMsg(eIndex1 >= 0, "eIndex1 expected to be >= 0");
+	CvAssertMsg(eIndex1 < GC.getNumSpecialistInfos(), "eIndex1 expected to be < GC.getNumSpecialistInfos()");
+	CvAssertMsg(eIndex2 >= 0, "eIndex2 expected to be >= 0");
+	CvAssertMsg(eIndex2 < NUM_YIELD_TYPES, "eIndex2 expected to be < NUM_YIELD_TYPES");
+
+	if(iChange != 0)
+	{
+		Firaxis::Array<int, NUM_YIELD_TYPES> yields = m_ppaaiSpecialistExtraYield[eIndex1];
+		yields[eIndex2] = (m_ppaaiSpecialistExtraYield[eIndex1][eIndex2] + iChange);
+		m_ppaaiSpecialistExtraYield.setAt(eIndex1, yields);
+		CvAssert(getSpecialistExtraYield(eIndex1, eIndex2) >= 0);
+
+		updateExtraSpecialistYield();
+	}
+}
+// END EventEngine
+
 //	--------------------------------------------------------------------------------
 int CvCity::getExtraSpecialistYield(YieldTypes eIndex) const
 {
@@ -9642,9 +10178,17 @@ int CvCity::getExtraSpecialistYield(YieldTypes eIndex, SpecialistTypes eSpeciali
 		return 0;
 	}
 
+	// EventEngine - v0.1, Snarko
+	/* Original code
 	int iYieldMultiplier = GET_PLAYER(getOwner()).getSpecialistExtraYield(eSpecialist, eIndex) +
 	                       GET_PLAYER(getOwner()).getSpecialistExtraYield(eIndex) +
 	                       GET_PLAYER(getOwner()).GetPlayerTraits()->GetSpecialistYieldChange(eSpecialist, eIndex);
+	*/
+	int iYieldMultiplier = GET_PLAYER(getOwner()).getSpecialistExtraYield(eSpecialist, eIndex) +
+	                       GET_PLAYER(getOwner()).getSpecialistExtraYield(eIndex) +
+	                       GET_PLAYER(getOwner()).GetPlayerTraits()->GetSpecialistYieldChange(eSpecialist, eIndex) +
+						   getCitySpecialistExtraYield(eSpecialist, eIndex);
+	// END EventEngine
 	int iExtraYield = GetCityCitizens()->GetSpecialistCount(eSpecialist) * iYieldMultiplier;
 
 	return iExtraYield;
@@ -9843,6 +10387,25 @@ void CvCity::setEverOwned(PlayerTypes eIndex, bool bNewValue)
 	CvAssertMsg(eIndex < MAX_PLAYERS, "eIndex expected to be < MAX_PLAYERS");
 	m_abEverOwned.setAt(eIndex, bNewValue);
 }
+
+// EventEngine - v0.1, Snarko
+//	--------------------------------------------------------------------------------
+bool CvCity::isEverConquered(PlayerTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < MAX_PLAYERS, "eIndex expected to be < MAX_PLAYERS");
+	return m_abEverConquered[eIndex];
+}
+//	--------------------------------------------------------------------------------
+void CvCity::setEverConquered(PlayerTypes eIndex, bool bNewValue)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < MAX_PLAYERS, "eIndex expected to be < MAX_PLAYERS");
+	m_abEverConquered.setAt(eIndex, bNewValue);
+}
+// END EventEngine
 
 //	--------------------------------------------------------------------------------
 bool CvCity::isRevealed(TeamTypes eIndex, bool bDebug) const
@@ -13183,6 +13746,12 @@ void CvCity::read(FDataStream& kStream)
 	// Version number to maintain backwards compatibility
 	uint uiVersion;
 	kStream >> uiVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem! Well, except mod versions created before using our modcomp(s)...
+	uint modVersion;
+	kStream >> modVersion;
+	// END modVersion
 
 	kStream >> m_iID;
 	kStream >> m_iX;
@@ -13198,17 +13767,20 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_iGreatPeopleRateModifier;
 	kStream >> m_iJONSCultureStored;
 	kStream >> m_iJONSCultureLevel;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	kStream >> m_iJONSCulturePerTurnFromBuildings;
 	kStream >> m_iJONSCulturePerTurnFromPolicies;
 	kStream >> m_iJONSCulturePerTurnFromSpecialists;
 	kStream >> m_iJONSCulturePerTurnFromReligion;
 	kStream >> m_iFaithPerTurnFromBuildings;
-
 	kStream >> m_iFaithPerTurnFromPolicies;
-
 	kStream >> m_iFaithPerTurnFromReligion;
-
 	kStream >> m_iCultureRateModifier;
+	*/
+	// END Revamped yields
 	kStream >> m_iNumWorldWonders;
 	kStream >> m_iNumTeamWonders;
 	kStream >> m_iNumNationalWonders;
@@ -13289,6 +13861,11 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_aiBaseYieldRateFromSpecialists;
 	kStream >> m_aiBaseYieldRateFromMisc;
 	kStream >> m_aiBaseYieldRateFromReligion;
+	// EventEngine - v0.1, Snarko
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	kStream >> m_aiBaseYieldRateFromEvents;
+	kStream >> m_aiEventYieldRateModifier;
+	// END EventEngine
 	kStream >> m_aiYieldPerPop;
 	if (uiVersion >= 4)
 	{
@@ -13305,11 +13882,19 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> m_aiPowerYieldRateModifier;
 	kStream >> m_aiResourceYieldRateModifier;
 	kStream >> m_aiExtraSpecialistYield;
+	// EventEngine - v0.1, Snarko
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	kStream >> m_ppaaiSpecialistExtraYield;
+	// END EventEngine
 	kStream >> m_aiProductionToYieldModifier;
 	kStream >> m_aiDomainFreeExperience;
 	kStream >> m_aiDomainProductionModifier;
 
 	kStream >> m_abEverOwned;
+	// EventEngine - v0.1, Snarko
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	kStream >> m_abEverConquered;
+	// END EventEngine
 	kStream >> m_abRevealed;
 
 	kStream >> m_strName;
@@ -13442,6 +14027,10 @@ void CvCity::read(FDataStream& kStream)
 	// City Building Happiness
 	kStream >> m_iBaseHappinessFromBuildings;
 	kStream >> m_iUnmoddedHappinessFromBuildings;
+	// EventEngine - v0.1, Snarko
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	kStream >> m_iHappinessFromEvents;
+	// END EventEngine
 
 	kStream >> m_bRouteToCapitalConnectedLastTurn;
 	kStream >> m_bRouteToCapitalConnectedThisTurn;
@@ -13496,6 +14085,12 @@ void CvCity::write(FDataStream& kStream) const
 	// Current version number
 	uint uiVersion = 5;
 	kStream << uiVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem!
+	uint modVersion = 1;
+	kStream << modVersion;
+	// END modVersion
 
 	kStream << m_iID;
 	kStream << m_iX;
@@ -13511,6 +14106,9 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iGreatPeopleRateModifier;
 	kStream << m_iJONSCultureStored;
 	kStream << m_iJONSCultureLevel;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	kStream << m_iJONSCulturePerTurnFromBuildings;
 	kStream << m_iJONSCulturePerTurnFromPolicies;
 	kStream << m_iJONSCulturePerTurnFromSpecialists;
@@ -13519,6 +14117,8 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_iFaithPerTurnFromPolicies;
 	kStream << m_iFaithPerTurnFromReligion;
 	kStream << m_iCultureRateModifier;
+	*/
+	// END Revamped yields
 	kStream << m_iNumWorldWonders;
 	kStream << m_iNumTeamWonders;
 	kStream << m_iNumNationalWonders;
@@ -13589,17 +14189,27 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << m_aiBaseYieldRateFromSpecialists;
 	kStream << m_aiBaseYieldRateFromMisc;
 	kStream << m_aiBaseYieldRateFromReligion;
+	// EventEngine - v0.1, Snarko
+	kStream << m_aiBaseYieldRateFromEvents;
+	kStream << m_aiEventYieldRateModifier;
+	// END EventEngine
 	kStream << m_aiYieldPerPop;
 	kStream << m_aiYieldPerReligion;
 	kStream << m_aiYieldRateModifier;
 	kStream << m_aiPowerYieldRateModifier;
 	kStream << m_aiResourceYieldRateModifier;
 	kStream << m_aiExtraSpecialistYield;
+	// EventEngine - v0.1, Snarko
+	kStream << m_ppaaiSpecialistExtraYield;
+	// END EventEngine
 	kStream << m_aiProductionToYieldModifier;
 	kStream << m_aiDomainFreeExperience;
 	kStream << m_aiDomainProductionModifier;
 
 	kStream << m_abEverOwned;
+	// EventEngine - v0.1, Snarko
+	kStream << m_abEverConquered;
+	// END EventEngine
 	kStream << m_abRevealed;
 
 	kStream << m_strName;
@@ -13690,6 +14300,9 @@ void CvCity::write(FDataStream& kStream) const
 
 	kStream << m_iBaseHappinessFromBuildings;
 	kStream << m_iUnmoddedHappinessFromBuildings;
+	// EventEngine - v0.1, Snarko
+	kStream << m_iHappinessFromEvents;
+	// END EventEngine
 
 	kStream << m_bRouteToCapitalConnectedLastTurn;
 	kStream << m_bRouteToCapitalConnectedThisTurn;
@@ -15044,15 +15657,32 @@ bool CvCity::isFighting() const
 
 //	----------------------------------------------------------------------------
 // EventEngine - v0.1, Snarko
+void CvCity::setFlag(std::string szFlag, int iValue)
+{
+	m_asziFlags[szFlag] = iValue;
+}
+
+void CvCity::changeFlag(std::string szFlag, int iValue)
+{
+	setFlag(szFlag, getFlag(szFlag) + iValue);
+}
+
+int CvCity::getFlag(std::string szFlag) const
+{
+	std::map<std::string, int>::const_iterator it = m_asziFlags.find(szFlag);
+	if (it == m_asziFlags.end())
+		return NULL;
+	else
+		return it->second;
+}
+
 void CvCity::doEvents()
 {
 	bool bValid;
 	CvPlayer &pPlayer = GET_PLAYER(getOwner());
-	std::map<std::string, std::vector<int> > asziScopes;
 
 	for (int i = 0; i < GC.getNumEventInfos(); i++)
 	{
-		asziScopes.clear();
 		bValid = true;
 		CvEventInfo* kEvent = GC.getEventInfo((EventTypes)i);
 		if (kEvent->getEventType() != EVENT_CITY)
@@ -15071,7 +15701,7 @@ void CvCity::doEvents()
 			}
 			else if (kRequirement.getModifierType() > EVENTMOD_PLAYER_START && kRequirement.getModifierType() < EVENTMOD_PLAYER_END)
 			{
-				if (!pPlayer.checkEventModifier(kRequirement, asziScopes))
+				if (!pPlayer.checkEventModifier(kRequirement))
 				{
 					bValid = false;
 					break;
@@ -15085,12 +15715,12 @@ void CvCity::doEvents()
 		}
 		if (bValid)
 		{
-			pPlayer.doEventChance(*kEvent, asziScopes, this);
+			pPlayer.doEventChance(*kEvent, this);
 		}
 	}
 }
 
-bool CvCity::checkEventModifier(CvEventModifierInfo& kModifier)
+bool CvCity::checkEventModifier(CvEventModifierInfo& kModifier, bool bRequirement)
 {
 	int iValue = 0;
 	CvCityEspionage* pCityEspionage = GetCityEspionage();
@@ -15105,8 +15735,13 @@ bool CvCity::checkEventModifier(CvEventModifierInfo& kModifier)
 		iValue = getStrengthValue();
 		break;
 
-	case EVENTMOD_CITY_YIELD:
+	case EVENTMOD_CITY_BASE_YIELD:
 		iValue = getBaseYieldRate((YieldTypes)kModifier.getTypeToCompare());
+		iValue += (GetYieldPerPopTimes100((YieldTypes)kModifier.getTypeToCompare()) * getPopulation());
+		iValue += (GetYieldPerReligionTimes100((YieldTypes)kModifier.getTypeToCompare()) * GetCityReligions()->GetNumReligionsWithFollowers());
+
+		if (GetGarrisonedUnit() != NULL)
+			iValue += GET_PLAYER(getOwner()).getYieldFromGarrison((YieldTypes)kModifier.getTypeToCompare());
 		break;
 
 	case EVENTMOD_CITY_MODIFIEDYIELD:
@@ -15121,41 +15756,185 @@ bool CvCity::checkEventModifier(CvEventModifierInfo& kModifier)
 		iValue = getPopulation();
 		break;
 
-	case EVENTMOD_CITY_SPY_PRESENT:
+	case EVENTMOD_CITY_OWN_SPY_PRESENT:
+		if (pCityEspionage)
+			return GC.EventBoolEval(pCityEspionage->HasCounterSpy(), kModifier);
+		else
+			return GC.EventBoolEval(false, kModifier);
+		break;
+	case EVENTMOD_CITY_SPY_RANK:
 		if(pCityEspionage)
 		{
-			//Looking for a specific civ (including ourselves!)
-			if (kModifier.getTypeToCompare() != -1)
+			// Civilization in Set
+			if (kModifier.getSet() != "default")
 			{
-				for(int i = 0; i < MAX_MAJOR_CIVS; i++)
+				return GET_PLAYER(getOwner()).testSetItems(kModifier, MAX_MAJOR_CIVS, bRequirement, this);
+			}
+			// Looking for a specific civilization (including ourselves!)
+			else if (kModifier.getTypeToCompare() != -1)
+			{
+				for(int iI = 0; iI < MAX_MAJOR_CIVS; iI++)
 				{
-					if (GET_PLAYER((PlayerTypes)i).isAlive())
+					if (GET_PLAYER((PlayerTypes)iI).isAlive())
 					{
-						if (GET_PLAYER((PlayerTypes)i).getCivilizationType() == (CivilizationTypes)kModifier.getTypeToCompare())
+						if (GET_PLAYER((PlayerTypes)iI).getCivilizationType() == (CivilizationTypes)kModifier.getTypeToCompare())
 						{
-							bool bAssignedSpy = (pCityEspionage->m_aiSpyAssignment[i] != -1);
-							return GC.EventBoolEval(bAssignedSpy, kModifier);
+							int iSpy = pCityEspionage->m_aiSpyAssignment[iI];
+							if (iSpy != -1)
+								iValue = (int)GET_PLAYER((PlayerTypes)iI).GetEspionage()->m_aSpyList[iSpy].m_eRank;
 						}
 					}
 				}
 			}
-			else //Any civ that isn't us.
+			else
 			{
-				for(int i = 0; i < MAX_MAJOR_CIVS; i++)
+				for(int iI = 0; iI < MAX_MAJOR_CIVS; iI++)
 				{
-					if (GET_PLAYER((PlayerTypes)i).isAlive() && GET_PLAYER((PlayerTypes)i).GetID() != GetID())
+					if (GET_PLAYER((PlayerTypes)iI).isAlive() && (kModifier.getNumberToCompare() == -1 || GET_PLAYER((PlayerTypes)iI).GetID() != getOwner()))
 					{
-						bool bAssignedSpy = (pCityEspionage->m_aiSpyAssignment[i] != -1);
-						return GC.EventBoolEval(bAssignedSpy, kModifier);
+						int iSpy = pCityEspionage->m_aiSpyAssignment[iI];
+						if (iSpy != -1)
+						{
+							if ((int)GET_PLAYER((PlayerTypes)iI).GetEspionage()->m_aSpyList[iSpy].m_eRank > iValue)
+							{
+								if (GC.EventIntEval((int)GET_PLAYER((PlayerTypes)iI).GetEspionage()->m_aSpyList[iSpy].m_eRank, kModifier))
+									return true;
+							}
+						}
 					}
 				}
 			}
-			//TODO: self civ
 		}
-		else //No spies in city, return true if we are testing for no spy in city.
+		// No spies in city, do not pass.
+		else 
 		{
-			return (kModifier.getCompareType() == COMPARE_NOTEQUAL);
+			return false;
 		}
+		break;
+
+	// These share code so much we make one case for them.
+	case EVENTMOD_CITY_NUM_SPY:
+	case EVENTMOD_CITY_NUM_DIPLOMAT:
+	case EVENTMOD_CITY_NUM_SPY_TOTAL:
+	{
+		if(pCityEspionage)
+		{
+			// This is a special case.
+			// We can't call testSetItems because we are supposed to count them.
+			if (kModifier.getSet() != "default")
+			{
+				std::vector< std::pair<int, int> > aSets;
+				GET_PLAYER(getOwner()).getSet(kModifier.getSet(), aSets);
+				if (!aSets.empty())
+				{
+					std::vector< std::pair<int, int> >::iterator iter = aSets.begin();
+					while (iter != aSets.end())
+					{
+						if (pCityEspionage->m_aiSpyAssignment[iter->first] != -1 && (kModifier.getNumberToCompare() == -1 || GET_PLAYER((PlayerTypes)iter->first).GetID() != getOwner()))
+						{
+							int iSpy = pCityEspionage->m_aiSpyAssignment[iter->first];
+							++iter;
+							bool bPass = false;
+							if (kModifier.getModifierType() == (int)EVENTMOD_CITY_NUM_DIPLOMAT && GET_PLAYER((PlayerTypes)iter->first).GetEspionage()->m_aSpyList[iSpy].m_bIsDiplomat)
+								bPass = true;
+							else if (kModifier.getModifierType() == (int)EVENTMOD_CITY_NUM_SPY && !(GET_PLAYER((PlayerTypes)iter->first).GetEspionage()->m_aSpyList[iSpy].m_bIsDiplomat))
+								bPass = true;
+							else if (kModifier.getModifierType() == (int)EVENTMOD_CITY_NUM_SPY_TOTAL)
+								bPass = true;
+							if (bPass)
+							{
+								iValue++;
+								// If a modifier, modify the value to alter the chance of this specific item being chosen.
+								if (!bRequirement)
+								{
+									if (kModifier.getFactor() == 0)
+										iter->second = 0;
+									else
+									{
+										// Change the modifier by the inverse of the modifier.
+										// We do this because it makes it easier to do a weighted random list later on.
+										// Then we just inverse the modifier again when we want to alter the event chance.
+										iter->second *= 100;
+										iter->second /= kModifier.getFactor();
+									}
+								}
+							}
+						}
+						else if (bRequirement)
+							iter = aSets.erase(iter);
+						else
+							++iter;
+					}
+				}
+				// It is empty. Set it. 
+				// We should never get here with it being empty, but having already been checked.
+				// If it has been checked and nothing met the requirements we should have already returned false when checking that requirement.
+				// This will add the civs to the Set if they meet the requirement, and then count them.
+				else if (bRequirement)
+				{
+					for (int iI = 0; iI < MAX_MAJOR_CIVS; iI++)
+					{
+						if (GET_PLAYER((PlayerTypes)iI).isAlive() && (kModifier.getNumberToCompare() == -1 || GET_PLAYER((PlayerTypes)iI).GetID() != getOwner()))
+						{
+							int iSpy = pCityEspionage->m_aiSpyAssignment[iI];
+							if (iSpy != -1)
+							{
+								if (kModifier.getModifierType() == (int)EVENTMOD_CITY_NUM_DIPLOMAT && GET_PLAYER((PlayerTypes)iI).GetEspionage()->m_aSpyList[iSpy].m_bIsDiplomat)
+								{
+									iValue++;
+									aSets.push_back(std::make_pair(iI, BASE_MODIFIER_CHANCE_SETS));
+								}
+								else if (kModifier.getModifierType() == (int)EVENTMOD_CITY_NUM_SPY && !(GET_PLAYER((PlayerTypes)iI).GetEspionage()->m_aSpyList[iSpy].m_bIsDiplomat))
+								{
+									iValue++;
+									aSets.push_back(std::make_pair(iI, BASE_MODIFIER_CHANCE_SETS));
+								}
+								else if (kModifier.getModifierType() == (int)EVENTMOD_CITY_NUM_SPY_TOTAL)
+								{
+									iValue++;
+									aSets.push_back(std::make_pair(iI, BASE_MODIFIER_CHANCE_SETS));
+								}
+							}
+						}
+					}
+				}
+				if (aSets.empty())
+				{
+					return false;
+				}
+				else
+				{
+					// Requirements modify how many values we have (or add them in the first place), modifiers changes the chance.
+					// Either way we need to update the map with the new data.
+					GET_PLAYER(getOwner()).setSet(kModifier.getSet(), aSets);
+					// Do not return. Check iValue later as normal.
+				}
+			}
+			else
+			{
+				for(int iI = 0; iI < MAX_MAJOR_CIVS; iI++)
+				{
+					if (GET_PLAYER((PlayerTypes)iI).isAlive() && (kModifier.getNumberToCompare() == -1 || GET_PLAYER((PlayerTypes)iI).GetID() != getOwner()))
+					{
+						int iSpy = pCityEspionage->m_aiSpyAssignment[iI];
+						if (iSpy != -1)
+						{
+							if (kModifier.getModifierType() == (int)EVENTMOD_CITY_NUM_DIPLOMAT && GET_PLAYER((PlayerTypes)iI).GetEspionage()->m_aSpyList[iSpy].m_bIsDiplomat)
+								iValue++;
+							else if (kModifier.getModifierType() == (int)EVENTMOD_CITY_NUM_SPY && !(GET_PLAYER((PlayerTypes)iI).GetEspionage()->m_aSpyList[iSpy].m_bIsDiplomat))
+								iValue++;
+							else if (kModifier.getModifierType() == (int)EVENTMOD_CITY_NUM_SPY_TOTAL)
+								iValue++;
+						}
+					}
+				}
+			}
+		}
+		else // No spies in city
+		{
+			iValue = 0;
+		}
+	}
 		break;
 
 	case EVENTMOD_CITY_IS_CAPITAL:
@@ -15167,11 +15946,60 @@ bool CvCity::checkEventModifier(CvEventModifierInfo& kModifier)
 		break;
 
 	case EVENTMOD_CITY_SPECIALIST:
-		iValue = GetCityCitizens()->GetSpecialistCount((SpecialistTypes)kModifier.getTypeToCompare());
+		// Any specialist in Set
+		if (kModifier.getSet() != "default")
+		{
+			return GET_PLAYER(getOwner()).testSetItems(kModifier, GC.getNumSpecialistInfos(), bRequirement, this);
+		}
+		// Specific resource being worked
+		else if (kModifier.getTypeToCompare() != -1)
+		{
+			iValue = GetCityCitizens()->GetSpecialistCount((SpecialistTypes)kModifier.getTypeToCompare());
+		}
+		// Any specialist meets the requirements
+		// I don't think this will be used but you never know
+		else
+		{
+			for (int iI = 0; iI < GC.getNumSpecialistInfos(); iI++)
+			{
+				if (GC.EventIntEval(GetCityCitizens()->GetSpecialistCount((SpecialistTypes)iI), kModifier))
+					return true;
+			}
+		}		
 		break;
 
 	case EVENTMOD_CITY_BUILDING:
-		iValue = GetCityBuildings()->GetNumBuilding((BuildingTypes)kModifier.getTypeToCompare());
+		if (kModifier.getSet() == "default")
+			// Type to compare -1 means check everything
+			if (kModifier.getTypeToCompare() == -1)
+				iValue = GetCityBuildings()->GetNumBuildings();
+			else
+				iValue = GetCityBuildings()->GetNumBuilding((BuildingTypes)kModifier.getTypeToCompare());
+		else
+			iValue = GET_PLAYER(getOwner()).testSetItems(kModifier, GC.getNumBuildingInfos(), bRequirement, this);
+		break;
+
+	case EVENTMOD_CITY_BUILDINGCLASS:
+		{
+			if (kModifier.getSet() == "default")
+			{
+				// Type to compare -1 means check everything
+				if (kModifier.getTypeToCompare() == -1)
+					iValue = GetCityBuildings()->GetNumBuildings();
+				else
+				{
+					for (int iI = 0; iI < GC.getNumBuildingInfos(); iI++)
+					{
+						if (GC.getBuildingInfo((BuildingTypes)iI)->GetBuildingClassType() == kModifier.getTypeToCompare())
+						{
+							iValue += GetCityBuildings()->GetNumBuilding((BuildingTypes)iI);
+						}
+					}
+				}
+			}
+			else
+				return GET_PLAYER(getOwner()).testSetItems(kModifier, GC.getNumBuildingInfos(), bRequirement, this);
+		}
 		break;
 
 	case EVENTMOD_CITY_NATIONAL_WONDERS:
@@ -15188,67 +16016,454 @@ bool CvCity::checkEventModifier(CvEventModifierInfo& kModifier)
 
 	case EVENTMOD_CITY_WORKING_RESOURCE:
 	{
-		// Loop through all plots near this City to see if we can find eResource - tests are ordered to optimize performance
-		CvPlot* pLoopPlot;
-		ResourceTypes eResource = (ResourceTypes)kModifier.getTypeToCompare();
-		bool bFoundResource = false;
-		for(int iCityPlotLoop = 0; iCityPlotLoop < NUM_CITY_PLOTS; iCityPlotLoop++)
+		// Any resource in Set
+		if (kModifier.getSet() != "default")
 		{
-			pLoopPlot = plotCity(getX(), getY(), iCityPlotLoop);
-
-			// Invalid plot
-			if(pLoopPlot == NULL)
-				continue;
-
-			// Doesn't have the resource (ignore team first to save time)
-			if(pLoopPlot->getResourceType() != eResource)
-				continue;
-
-			// Not owned by this player
-			if(pLoopPlot->getOwner() != getOwner())
-				continue;
-
-			// Team can't see the resource here
-			if(pLoopPlot->getResourceType(getTeam()) != eResource)
-				continue;
-
-			// Resource not linked to this city
-			if(pLoopPlot->GetResourceLinkedCity() != this)
-				continue;
-
-			//Resource not worked
-			if(!GetCityCitizens()->IsWorkingPlot(pLoopPlot))
-				continue;
-
-			bFoundResource = true;
-			break;
+			return GET_PLAYER(getOwner()).testSetItems(kModifier, GC.getNumResourceInfos(), bRequirement, this);
 		}
-		return GC.EventBoolEval(bFoundResource, kModifier);
+		// Specific resource being worked
+		else if (kModifier.getTypeToCompare() != -1)
+		{
+			bool bWorkingResource = IsWorkingResource((ResourceTypes)kModifier.getTypeToCompare());
+			return GC.EventBoolEval(bWorkingResource, kModifier);
+		}
+		// Any resource being worked
+		else
+		{
+			// Loop through all plots near this City to see if we can find a resource - tests are ordered to optimize performance
+			CvPlot* pLoopPlot;
+			bool bFoundResource = false;
+			for(int iCityPlotLoop = 0; iCityPlotLoop < NUM_CITY_PLOTS; iCityPlotLoop++)
+			{
+				pLoopPlot = plotCity(getX(), getY(), iCityPlotLoop);
+
+				// Invalid plot
+				if(pLoopPlot == NULL)
+					continue;
+
+				// Doesn't have a resource (ignore team first to save time)
+				if(pLoopPlot->getResourceType() != NO_RESOURCE)
+					continue;
+
+				// Not owned by this player
+				if(pLoopPlot->getOwner() != getOwner())
+					continue;
+
+				// Team can't see the resource here
+				if(pLoopPlot->getResourceType(getTeam()) != NO_RESOURCE)
+					continue;
+
+				// Resource not linked to this city
+				if(pLoopPlot->GetResourceLinkedCity() != this)
+					continue;
+
+				// Resource not worked
+				if(!GetCityCitizens()->IsWorkingPlot(pLoopPlot))
+					continue;
+
+				bFoundResource = true;
+				break;
+			}
+			return GC.EventBoolEval(bFoundResource, kModifier);
+		}
+		break;
 	}
 	case EVENTMOD_CITY_HAS_RESOURCE:
-		return GC.EventBoolEval(IsHasResourceLocal((ResourceTypes)kModifier.getTypeToCompare(), true), kModifier);
-
-	case EVENTMOD_CITY_HAS_RELIGION:
-		if ((ReligionTypes)kModifier.getTypeToCompare() == NO_RELIGION)
+		// Any resource in Set
+		if (kModifier.getSet() != "default")
 		{
-			return GC.EventBoolEval(GetCityReligions()->IsReligionInCity(), kModifier);
+			return GET_PLAYER(getOwner()).testSetItems(kModifier, GC.getNumResourceInfos(), bRequirement, this);
 		}
+		// Specific resource
+		else if (kModifier.getTypeToCompare() != -1)
+		{
+			return GC.EventBoolEval(IsHasResourceLocal((ResourceTypes)kModifier.getTypeToCompare(), true), kModifier);
+		}
+		// Any resource
 		else
 		{
-			return GC.EventBoolEval(GetCityReligions()->GetNumFollowers((ReligionTypes)kModifier.getTypeToCompare()), kModifier);
+			// Loop through all plots near this City to see if we can find a resource - tests are ordered to optimize performance
+			CvPlot* pLoopPlot;
+			bool bFoundResource = false;
+			for(int iCityPlotLoop = 0; iCityPlotLoop < NUM_CITY_PLOTS; iCityPlotLoop++)
+			{
+				pLoopPlot = plotCity(getX(), getY(), iCityPlotLoop);
+
+				// Invalid plot
+				if(pLoopPlot == NULL)
+					continue;
+
+				// Doesn't have a resource (ignore team first to save time)
+				if(pLoopPlot->getResourceType() != NO_RESOURCE)
+					continue;
+
+				// Not owned by this player
+				if(pLoopPlot->getOwner() != getOwner())
+					continue;
+
+				// Team can't see the resource here
+				if(pLoopPlot->getResourceType(getTeam()) != NO_RESOURCE)
+					continue;
+
+				// Resource not linked to this city
+				if(pLoopPlot->GetResourceLinkedCity() != this)
+					continue;
+
+				bFoundResource = true;
+				break;
+			}
+			return GC.EventBoolEval(bFoundResource, kModifier);
 		}
+		break;
+
+	case EVENTMOD_CITY_RELIGION_PRESSURE:
+		// Any religion in Set
+		if (kModifier.getSet() != "default")
+		{
+			return GET_PLAYER(getOwner()).testSetItems(kModifier, GC.getNumReligionInfos(), bRequirement, this);
+		}
+		// Specific religion
+		else if ((ReligionTypes)kModifier.getTypeToCompare() != NO_RELIGION)
+		{
+			iValue = GetCityReligions()->GetPressure((ReligionTypes)kModifier.getTypeToCompare());
+		}
+		// Any religion
+		else
+		{
+			for (int iI = 0; iI < GC.getNumReligionInfos(); iI++)
+			{
+				iValue = GetCityReligions()->GetPressure((ReligionTypes)iI);
+				if (GC.EventIntEval(iValue, kModifier))
+					return true;
+			}
+			return false;
+		}
+		break;
 		
 	case EVENTMOD_CITY_FOLLOWERS_RELIGION:
-		if ((ReligionTypes)kModifier.getTypeToCompare() == NO_RELIGION)
+		// Any religion in Set
+		if (kModifier.getSet() != "default")
 		{
-			iValue = GC.EventBoolEval(GetCityReligions()->IsReligionInCity(), kModifier);
+			return GET_PLAYER(getOwner()).testSetItems(kModifier, GC.getNumReligionInfos(), bRequirement, this);
+		}
+		// Specific religion
+		else if ((ReligionTypes)kModifier.getTypeToCompare() != NO_RELIGION)
+		{
+			iValue = GetCityReligions()->GetNumFollowers((ReligionTypes)kModifier.getTypeToCompare());
+			
+		}
+		// Any religion
+		else
+		{
+			for (int iI = 0; iI < GC.getNumReligionInfos(); iI++)
+			{
+				iValue = GetCityReligions()->GetNumFollowers((ReligionTypes)iI);
+				if (GC.EventIntEval(iValue, kModifier))
+					return true;
+			}
+			return false;
+		}
+		break;
+
+	case EVENTMOD_CITY_RELIGION_HOLY:
+		// Any religion in Set
+		if (kModifier.getSet() != "default")
+		{
+			return GET_PLAYER(getOwner()).testSetItems(kModifier, GC.getNumReligionInfos(), bRequirement, this);
+		}
+		// Specific religion
+		else if ((ReligionTypes)kModifier.getTypeToCompare() != NO_RELIGION)
+		{
+			return GC.EventBoolEval(GetCityReligions()->IsHolyCityForReligion((ReligionTypes)kModifier.getTypeToCompare()), kModifier);
+		}
+		// Any religion
+		else
+		{
+			return GC.EventBoolEval(GetCityReligions()->IsHolyCityAnyReligion(), kModifier);
+		}
+		break;
+
+	case EVENTMOD_CITY_EVER_OWNED:
+		// Ever owned by any player (actually civilization) in Set
+		if (kModifier.getSet() != "default")
+		{
+			return GET_PLAYER(getOwner()).testSetItems(kModifier, MAX_PLAYERS, bRequirement, this);
+		}
+		// Ever owned by specific civ
+		if ((CivilizationTypes)kModifier.getTypeToCompare() != NO_CIVILIZATION)
+		{
+			for (int iI = 0; iI < MAX_PLAYERS; iI++)
+			{
+				if (GET_PLAYER((PlayerTypes)iI).getCivilizationType() == (CivilizationTypes)kModifier.getTypeToCompare())
+				{
+					return GC.EventBoolEval(isEverOwned((PlayerTypes)iI), kModifier);
+				}
+			}
+		}
+		// Any civilization.
+		// It makes no sense to test for this, because a city is by definition always owned by someone.
+		// So don't test for it.
+		else
+			return false;
+
+	case EVENTMOD_CITY_EVER_CONQUERED:
+		// Conquered by any player (actually civilization) in Set
+		if (kModifier.getSet() != "default")
+		{
+			return GET_PLAYER(getOwner()).testSetItems(kModifier, MAX_PLAYERS, bRequirement, this);
+		}
+		// Conquered by specific civ
+		else if ((CivilizationTypes)kModifier.getTypeToCompare() != NO_CIVILIZATION)
+		{
+			for (int iI = 0; iI < MAX_PLAYERS; iI++)
+			{
+				if (GET_PLAYER((PlayerTypes)iI).getCivilizationType() == (CivilizationTypes)kModifier.getTypeToCompare())
+				{
+					return GC.EventBoolEval(isEverConquered((PlayerTypes)iI), kModifier);
+				}
+			}
+		}
+		// Has ever been conquered (by anyone)
+		else
+		{
+			for (int iI = 0; iI < MAX_PLAYERS; iI++)
+			{
+				if (GC.EventBoolEval(isEverConquered((PlayerTypes)iI), kModifier))
+					return true;
+			}
+			return false;
+		}
+		break;
+
+	case EVENTMOD_CITY_ORIGINAL_OWNER:
+		// Original owner is any player (actually civilization) in Set
+		if (kModifier.getSet() != "default")
+		{
+			return GET_PLAYER(getOwner()).testSetItems(kModifier, -1, bRequirement, this);
+		}
+		// Original owner is specific civilization
+		else if ((CivilizationTypes)kModifier.getTypeToCompare() != NO_CIVILIZATION)
+		{
+			PlayerTypes ePlayer = getOriginalOwner();
+			bool bOriginalOwner = GET_PLAYER(ePlayer).getCivilizationType() == (CivilizationTypes)kModifier.getTypeToCompare();
+			return GC.EventBoolEval(bOriginalOwner, kModifier);
+		}
+		// Any civilization.
+		// It makes no sense to test for this, because by definition someone is always the original owner.
+		// So don't test for it.
+		else
+			return false;
+		break;
+
+	// These share code so much we make one case for them.
+	case EVENTMOD_CITY_NUM_FEATURE_IN_RANGE:
+	case EVENTMOD_CITY_NUM_IMPROVEMENT_IN_RANGE:
+	case EVENTMOD_CITY_NUM_RESOURCE_IN_RANGE:
+	case EVENTMOD_CITY_NUM_TERRAIN_IN_RANGE:
+		{
+			int iMaxRange = kModifier.getNumberToCompare();
+			int iDX, iDY;
+			CvPlot* pLoopPlot;
+			int iItem;
+
+			std::vector<int> iNumItems;
+			if (kModifier.getModifierType() == EVENTMOD_CITY_NUM_FEATURE_IN_RANGE)
+				iNumItems.resize(GC.getNumFeatureInfos(), 0);
+			else if (kModifier.getModifierType() == EVENTMOD_CITY_NUM_IMPROVEMENT_IN_RANGE)
+				iNumItems.resize(GC.getNumImprovementInfos(), 0);
+			else if (kModifier.getModifierType() == EVENTMOD_CITY_NUM_RESOURCE_IN_RANGE)
+				iNumItems.resize(GC.getNumResourceInfos(), 0);
+			else // EVENTMOD_CITY_NUM_TERRAIN_IN_RANGE
+				iNumItems.resize(GC.getNumTerrainInfos(), 0);
+
+			for (iDX = -iMaxRange; iDX <= iMaxRange; iDX++)
+			{
+				for (iDY = -iMaxRange; iDY <= iMaxRange; iDY++)
+				{
+					pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, iMaxRange);
+					if (pLoopPlot != NULL)
+					{
+						if (kModifier.getModifierType() == EVENTMOD_CITY_NUM_FEATURE_IN_RANGE)
+							iItem = (int)pLoopPlot->getFeatureType();
+						else if (kModifier.getModifierType() == EVENTMOD_CITY_NUM_IMPROVEMENT_IN_RANGE)
+							iItem = (int)pLoopPlot->getImprovementType();
+						else if (kModifier.getModifierType() == EVENTMOD_CITY_NUM_RESOURCE_IN_RANGE)
+							iItem = (int)pLoopPlot->getResourceType(getTeam());
+						else // EVENTMOD_CITY_NUM_TERRAIN_IN_RANGE
+							iItem = (int)pLoopPlot->getTerrainType();
+						if (iItem != -1)
+							iNumItems[iItem]++;
+					}
+				}
+			}
+			// This is a special case for Sets
+			// We can't call testSetItems because we need to check all plots in a range
+			if (kModifier.getSet() != "default")
+			{
+				bool bPassed = false;
+				std::vector< std::pair<int, int> > aSets;
+				GET_PLAYER(getOwner()).getSet(kModifier.getSet(), aSets);
+				if (!aSets.empty())
+				{
+					std::vector< std::pair<int, int> >::iterator iter = aSets.begin();
+					while (iter != aSets.end())
+					{
+						if (GC.EventIntEval(iNumItems[iter->first], kModifier))
+						{
+							++iter;
+							bPassed = true;
+							if (!bRequirement)
+							{
+								if (kModifier.getFactor() == 0)
+									iter->second = 0;
+								else
+								{
+									// Change the modifier by the inverse of the modifier.
+									// We do this because it makes it easier to do a weighted random list later on.
+									// Then we just inverse the modifier again when we want to alter the event chance.
+									iter->second *= 100;
+									iter->second /= kModifier.getFactor();
+								}
+							}
+						}
+						// Remove it if this is a requirement. It did not meet the requirement.
+						else if (bRequirement)
+							iter = aSets.erase(iter);
+						// If this is a modifier we want to keep it, even if it failed this specific modifier.
+						else
+							++iter;
+					}
+				}
+				else if (bRequirement)
+				{
+					for (uint iI = 0; iI < iNumItems.size(); iI++)
+					{
+						if (GC.EventIntEval(iNumItems[iI], kModifier))
+						{
+							bPassed = true;
+							aSets.push_back(std::make_pair(iI, BASE_MODIFIER_CHANCE_SETS));
+						}
+					}
+				}
+				if (aSets.empty() || !bPassed)
+				{
+					return false;
+				}
+				else
+				{
+					// Requirements modify how many values we have (or add them in the first place), modifiers changes the chance.
+					// Either way we need to update the map with the new data.
+					GET_PLAYER(getOwner()).setSet(kModifier.getSet(), aSets);
+					return true;
+				}
+			}
+			// Check a specific item.
+			else if (kModifier.getTypeToCompare() != -1)
+			{
+				iValue = iNumItems[kModifier.getTypeToCompare()];
+			}
+			// Any item that matches.
+			else
+			{
+				for (uint iI = 0; iI < iNumItems.size(); iI++)
+				{
+					if (GC.EventIntEval(iNumItems[iI], kModifier))
+						return true;
+				}
+				return false;
+			}
+		}
+		break;
+
+	default:
+		FAssert(false);
+		return false;
+	}
+
+	return GC.EventIntEval(iValue, kModifier);
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::addTempEventEffect(CvEventEffect& kEventEffect)
+{
+	m_aEventEffects.push_back(kEventEffect);
+}
+
+//	--------------------------------------------------------------------------------
+int CvCity::getNumTempEventEffects() const
+{
+	return m_aEventEffects.size();
+}
+
+//	--------------------------------------------------------------------------------
+CvEventEffect& CvCity::getTempEventEffect(int index)
+{
+	return m_aEventEffects[index];
+}
+
+//	--------------------------------------------------------------------------------
+void CvCity::doTempEventEffects()
+{
+	std::vector<CvEventEffect>::iterator it = m_aEventEffects.begin();
+	while (it != m_aEventEffects.end())
+	{
+		it->changeNumTurns(-1);
+		if (it->getNumTurns() <= 0)
+		{
+			unprocessTempEventEffect(it);
+			it = m_aEventEffects.erase(it);
 		}
 		else
 		{
-			iValue = GC.EventBoolEval(GetCityReligions()->GetNumFollowers((ReligionTypes)kModifier.getTypeToCompare()), kModifier);
+			++it;
 		}
 	}
+}
 
-	return true;
+//	--------------------------------------------------------------------------------
+void CvCity::unprocessTempEventEffect(std::vector<CvEventEffect>::iterator& kEventEffects)
+{
+	EventActionTypeTypes eAction = kEventEffects->getEventAction();
+	CvEventActionInfo* pAction = GC.getEventActionInfo(kEventEffects->getAction());
+	switch(eAction)
+	{
+	case EVENTACTION_CITY_ADD_BUILDING:
+		if (pAction->getBool1())
+			m_pCityBuildings->SetNumFreeBuilding((BuildingTypes)kEventEffects->getTypeToAction(), range(m_pCityBuildings->GetNumFreeBuilding((BuildingTypes)kEventEffects->getTypeToAction()) - pAction->getValue1(), 0, GC.getCITY_MAX_NUM_BUILDINGS()));
+		else
+			m_pCityBuildings->SetNumRealBuilding((BuildingTypes)kEventEffects->getTypeToAction(), range(m_pCityBuildings->GetNumRealBuilding((BuildingTypes)kEventEffects->getTypeToAction()) - pAction->getValue1(), 0, GC.getCITY_MAX_NUM_BUILDINGS()));
+		break;
+
+	case EVENTACTION_CITY_YIELD:
+		ChangeBaseYieldRateFromEvents((YieldTypes)kEventEffects->getTypeToAction(), -pAction->getValue1());
+		break;
+
+	case EVENTACTION_CITY_YIELDMOD:
+		ChangeEventYieldRateModifier((YieldTypes)kEventEffects->getTypeToAction(), -pAction->getValue1());
+		break;
+
+	case EVENTACTION_CITY_POPULATION:
+		changePopulation(std::max(1 - getPopulation(), -pAction->getValue1()));
+		break;
+
+	case EVENTACTION_CITY_LOCAL_HAPPY:
+		ChangeHappinessFromEvents(-pAction->getValue1());
+		break;
+
+	case EVENTACTION_CITY_FREE_SPECIALIST:
+		{
+			int iNumSpecialist = GetCityCitizens()->GetNumFreeSpecialist((SpecialistTypes)kEventEffects->getTypeToAction());
+			GetCityCitizens()->ChangeNumFreeSpecialist((SpecialistTypes)kEventEffects->getTypeToAction(), std::max(-iNumSpecialist, -pAction->getValue1()));
+		}
+		break;
+
+	case EVENTACTION_CITY_SPECIALIST_YIELD:
+		changeCitySpecialistExtraYield((SpecialistTypes)kEventEffects->getTypeToAction(), (YieldTypes)pAction->getValue1(), -pAction->getValue2());
+		break;
+
+	default:
+		FAssertMsg(false, "Unknown EventActionTypeTypes in CvPlayer::unprocessTempEventEffect");
+		break;
+	}
 }
 // END EventEngine

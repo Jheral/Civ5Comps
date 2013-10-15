@@ -1319,13 +1319,27 @@ void CvEconomicAI::LogMonitor(void)
 	}
 
 	// Gold breakdown
+	// Revamped yields - v0.1, Snarko
+	// TODO do this for other yields?
+	// No longer used
+	/*
 	int iGoldPerTurn = m_pPlayer->calculateTotalYield((YieldTypes)YIELD_GOLD) + m_pPlayer->GetTreasury()->GetCityConnectionGold();
+	*/
+	int iGoldPerTurn = m_pPlayer->calculateTotalYield((YieldTypes)YIELD_GOLD) + m_pPlayer->GetCityConnectionYield(YIELD_GOLD);
+	// END Revamped yields
 	iGoldPerTurn -= m_pPlayer->GetTreasury()->GetExpensePerTurnUnitMaintenance();
 	iGoldPerTurn -= m_pPlayer->GetTreasury()->GetBuildingGoldMaintenance();
 	iGoldPerTurn -= m_pPlayer->GetTreasury()->GetImprovementGoldMaintenance();
 	AppendToLog(strHeader, strLog, "GPT", iGoldPerTurn);
 	AppendToLog(strHeader, strLog, "Treasury", m_pPlayer->GetTreasury()->GetGold());
+	// Revamped yields - v0.1, Snarko
+	// TODO do this for other yields?
+	// No longer used
+	/*
 	AppendToLog(strHeader, strLog, "GPT - Connects", m_pPlayer->GetTreasury()->GetCityConnectionGold());
+	*/
+	AppendToLog(strHeader, strLog, "GPT - Connects", m_pPlayer->GetCityConnectionYield(YIELD_GOLD));
+	// END Revamped yields
 	AppendToLog(strHeader, strLog, "GPT - Diplo", m_pPlayer->GetTreasury()->GetGoldPerTurnFromDiplomacy());
 	AppendToLog(strHeader, strLog, "Unit Maint", m_pPlayer->GetTreasury()->GetExpensePerTurnUnitMaintenance());
 	AppendToLog(strHeader, strLog, "Build Maint", m_pPlayer->GetTreasury()->GetBuildingGoldMaintenance());

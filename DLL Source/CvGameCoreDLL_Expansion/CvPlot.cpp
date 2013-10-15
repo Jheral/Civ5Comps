@@ -2463,6 +2463,16 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible,
 			}
 		}
 
+		// EventEngine - v0.1, Snarko
+		CvImprovementEntry* pkImprovementInfo = GC.getImprovementInfo(eImprovement);
+		for (int iI = 0; iI < pkImprovementInfo->getNumFlagPrereqs(); iI++)
+		{
+			std::string szFlag = pkImprovementInfo->getFlagPrereq(iI);
+			if (GET_PLAYER(ePlayer).getFlag(szFlag) < pkImprovementInfo->getFlagPrereqValue(iI))
+				return false;
+		}
+		// END EventEngine
+
 		bValid = true;
 	}
 
@@ -2471,12 +2481,22 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible,
 	// Route
 	if(eRoute != NO_ROUTE)
 	{
+		// Bugfix - 1.0, Snarko
+		/* Original code
 		if(getRouteType() != NO_ROUTE)
-		{
+		{	
 			if (isWater() && !thisBuildInfo.IsWater())
 			{
 				return false;
 			}
+		*/
+		if (isWater() && !thisBuildInfo.IsWater())
+		{
+			return false;
+		}
+		if(getRouteType() != NO_ROUTE)
+		{
+		// END Bugfix
 
 			CvRouteInfo* pkPlotRoute = GC.getRouteInfo(getRouteType());
 			CvRouteInfo* pkBuildRoute = GC.getRouteInfo(eRoute);
@@ -2492,6 +2512,15 @@ bool CvPlot::canBuild(BuildTypes eBuild, PlayerTypes ePlayer, bool bTestVisible,
 				}
 			}
 		}
+		// EventEngine - v0.1, Snarko
+		CvRouteInfo* pkBuildRoute = GC.getRouteInfo(eRoute);
+		for (int iI = 0; iI < pkBuildRoute->getNumFlagPrereqs(); iI++)
+		{
+			std::string szFlag = pkBuildRoute->getFlagPrereq(iI);
+			if (GET_PLAYER(ePlayer).getFlag(szFlag) < pkBuildRoute->getFlagPrereqValue(iI))
+				return false;
+		}
+		// END EventEngine
 
 		bValid = true;
 	}

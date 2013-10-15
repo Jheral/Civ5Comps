@@ -192,6 +192,10 @@ int CvLuaEnums::pRegister(lua_State* L)
 	RegisterEnum(BUTTONPOPUP_CHOOSE_GOODY_HUT_REWARD);
 	RegisterEnum(BUTTONPOPUP_LEAGUE_SPLASH);
 
+	// EventEngine - v0.1, Snarko
+	RegisterEnum(BUTTONPOPUP_EVENT);
+	// END EventEngine
+
 	EnumEnd(L);
 
 

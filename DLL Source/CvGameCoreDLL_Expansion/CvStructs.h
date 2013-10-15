@@ -186,6 +186,26 @@ struct BuildingGreatWork
 FDataStream& operator<<(FDataStream&, const BuildingGreatWork&);
 FDataStream& operator>>(FDataStream&, BuildingGreatWork&);
 
+
+// Revamped yields - v0.1, Snarko
+struct LeagueRewardYieldModifier
+{
+	LeagueRewardYieldModifier()
+		: eYield(NO_YIELD)
+		, iChange(0)
+		, iTurns(0)
+	{
+	}
+
+	YieldTypes eYield;
+	int iChange;
+	int iTurns;
+};
+
+FDataStream& operator<<(FDataStream&, const LeagueRewardYieldModifier&);
+FDataStream& operator>>(FDataStream&, LeagueRewardYieldModifier&);
+// END Revamped yields
+
 // PITBOSS related structures
 //struct PBGameSetupData
 //{

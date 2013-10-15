@@ -1,6 +1,9 @@
 -------------------------------
 -- TopPanel.lua
 -------------------------------
+-- For GetGenericYieldTooltip
+include( "YieldHelpers" );
+-- END Revamped yields
 
 function UpdateData()
 
@@ -403,10 +406,46 @@ function ScienceTipHandler( control )
 			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_SCIENCE", iSciencePerTurn);
 		
 			if (pPlayer:GetNumCities() > 0) then
-				strText = strText .. "[NEWLINE][NEWLINE]";
+				-- Revamped yields - v0.1, Snarko
+				--strText = strText .. "[NEWLINE][NEWLINE]";
+				strText = strText .. "[NEWLINE]";
+				-- END Revamped yields
 			end
 		end
 	
+		-- Revamped yields - v0.1, Snarko
+		-- Science LOSS from Budget Deficits
+		local fScienceFromBudgetDeficit = pPlayer:GetScienceFromBudgetDeficitTimes100() / 100;
+		if (fScienceFromBudgetDeficit ~= 0) then
+			strText = strText .. "[NEWLINE]";
+			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_SCIENCE_FROM_BUDGET_DEFICIT", fScienceFromBudgetDeficit);
+		end
+
+		-- Science from Other Players
+		local fScienceFromOtherPlayers = pPlayer:GetScienceFromOtherPlayersTimes100() / 100;
+		if (fScienceFromOtherPlayers ~= 0) then
+			strText = strText .. "[NEWLINE]";
+			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_SCIENCE_FROM_MINORS", fScienceFromOtherPlayers);
+		end
+
+		-- Science from Research Agreements
+		local fScienceFromRAs = pPlayer:GetScienceFromResearchAgreementsTimes100() / 100;
+		if (fScienceFromRAs ~= 0) then
+			strText = strText .. "[NEWLINE]";
+			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_SCIENCE_FROM_RESEARCH_AGREEMENTS", fScienceFromRAs);
+		end
+
+		-- Science from Trade Routes
+		local fScienceFromTrade = (pPlayer:GetYieldFromCitiesTimes100(YIELD_SCIENCE, false) - pPlayer:GetYieldFromCitiesTimes100(YIELD_SCIENCE, true)) / 100;
+		if (fScienceFromTrade ~= 0) then
+			strText = strText .. "[NEWLINE]";
+			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_SCIENCE_FROM_ITR", fScienceFromTrade);
+		end
+
+		strText = strText .. GetGenericYieldTooltip(YieldTypes.YIELD_SCIENCE, fScienceFromBudgetDeficit + fScienceFromOtherPlayers + fScienceFromRAs + fScienceFromTrade);
+
+		strText = strText .. "[NEWLINE]";
+		--[[ Original code
 		local bFirstEntry = true;
 	
 		-- Science LOSS from Budget Deficits
@@ -492,26 +531,19 @@ function ScienceTipHandler( control )
 			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_SCIENCE_FROM_RESEARCH_AGREEMENTS", iScienceFromRAs / 100);
 		end
 
-		-- EventEngine - v0.1, Snarko
-		-- Science from events
-		local iScienceFromEvents = pPlayer:GetYieldFromEvents(YieldTypes.YIELD_SCIENCE);
-		if (iScienceFromEvents ~= 0) then
-			-- Add separator for non-initial entries
-			if (bFirstEntry) then
-				bFirstEntry = false;
-			else
-				strText = strText .. "[NEWLINE]";
-			end
-
-			strText = strText .. "[ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_SCIENCE_FROM_EVENTS", iScienceFromEvents);
-		end
-		-- END EventEngine
-		
 		-- Let people know that building more cities makes techs harder to get
 		if (not OptionsManager.IsNoBasicHelp()) then
 			strText = strText .. "[NEWLINE][NEWLINE]";
 			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_TECH_CITY_COST", Game.GetNumCitiesTechCostMod());
 		end
+		]]--
+		
+		-- Let people know that building more cities makes techs harder to get
+		if (not OptionsManager.IsNoBasicHelp()) then
+			strText = strText .. "[NEWLINE]";
+			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_TECH_CITY_COST", Game.GetNumCitiesTechCostMod());
+		end
+		-- END Revamped yields
 	end
 	
 	tipControlTable.TooltipLabel:SetText( strText );
@@ -540,6 +572,8 @@ function GoldTipHandler( control )
 		iGoldPerTurnFromOtherPlayers = 0;
 	end
 	
+	-- Revamped yields - v0.1, Snarko
+	--[[ Original code
 	local iGoldPerTurnFromReligion = pPlayer:GetGoldPerTurnFromReligion();
 
 	local fTradeRouteGold = (pPlayer:GetGoldFromCitiesTimes100() - pPlayer:GetGoldFromCitiesMinusTradeRoutesTimes100()) / 100;
@@ -548,6 +582,10 @@ function GoldTipHandler( control )
 	--local fInternationalTradeRouteGold = pPlayer:GetGoldPerTurnFromTradeRoutesTimes100() / 100;
 	local fTraitGold = pPlayer:GetGoldPerTurnFromTraits();
 	local fTotalIncome = fGoldPerTurnFromCities + iGoldPerTurnFromOtherPlayers + fCityConnectionGold + iGoldPerTurnFromReligion + fTradeRouteGold + fTraitGold;
+	]]--
+	local fTradeRouteGold = (pPlayer:GetYieldFromCitiesTimes100(YIELD_GOLD, false) - pPlayer:GetYieldFromCitiesTimes100(YIELD_GOLD, true)) / 100;
+	local fTotalIncome = pPlayer:CalculateGrossGoldTimes100() / 100;
+	-- END Revamped yields
 	
 	if (pPlayer:IsAnarchy()) then
 		strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_ANARCHY", pPlayer:GetAnarchyNumTurns());
@@ -561,6 +599,8 @@ function GoldTipHandler( control )
 	
 	strText = strText .. "[COLOR:150:255:150:255]";
 	strText = strText .. "+" .. Locale.ConvertTextKey("TXT_KEY_TP_TOTAL_INCOME", math.floor(fTotalIncome));
+	-- Revamped yields - v0.1, Snarko
+	--[[ Original code
 	strText = strText .. "[NEWLINE]  [ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_CITY_OUTPUT", fGoldPerTurnFromCities);
 	strText = strText .. "[NEWLINE]  [ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_GOLD_FROM_CITY_CONNECTIONS", math.floor(fCityConnectionGold));
 	strText = strText .. "[NEWLINE]  [ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_GOLD_FROM_ITR", math.floor(fTradeRouteGold));
@@ -573,13 +613,15 @@ function GoldTipHandler( control )
 	if (iGoldPerTurnFromReligion > 0) then
 		strText = strText .. "[NEWLINE]  [ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_GOLD_FROM_RELIGION", iGoldPerTurnFromReligion);
 	end
-	-- EventEngine - v0.1, Snarko
-	local iGoldFromEvents = pPlayer:GetYieldFromEvents(YieldTypes.YIELD_GOLD);
-	if (iGoldFromEvents ~= 0) then
-		strText = strText .. "[NEWLINE]  [ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_GOLD_FROM_EVENTS", iGoldFromEvents);
-	end
-	-- END EventEngine
 	strText = strText .. "[/COLOR]";
+	]]--
+	strText = strText .. "[NEWLINE]  [ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_GOLD_FROM_ITR", math.floor(fTradeRouteGold));
+	if (iGoldPerTurnFromOtherPlayers > 0) then
+		strText = strText .. "[NEWLINE]  [ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_GOLD_FROM_OTHERS", iGoldPerTurnFromOtherPlayers);
+	end
+
+	strText = strText .. GetGenericYieldTooltip(YieldTypes.YIELD_GOLD, fTradeRouteGold + iGoldPerTurnFromOtherPlayers);
+	-- END Revamped yields
 	
 	local iUnitCost = pPlayer:CalculateUnitCost();
 	local iUnitSupply = pPlayer:CalculateUnitSupply();
@@ -914,8 +956,7 @@ function CultureTipHandler( control )
 				iTurns = "?";
 			else
 				iTurns = iCultureNeeded / pPlayer:GetTotalJONSCulturePerTurn();
-				iTurns = iTurns + 1;
-				iTurns = math.floor(iTurns);
+				iTurns = math.ceil(iTurns);
 			end
 	    end
 	    
@@ -941,9 +982,12 @@ function CultureTipHandler( control )
 			tipControlTable.TopPanelMouseover:DoAutoSize();
 			return;
 		end
-
-		local bFirstEntry = true;
 		
+		-- Revamped yields - v0.1, Snarko
+		--[[ Original code
+		local bFirstEntry = true;
+
+		-- REMOVED
 		-- Culture for Free
 		local iCultureForFree = pPlayer:GetJONSCulturePerTurnForFree();
 		if (iCultureForFree ~= 0) then
@@ -957,8 +1001,21 @@ function CultureTipHandler( control )
 			strText = strText .. "[NEWLINE]";
 			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_CULTURE_FOR_FREE", iCultureForFree);
 		end
+		]]--
+
+		strText = strText .. "[NEWLINE]";
+
+		-- Culture from Minor Civs
+		local iCultureFromMinors = pPlayer:GetCulturePerTurnFromMinorCivs();
+		if (iCultureFromMinors ~= 0) then
+			strText = strText .. "[NEWLINE]";
+			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_CULTURE_FROM_MINORS", iCultureFromMinors);
+		end
+
+		strText = strText .. GetGenericYieldTooltip(YieldTypes.YIELD_CULTURE, iCultureFromMinors);
+		--[[ Original code
 	
-		-- Culture from Cities
+		-- Culture from Cities		
 		local iCultureFromCities = pPlayer:GetJONSCulturePerTurnFromCities();
 		if (iCultureFromCities ~= 0) then
 		
@@ -1027,7 +1084,7 @@ function CultureTipHandler( control )
 			strText = strText .. "[NEWLINE]";
 			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_CULTURE_FROM_RELIGION", iCultureFromReligion);
 		end
-		
+
 		-- Culture from a bonus turns (League Project)
 		local iCultureFromBonusTurns = pPlayer:GetCulturePerTurnFromBonusTurns();
 		if (iCultureFromBonusTurns ~= 0) then
@@ -1043,25 +1100,9 @@ function CultureTipHandler( control )
 			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_CULTURE_FROM_BONUS_TURNS", iCultureFromBonusTurns, iBonusTurns);
 		end
 
-		-- EventEngine - v0.1, Snarko
-		local iCultureFromEvents = pPlayer:GetYieldFromEvents(YieldTypes.YIELD_CULTURE);
-		if (iCultureFromEvents ~= 0) then
-			-- Add separator for non-initial entries
-			if (bFirstEntry) then
-				strText = strText .. "[NEWLINE]";
-				bFirstEntry = false;
-			end
-
-			strText = strText .. "[NEWLINE]";
-			strText = strText .. "[ICON_BULLET]" .. Locale.ConvertTextKey("TXT_KEY_TP_CULTURE_FROM_EVENTS", iCultureFromEvents);
-		end
-
-		
 		
 		-- Culture from Golden Age
-		--local iCultureFromGoldenAge = pPlayer:GetTotalJONSCulturePerTurn() - iCultureForFree - iCultureFromCities - iCultureFromHappiness - iCultureFromMinors - iCultureFromReligion - iCultureFromTraits - iCultureFromBonusTurns;
-		local iCultureFromGoldenAge = pPlayer:GetTotalJONSCulturePerTurn() - iCultureForFree - iCultureFromCities - iCultureFromHappiness - iCultureFromMinors - iCultureFromReligion - iCultureFromTraits - iCultureFromBonusTurns - iCultureFromEvents;
-		-- END EventEngine
+		local iCultureFromGoldenAge = pPlayer:GetTotalJONSCulturePerTurn() - iCultureForFree - iCultureFromCities - iCultureFromHappiness - iCultureFromMinors - iCultureFromReligion - iCultureFromTraits - iCultureFromBonusTurns;
 		if (iCultureFromGoldenAge ~= 0) then
 		
 			-- Add separator for non-initial entries
@@ -1073,7 +1114,8 @@ function CultureTipHandler( control )
 			strText = strText .. "[NEWLINE]";
 			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_CULTURE_FROM_GOLDEN_AGE", iCultureFromGoldenAge);
 		end
-
+		]]--
+		-- END Revamped yields
 		
 
 		-- Let people know that building more cities makes policies harder to get
@@ -1145,6 +1187,18 @@ function FaithTipHandler( control )
 		strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_FAITH_ACCUMULATED", pPlayer:GetFaith());
 		strText = strText .. "[NEWLINE]";
 	
+		-- Revamped yields - v0.1, Snarko
+		-- Faith from Minor Civs
+		local iFaithFromMinorCivs = pPlayer:GetFaithPerTurnFromMinorCivs();
+		if (iFaithFromMinorCivs ~= 0) then
+			strText = strText .. "[NEWLINE]";
+			strText = strText .. Locale.ConvertTextKey("TXT_KEY_TP_FAITH_FROM_MINORS", iFaithFromMinorCivs);
+		end
+
+		strText = strText .. GetGenericYieldTooltip(YieldTypes.YIELD_FAITH, iFaithFromMinorCivs);
+
+		strText = strText .. "[NEWLINE]";
+		--[[ Original code
 		-- Faith from Cities
 		local iFaithFromCities = pPlayer:GetFaithPerTurnFromCities();
 		if (iFaithFromCities ~= 0) then
@@ -1169,6 +1223,7 @@ function FaithTipHandler( control )
 		if (iFaithFromCities ~= 0 or iFaithFromMinorCivs ~= 0 or iFaithFromReligion ~= 0) then
 			strText = strText .. "[NEWLINE]";
 		end
+		]]--
 	
 		strText = strText .. "[NEWLINE]";
 

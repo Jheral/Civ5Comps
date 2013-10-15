@@ -47,12 +47,29 @@ public:
 	int GetLandBarbarianConversionPercent() const;
 	int GetWonderProductionModifier() const;
 	int GetPlayerHappiness() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use GetPlayerYieldModifier
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetPlayerCultureModifier() const;
+	*/
+	int GetPlayerYieldModifier(int i) const;
+	// END Revamped yields
 	float GetHappinessPerFollowingCity() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetGoldPerFollowingCity() const;
 	int GetGoldPerXFollowers() const;
 	int GetGoldWhenCityAdopts() const;
 	int GetSciencePerOtherReligionFollower() const;
+	*/
+	int GetYieldPerFollowingCity(int i) const;
+	int GetYieldPerXFollowers(int i) const;
+	int GetYieldWhenCityAdopts(int i) const;
+	int GetYieldPerOtherReligionFollower(int i) const;
+	// END Revamped yields
 	int GetSpreadDistanceModifier() const;
 	int GetSpreadStrengthModifier() const;
 	int GetProphetStrengthModifier() const;
@@ -60,7 +77,13 @@ public:
 	int GetMissionaryStrengthModifier() const;
 	int GetMissionaryCostModifier() const;
 	int GetFriendlyCityStateSpreadModifier() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int GetGreatPersonExpendedFaith() const;
+	*/
+	int GetGreatPersonExpendedYield(int i) const;
+	// END Revamped yields
 	int GetCityStateMinimumInfluence() const;
 	int GetCityStateInfluenceModifier() const;
 	int GetOtherReligionPressureErosion() const;
@@ -128,14 +151,31 @@ protected:
 	int m_iLandBarbarianConversionPercent;
 	int m_iWonderProductionModifier;
 	int m_iPlayerHappiness;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piPlayerYieldModifier
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iPlayerCultureModifier;
+	*/
+	int* m_piPlayerYieldModifier;
+	// END Revamped yields
 
 	float m_fHappinessPerFollowingCity;
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iGoldPerFollowingCity;
 	int m_iGoldPerXFollowers;
 	int m_iGoldWhenCityAdopts;
 	int m_iSciencePerOtherReligionFollower;
+	*/
+	int* m_iYieldPerFollowingCity;
+	int* m_iYieldPerXFollowers;
+	int* m_iYieldWhenCityAdopts;
+	int* m_iYieldPerOtherReligionFollower;
+	// END Revamped yields
 	int m_iSpreadDistanceModifier;
 	int m_iSpreadStrengthModifier;
 	int m_iProphetStrengthModifier;
@@ -143,7 +183,14 @@ protected:
 	int m_iMissionaryStrengthModifier;
 	int m_iMissionaryCostModifier;
 	int m_iFriendlyCityStateSpreadModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iGreatPersonExpendedFaith;
+	*/
+	int* m_piGreatPersonExpendedYield;
+	// END Revamped yields
 	int m_iCityStateMinimumInfluence;
 	int m_iCityStateInfluenceModifier;
 	int m_iOtherReligionPressureErosion;
@@ -310,10 +357,16 @@ public:
 	{
 		return m_iFriendlyCityStateSpreadModifier;
 	};
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int GetGreatPersonExpendedFaith() const
 	{
 		return m_iGreatPersonExpendedFaith;
 	};
+	*/
+	int GetGreatPersonExpendedYield(YieldTypes eYield) const;
+	// END Revamped yields
 	int GetCityStateMinimumInfluence() const
 	{
 		return m_iCityStateMinimumInfluence;
@@ -357,12 +410,28 @@ public:
 	int GetHappinessPerXPeacefulForeignFollowers() const;
 	int GetWonderProductionModifier(EraTypes eWonderEra) const;
 	int GetPlayerHappiness(bool bAtPeace) const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use GetPlayerYieldModifier
+	/* Original code
 	int GetPlayerCultureModifier(bool bAtPeace) const;
+	*/
+	int GetPlayerYieldModifier(YieldTypes eYield, bool bAtPeace) const;
+	// END Revamped yields
 	float GetHappinessPerFollowingCity() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetGoldPerFollowingCity() const;
 	int GetGoldPerXFollowers() const;
 	int GetGoldWhenCityAdopts() const;
 	int GetSciencePerOtherReligionFollower() const;
+	*/
+	int GetYieldPerFollowingCity(YieldTypes eYield) const;
+	int GetYieldPerXFollowers(YieldTypes eYield) const;
+	int GetYieldWhenCityAdopts(YieldTypes eYield) const;
+	int GetYieldPerOtherReligionFollower(YieldTypes eYield) const;
+	// END Revamped yields
 	int GetCityGrowthModifier(bool bAtPeace) const;
 
 	int GetCityYieldChange(int iPopulation, YieldTypes eYield) const;
@@ -412,7 +481,13 @@ private:
 	int m_iMissionaryStrengthModifier;
 	int m_iMissionaryCostModifier;
 	int m_iFriendlyCityStateSpreadModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int m_iGreatPersonExpendedFaith;
+	*/
+	int* m_paiGreatPersonExpendedYield;
+	// END Revamped yields
 	int m_iCityStateMinimumInfluence;
 	int m_iCityStateInfluenceModifier;
 	int m_iOtherReligionPressureErosion;

@@ -30,6 +30,9 @@ CvCityCitizens::CvCityCitizens()
 	m_aiNumSpecialistsInBuilding = NULL;
 	m_aiNumForcedSpecialistsInBuilding = NULL;
 	m_piBuildingGreatPeopleRateChanges = NULL;
+	// EventEngine - v0.1, Snarko
+	m_aiNumFreeSpecialists.clear();
+	// END EventEngine
 }
 
 /// Destructor
@@ -86,6 +89,11 @@ void CvCityCitizens::Reset()
 	m_iNumDefaultSpecialists = 0;
 	m_iNumForcedDefaultSpecialists = 0;
 
+	// EventEngine - v0.1, Snarko
+	m_aiNumFreeSpecialists.clear();
+	m_aiNumFreeSpecialists.resize(GC.getNumSpecialistInfos(), 0);
+	// END EventEngine
+
 	CvAssertMsg(m_aiSpecialistCounts==NULL, "about to leak memory, CvCityCitizens::m_aiSpecialistCounts");
 	m_aiSpecialistCounts = FNEW(int[GC.getNumSpecialistInfos()], c_eCiv5GameplayDLL, 0);
 	for(iI = 0; iI < GC.getNumSpecialistInfos(); iI++)
@@ -130,6 +138,12 @@ void CvCityCitizens::Read(FDataStream& kStream)
 	// Version number to maintain backwards compatibility
 	uint uiVersion;
 	kStream >> uiVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem! Well, except mod versions created before using our modcomp(s)...
+	uint modVersion;
+	kStream >> modVersion;
+	// END modVersion
 
 	kStream >> m_bAutomated;
 	kStream >> m_bNoAutoAssignSpecialists;
@@ -147,6 +161,11 @@ void CvCityCitizens::Read(FDataStream& kStream)
 	kStream >> m_iNumDefaultSpecialists;
 	kStream >> m_iNumForcedDefaultSpecialists;
 
+	// EventEngine - v0.1, Snarko
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	kStream >> m_aiNumFreeSpecialists;
+	// END EventEngine
+
 	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_aiSpecialistCounts, GC.getNumSpecialistInfos());
 	CvInfosSerializationHelper::ReadHashedDataArray(kStream, m_aiSpecialistGreatPersonProgressTimes100, GC.getNumSpecialistInfos());
 
@@ -162,6 +181,12 @@ void CvCityCitizens::Write(FDataStream& kStream)
 	// Current version number
 	uint uiVersion = 1;
 	kStream << uiVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem!
+	uint modVersion = 1;
+	kStream << modVersion;
+	// END modVersion
 
 	kStream << m_bAutomated;
 	kStream << m_bNoAutoAssignSpecialists;
@@ -178,6 +203,10 @@ void CvCityCitizens::Write(FDataStream& kStream)
 
 	kStream << m_iNumDefaultSpecialists;
 	kStream << m_iNumForcedDefaultSpecialists;
+
+	// EventEngine - v0.1, Snarko
+	kStream << m_aiNumFreeSpecialists;
+	// END EventEngine
 
 	CvInfosSerializationHelper::WriteHashedDataArray<SpecialistTypes, int>(kStream, m_aiSpecialistCounts, GC.getNumSpecialistInfos());
 	CvInfosSerializationHelper::WriteHashedDataArray<SpecialistTypes, int>(kStream, m_aiSpecialistGreatPersonProgressTimes100, GC.getNumSpecialistInfos());
@@ -664,7 +693,13 @@ bool CvCityCitizens::IsAIWantSpecialistRightNow()
 					{
 						const SpecialistTypes eSpecialist = (SpecialistTypes) pkBuildingInfo->GetSpecialistType();
 						CvSpecialistInfo* pSpecialistInfo = GC.getSpecialistInfo(eSpecialist);
+						// Revamped yields - v0.1, Snarko
+						// No longer used, use getYieldChange
+						/* Original code
 						if(pSpecialistInfo && pSpecialistInfo->getCulturePerTurn() > 0)
+						*/
+						if(pSpecialistInfo && pSpecialistInfo->getYieldChange(YIELD_CULTURE) > 0)
+						// END Revamped yields
 						{
 							iWeight *= 3;
 							break;
@@ -957,7 +992,14 @@ int CvCityCitizens::GetSpecialistValue(SpecialistTypes eSpecialist)
 	int iProductionYieldValue = (GC.getAI_CITIZEN_VALUE_PRODUCTION() * pPlayer->specialistYield(eSpecialist, YIELD_PRODUCTION));
 	int iGoldYieldValue = (GC.getAI_CITIZEN_VALUE_GOLD() * pPlayer->specialistYield(eSpecialist, YIELD_GOLD));
 	int iScienceYieldValue = (GC.getAI_CITIZEN_VALUE_SCIENCE() * pPlayer->specialistYield(eSpecialist, YIELD_SCIENCE));
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int iCultureYieldValue = (GC.getAI_CITIZEN_VALUE_CULTURE() * m_pCity->GetCultureFromSpecialist(eSpecialist)); 
+	*/
+	int iCultureYieldValue = (GC.getAI_CITIZEN_VALUE_CULTURE() * pPlayer->specialistYield(eSpecialist, YIELD_CULTURE)); 
+	// END Revamped yields
 	int iFaithYieldValue = (GC.getAI_CITIZEN_VALUE_FAITH() * pPlayer->specialistYield(eSpecialist, YIELD_FAITH));
 	int iGPPYieldValue = pSpecialistInfo->getGreatPeopleRateChange() * 3; // TODO: un-hardcode this
 	int iHappinessYieldValue = (m_pCity->GetPlayer()->isHalfSpecialistUnhappiness()) ? 5 : 0; // TODO: un-hardcode this
@@ -2265,6 +2307,34 @@ void CvCityCitizens::ChangeNumForcedDefaultSpecialists(int iChange)
 {
 	m_iNumForcedDefaultSpecialists += iChange;
 }
+
+// EventEngine - v0.1, Snarko
+/// How many specialists do we have that are free (doesn't count towards population)?
+int CvCityCitizens::GetNumFreeSpecialist(SpecialistTypes eIndex) const
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < GC.getNumSpecialistInfos(), "eIndex expected to be < GC.getNumSpecialistInfos()");
+	return m_aiNumFreeSpecialists[eIndex];
+}
+
+/// How many specialists do we have that are free (doesn't count towards population)?
+void CvCityCitizens::ChangeNumFreeSpecialist(SpecialistTypes eIndex, int iChange)
+{
+	VALIDATE_OBJECT
+	CvAssertMsg(eIndex >= 0, "eIndex expected to be >= 0");
+	CvAssertMsg(eIndex < GC.getNumSpecialistInfos(), "eIndex expected to be < GC.getNumSpecialistInfos()");
+	if (iChange != 0)
+	{
+		m_aiNumFreeSpecialists[eIndex] += iChange;
+		CvAssertMsg(m_aiNumFreeSpecialists[eIndex] >= 0, "Number of free specialists expected to be >= 0");
+
+		m_aiSpecialistCounts[eIndex] += iChange;
+
+		GetCity()->processSpecialist(eIndex, iChange);
+	}
+}
+// END EventEngine
 
 /// How many Specialists do we have assigned of this type in our City?
 int CvCityCitizens::GetSpecialistCount(SpecialistTypes eIndex) const

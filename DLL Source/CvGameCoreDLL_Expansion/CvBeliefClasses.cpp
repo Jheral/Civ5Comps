@@ -37,12 +37,29 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_iLandBarbarianConversionPercent(0),
 	m_iWonderProductionModifier(0),
 	m_iPlayerHappiness(0),
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piPlayerYieldModifier
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iPlayerCultureModifier(0),
+	*/
+	m_piPlayerYieldModifier(NULL),
+	// END Revamped yields
 	m_fHappinessPerFollowingCity(0),
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iGoldPerFollowingCity(0),
 	m_iGoldPerXFollowers(0),
 	m_iGoldWhenCityAdopts(0),
 	m_iSciencePerOtherReligionFollower(0),
+	*/
+	m_iYieldPerFollowingCity(NULL),
+	m_iYieldPerXFollowers(NULL),
+	m_iYieldWhenCityAdopts(NULL),
+	m_iYieldPerOtherReligionFollower(NULL),
+	// END Revamped yields
 	m_iSpreadDistanceModifier(0),
 	m_iSpreadStrengthModifier(0),
 	m_iProphetStrengthModifier(0),
@@ -50,7 +67,14 @@ CvBeliefEntry::CvBeliefEntry() :
 	m_iMissionaryStrengthModifier(0),
 	m_iMissionaryCostModifier(0),
 	m_iFriendlyCityStateSpreadModifier(0),
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iGreatPersonExpendedFaith(0),
+	*/
+	m_piGreatPersonExpendedYield(NULL),
+	// END Revamped yields
 	m_iCityStateMinimumInfluence(0),
 	m_iCityStateInfluenceModifier(0),
 	m_iOtherReligionPressureErosion(0),
@@ -213,11 +237,23 @@ int CvBeliefEntry::GetPlayerHappiness() const
 	return m_iPlayerHappiness;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used, use GetPlayerYieldModifier
+// XML tag still kept for backwards compatibility
+/* Original code
 /// Accessor:: boost in production speed for wonders prior to obsolete era
 int CvBeliefEntry::GetPlayerCultureModifier() const
 {
 	return m_iPlayerCultureModifier;
 }
+*/
+int CvBeliefEntry::GetPlayerYieldModifier(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piPlayerYieldModifier ? m_piPlayerYieldModifier[i] : 0;
+}
+// END Revamped yields
 
 /// Accessor:: amount of extra happiness from each city following this religion
 float CvBeliefEntry::GetHappinessPerFollowingCity() const
@@ -225,6 +261,10 @@ float CvBeliefEntry::GetHappinessPerFollowingCity() const
 	return m_fHappinessPerFollowingCity;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+// XML tag still kept for backwards compatibility
+/* Original code
 /// Accessor:: amount of extra gold from each city following this religion
 int CvBeliefEntry::GetGoldPerFollowingCity() const
 {
@@ -248,6 +288,39 @@ int CvBeliefEntry::GetSciencePerOtherReligionFollower() const
 {
 	return m_iSciencePerOtherReligionFollower;
 }
+*/
+/// Accessor:: amount of extra yield from each city following this religion
+int CvBeliefEntry::GetYieldPerFollowingCity(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_iYieldPerFollowingCity ? m_iYieldPerFollowingCity[i] : 0;
+}
+
+/// Accessor:: amount of extra yield per X number of followers
+int CvBeliefEntry::GetYieldPerXFollowers(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_iYieldPerXFollowers ? m_iYieldPerXFollowers[i] : 0;
+}
+
+/// Accessor:: amount of extra yield when a city adopts the religion
+int CvBeliefEntry::GetYieldWhenCityAdopts(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_iYieldWhenCityAdopts ? m_iYieldWhenCityAdopts[i] : 0;
+}
+
+/// Accessor:: amount of science for each follower of another religion in city spread to
+int CvBeliefEntry::GetYieldPerOtherReligionFollower(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_iYieldPerOtherReligionFollower ? m_iYieldPerOtherReligionFollower[i] : 0;
+}
+// END Revamped yields
 
 /// Accessor:: extra distance in city-to-city religion spread
 int CvBeliefEntry::GetSpreadDistanceModifier() const
@@ -291,11 +364,23 @@ int CvBeliefEntry::GetFriendlyCityStateSpreadModifier() const
 	return m_iFriendlyCityStateSpreadModifier;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 /// Accessor: faith earned for each GP expended
 int CvBeliefEntry::GetGreatPersonExpendedFaith() const
 {
 	return m_iGreatPersonExpendedFaith;
 }
+*/
+
+int CvBeliefEntry::GetGreatPersonExpendedYield(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piGreatPersonExpendedYield[i];
+}
+// END Revamped yields
 
 /// Accessor: minimum influence with city states of a shared religion
 int CvBeliefEntry::GetCityStateMinimumInfluence() const
@@ -608,12 +693,73 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iLandBarbarianConversionPercent = kResults.GetInt("LandBarbarianConversionPercent");
 	m_iWonderProductionModifier       = kResults.GetInt("WonderProductionModifier");
 	m_iPlayerHappiness			      = kResults.GetInt("PlayerHappiness");
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piPlayerYieldModifier
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iPlayerCultureModifier          = kResults.GetInt("PlayerCultureModifier");
+	*/
+	kUtility.SetYields(m_piPlayerYieldModifier, "Belief_PlayerYieldModifier", "BeliefType", GetType());
+	int iPlayerCultureModifier = kResults.GetInt("PlayerCultureModifier");
+	if (iPlayerCultureModifier != 0)
+	{
+		if (m_piPlayerYieldModifier == NULL)
+			kUtility.InitializeArray(m_piPlayerYieldModifier, NUM_YIELD_TYPES, 0);
+
+		m_piPlayerYieldModifier[YIELD_CULTURE] += iPlayerCultureModifier;
+	}
+	// END Revamped yields
 	m_fHappinessPerFollowingCity      = kResults.GetFloat("HappinessPerFollowingCity");
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iGoldPerFollowingCity           = kResults.GetInt("GoldPerFollowingCity");
 	m_iGoldPerXFollowers              = kResults.GetInt("GoldPerXFollowers");
 	m_iGoldWhenCityAdopts             = kResults.GetInt("GoldPerFirstCityConversion");
 	m_iSciencePerOtherReligionFollower= kResults.GetInt("SciencePerOtherReligionFollower");
+	*/
+	kUtility.SetYields(m_iYieldPerFollowingCity, "Belief_YieldPerFollowingCity", "BeliefType", GetType());
+	kUtility.SetYields(m_iYieldPerXFollowers, "Belief_YieldPerXFollowers", "BeliefType", GetType());
+	kUtility.SetYields(m_iYieldWhenCityAdopts, "Belief_YieldWhenCityAdopts", "BeliefType", GetType());
+	kUtility.SetYields(m_iYieldPerOtherReligionFollower, "Belief_YieldPerOtherReligionFollower", "BeliefType", GetType());
+
+	int iGoldPerFollowingCity = kResults.GetInt("GoldPerFollowingCity");
+	if (iGoldPerFollowingCity != 0)
+	{
+		if (m_iYieldPerFollowingCity == NULL)
+			kUtility.InitializeArray(m_iYieldPerFollowingCity, NUM_YIELD_TYPES, 0);
+
+		m_iYieldPerFollowingCity[YIELD_GOLD] += iGoldPerFollowingCity;
+	}
+
+	int iGoldPerXFollowers = kResults.GetInt("GoldPerXFollowers");
+	if (iGoldPerXFollowers != 0)
+	{
+		if (m_iYieldPerXFollowers == NULL)
+			kUtility.InitializeArray(m_iYieldPerXFollowers, NUM_YIELD_TYPES, 0);
+
+		m_iYieldPerXFollowers[YIELD_GOLD] += iGoldPerXFollowers;
+	}
+
+	int iGoldWhenCityAdopts = kResults.GetInt("GoldPerFirstCityConversion");
+	if (iGoldWhenCityAdopts != 0)
+	{
+		if (m_iYieldWhenCityAdopts == NULL)
+			kUtility.InitializeArray(m_iYieldWhenCityAdopts, NUM_YIELD_TYPES, 0);
+
+		m_iYieldWhenCityAdopts[YIELD_GOLD] += iGoldWhenCityAdopts;
+	}
+
+	int iSciencePerOtherReligionFollower = kResults.GetInt("SciencePerOtherReligionFollower");
+	if (iSciencePerOtherReligionFollower != 0)
+	{
+		if (m_iYieldPerOtherReligionFollower == NULL)
+			kUtility.InitializeArray(m_iYieldPerOtherReligionFollower, NUM_YIELD_TYPES, 0);
+
+		m_iYieldPerOtherReligionFollower[YIELD_SCIENCE] += iSciencePerOtherReligionFollower;
+	}
+	// END Revamped yields
 	m_iSpreadDistanceModifier         = kResults.GetInt("SpreadDistanceModifier");
 	m_iSpreadStrengthModifier		  = kResults.GetInt("SpreadStrengthModifier");
 	m_iProphetStrengthModifier        = kResults.GetInt("ProphetStrengthModifier");
@@ -621,7 +767,21 @@ bool CvBeliefEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iMissionaryStrengthModifier     = kResults.GetInt("MissionaryStrengthModifier");
 	m_iMissionaryCostModifier         = kResults.GetInt("MissionaryCostModifier");
 	m_iFriendlyCityStateSpreadModifier= kResults.GetInt("FriendlyCityStateSpreadModifier");
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iGreatPersonExpendedFaith       = kResults.GetInt("GreatPersonExpendedFaith");
+	*/
+	kUtility.SetYields(m_piGreatPersonExpendedYield, "Belief_GreatPersonExpendedYield", "BeliefType", GetType());
+
+	int iGreatPersonExpendedFaith = kResults.GetInt("GreatPersonExpendedFaith");
+	if (iGreatPersonExpendedFaith != 0)
+	{
+		m_piGreatPersonExpendedYield[YIELD_FAITH] += iGreatPersonExpendedFaith;
+	}
+
+	// END Revamped yields
 	m_iCityStateMinimumInfluence      = kResults.GetInt("CityStateMinimumInfluence");
 	m_iCityStateInfluenceModifier     = kResults.GetInt("CityStateInfluenceModifier");
 	m_iOtherReligionPressureErosion   = kResults.GetInt("OtherReligionPressureErosion");
@@ -833,6 +993,9 @@ CvBeliefEntry* CvBeliefXMLEntries::GetEntry(int index)
 //=====================================
 /// Constructor
 CvReligionBeliefs::CvReligionBeliefs():
+	// Revamped yields - v0.1, Snarko
+	m_paiGreatPersonExpendedYield(NULL),
+	// END Revamped yields
 	m_paiBuildingClassEnabled(NULL)
 {
 	Reset();
@@ -863,7 +1026,17 @@ CvReligionBeliefs::CvReligionBeliefs(const CvReligionBeliefs& source)
 	m_iMissionaryStrengthModifier = source.m_iMissionaryStrengthModifier;
 	m_iMissionaryCostModifier = source.m_iMissionaryCostModifier;
 	m_iFriendlyCityStateSpreadModifier = source.m_iFriendlyCityStateSpreadModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piGreatPersonExpendedYield
+	/* Original code
 	m_iGreatPersonExpendedFaith = source.m_iGreatPersonExpendedFaith;
+	*/
+	m_paiGreatPersonExpendedYield = FNEW(int[NUM_YIELD_TYPES], c_eCiv5GameplayDLL, 0);
+	for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+	{
+		m_paiGreatPersonExpendedYield[iI] = source.m_paiGreatPersonExpendedYield[iI];
+	}
+	// END Revamped yields
 	m_iCityStateMinimumInfluence = source.m_iCityStateMinimumInfluence;
 	m_iCityStateInfluenceModifier = source.m_iCityStateInfluenceModifier;
 	m_iOtherReligionPressureErosion = source.m_iOtherReligionPressureErosion;
@@ -894,6 +1067,9 @@ CvReligionBeliefs::CvReligionBeliefs(const CvReligionBeliefs& source)
 void CvReligionBeliefs::Uninit()
 {
 	SAFE_DELETE_ARRAY(m_paiBuildingClassEnabled);
+	// Revamped yields - v0.1, Snarko
+	SAFE_DELETE_ARRAY(m_paiGreatPersonExpendedYield);
+	// END Revamped yields
 }
 
 /// Reset data members
@@ -915,7 +1091,17 @@ void CvReligionBeliefs::Reset()
 	m_iMissionaryStrengthModifier = 0;
 	m_iMissionaryCostModifier = 0;
 	m_iFriendlyCityStateSpreadModifier = 0;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	m_iGreatPersonExpendedFaith = 0;
+	*/
+	m_paiGreatPersonExpendedYield = FNEW(int[NUM_YIELD_TYPES], c_eCiv5GameplayDLL, 0);
+	for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+	{
+		m_paiGreatPersonExpendedYield[iI] = 0;
+	}
+	// END Revamped yields
 	m_iCityStateMinimumInfluence = 0;
 	m_iCityStateInfluenceModifier = 0;
 	m_iOtherReligionPressureErosion = 0;
@@ -970,7 +1156,20 @@ void CvReligionBeliefs::AddBelief(BeliefTypes eBelief)
 	m_iMissionaryStrengthModifier += belief->GetMissionaryStrengthModifier();
 	m_iMissionaryCostModifier += belief->GetMissionaryCostModifier();
 	m_iFriendlyCityStateSpreadModifier += belief->GetFriendlyCityStateSpreadModifier();
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iGreatPersonExpendedFaith += belief->GetGreatPersonExpendedFaith();
+	*/
+	for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+	{
+		if (belief->GetGreatPersonExpendedYield(iI) != 0)
+		{
+			m_paiGreatPersonExpendedYield[iI] += belief->GetGreatPersonExpendedYield(iI);
+		}
+	}
+	// END Revamped yields
 	m_iCityStateMinimumInfluence += belief->GetCityStateMinimumInfluence();
 	m_iCityStateInfluenceModifier += belief->GetCityStateInfluenceModifier();
 	m_iOtherReligionPressureErosion += belief->GetOtherReligionPressureErosion();
@@ -1113,6 +1312,10 @@ int CvReligionBeliefs:: GetPlayerHappiness(bool bAtPeace) const
 	return rtnValue;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used, use GetPlayerYieldModifier
+// XML tag still kept for backwards compatibility
+/* Original code
 /// Player culture modifier
 int CvReligionBeliefs:: GetPlayerCultureModifier(bool bAtPeace) const
 {
@@ -1132,6 +1335,34 @@ int CvReligionBeliefs:: GetPlayerCultureModifier(bool bAtPeace) const
 
 	return rtnValue;
 }
+*/
+/// Player yield modifier
+int CvReligionBeliefs::GetPlayerYieldModifier(YieldTypes eYield, bool bAtPeace) const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for(int i = 0; i < pBeliefs->GetNumBeliefs(); i++)
+	{
+		if(HasBelief((BeliefTypes)i))
+		{
+			if(bAtPeace || !pBeliefs->GetEntry(i)->RequiresPeace())
+			{
+				rtnValue += pBeliefs->GetEntry(i)->GetPlayerYieldModifier((int)eYield);
+			}
+		}
+	}
+
+	return rtnValue;
+}
+
+int CvReligionBeliefs::GetGreatPersonExpendedYield(YieldTypes eYield) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_paiGreatPersonExpendedYield[(int)eYield];
+}
+// END Revamped yields
 
 /// Happiness per following city
 float CvReligionBeliefs:: GetHappinessPerFollowingCity() const
@@ -1150,6 +1381,10 @@ float CvReligionBeliefs:: GetHappinessPerFollowingCity() const
 	return rtnValue;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+// XML tag still kept for backwards compatibility
+/* Original code
 /// Gold per following city
 int CvReligionBeliefs:: GetGoldPerFollowingCity() const
 {
@@ -1217,6 +1452,71 @@ int CvReligionBeliefs:: GetSciencePerOtherReligionFollower() const
 
 	return rtnValue;
 }
+*/
+int CvReligionBeliefs::GetYieldPerFollowingCity(YieldTypes eYield) const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for(int i = 0; i < pBeliefs->GetNumBeliefs(); i++)
+	{
+		if(HasBelief((BeliefTypes)i))
+		{
+			rtnValue += pBeliefs->GetEntry(i)->GetYieldPerFollowingCity((int)eYield);
+		}
+	}
+
+	return rtnValue;
+}
+
+int CvReligionBeliefs::GetYieldPerXFollowers(YieldTypes eYield) const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for(int i = 0; i < pBeliefs->GetNumBeliefs(); i++)
+	{
+		if(HasBelief((BeliefTypes)i))
+		{
+			rtnValue += pBeliefs->GetEntry(i)->GetYieldPerXFollowers((int)eYield);
+		}
+	}
+
+	return rtnValue;
+}
+
+int CvReligionBeliefs::GetYieldWhenCityAdopts(YieldTypes eYield) const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for(int i = 0; i < pBeliefs->GetNumBeliefs(); i++)
+	{
+		if(HasBelief((BeliefTypes)i))
+		{
+			rtnValue += pBeliefs->GetEntry(i)->GetYieldWhenCityAdopts((int)eYield);
+		}
+	}
+
+	return rtnValue;
+}
+
+int CvReligionBeliefs::GetYieldPerOtherReligionFollower(YieldTypes eYield) const
+{
+	CvBeliefXMLEntries* pBeliefs = GC.GetGameBeliefs();
+	int rtnValue = 0;
+
+	for(int i = 0; i < pBeliefs->GetNumBeliefs(); i++)
+	{
+		if(HasBelief((BeliefTypes)i))
+		{
+			rtnValue += pBeliefs->GetEntry(i)->GetYieldPerOtherReligionFollower((int)eYield);
+		}
+	}
+
+	return rtnValue;
+}
+// END Revamped yields
 
 /// City growth modifier
 int CvReligionBeliefs::GetCityGrowthModifier(bool bAtPeace) const
@@ -1656,7 +1956,23 @@ void CvReligionBeliefs::Read(FDataStream& kStream)
 	kStream >> m_iMissionaryStrengthModifier;
 	kStream >> m_iMissionaryCostModifier;
 	kStream >> m_iFriendlyCityStateSpreadModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
+	/* Original code
 	kStream >> m_iGreatPersonExpendedFaith;
+	*/
+	bool bGreatPersonYield;
+	kStream >> bGreatPersonYield;
+	if (bGreatPersonYield)
+	{
+		if (m_paiGreatPersonExpendedYield == NULL)
+			m_paiGreatPersonExpendedYield = FNEW(int[NUM_YIELD_TYPES], c_eCiv5GameplayDLL, 0);
+
+		for (int i = 0; i < NUM_YIELD_TYPES; i++)
+			kStream >> m_paiGreatPersonExpendedYield[i];
+	}
+	// END Revamped yields
 	kStream >> m_iCityStateMinimumInfluence;
 	kStream >> m_iCityStateInfluenceModifier;
 	kStream >> m_iOtherReligionPressureErosion;
@@ -1710,7 +2026,18 @@ void CvReligionBeliefs::Write(FDataStream& kStream) const
 	kStream << m_iMissionaryStrengthModifier;
 	kStream << m_iMissionaryCostModifier;
 	kStream << m_iFriendlyCityStateSpreadModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	kStream << m_iGreatPersonExpendedFaith;
+	*/
+	kStream << (m_paiGreatPersonExpendedYield != NULL);
+	if (m_paiGreatPersonExpendedYield != NULL)
+	{
+		for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+			kStream << m_paiGreatPersonExpendedYield[iI];
+	}
+	// END Revamped yields
 	kStream << m_iCityStateMinimumInfluence;
 	kStream << m_iCityStateInfluenceModifier;
 	kStream << m_iOtherReligionPressureErosion;

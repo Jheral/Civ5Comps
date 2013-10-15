@@ -633,6 +633,16 @@ void CvPlayerAI::AI_considerAnnex()
 	}
 }
 
+// EventEngine - v0.1, Snarko
+void CvPlayerAI::AI_chooseEventOption(int iEvent)
+{
+	// TODO!!!
+	CvEvent* pEvent = getEvent(iEvent);
+	int iOption = GC.getGame().getJonRandNum(pEvent->getNumOptions(), "Stupidly picking AI option choice");
+	processEventOption(pEvent->GetID(), iOption);
+}
+// END EventEngine
+
 int CvPlayerAI::AI_plotTargetMissionAIs(CvPlot* pPlot, MissionAITypes eMissionAI, int iRange)
 {
 	int iCount = 0;

@@ -29,14 +29,16 @@ protected:
 	static int lGetOption(lua_State* L);
 
 	static int lTrigger(lua_State* L);
-	static int lProcessEventOption(lua_State* L);
+
+	static int lGetToolTip(lua_State* L);
+	static int lGetToolTipByOptionID(lua_State* L);
 
 };
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-class CvLuaEventEffects : public CvLuaScopedInstance<CvLuaEventEffects, CvEventEffects>
+class CvLuaEventEffects : public CvLuaScopedInstance<CvLuaEventEffects, CvEventEffect>
 {
 public:
 
@@ -52,12 +54,9 @@ public:
 protected:
 	static int lGetEventType(lua_State* L);
 	static int lGetOption(lua_State* L);
+	static int lGetEventAction(lua_State* L);
 	static int lGetAction(lua_State* L);
-	static int lSetAction(lua_State* L);
-	static int lSetType(lua_State* L);
 	static int lGetType(lua_State* L);
-	static int lGetValue(lua_State* L);
-	static int lSetValue(lua_State* L);
 	static int lGetNumTurns(lua_State* L);
 	static int lSetNumTurns(lua_State* L);
 	static int lChangeNumTurns(lua_State* L);

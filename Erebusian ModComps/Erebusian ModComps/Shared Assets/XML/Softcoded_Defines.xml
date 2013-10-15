@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Created by ModBuddy on 8/17/2013 12:05:20 PM -->
+<!-- These defines are used by the DLL -->
+<!-- DO NOT USE THE DLL WITHOUT THEM -->
 <GameData>
 	<Defines>
 		<Row Name="BASE_TRADE_RANGE_SEA">
@@ -7,6 +9,15 @@
 		</Row>
 		<Row Name="BASE_TRADE_RANGE_LAND">
 			<Value>10</Value>
+		</Row>
+		<Row Name="SEA_TRADEROUTE_MODIFIER">
+			<Value>100</Value>
+		</Row>
+		<Row Name="LAND_TRADEROUTE_MODIFIER">
+			<Value>0</Value>
+		</Row>
+		<Row Name="CITY_CAPTURE_WARMONGER_OFFSET">
+			<Value>1000</Value>
 		</Row>
 	</Defines>
 </GameData>

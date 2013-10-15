@@ -59,7 +59,7 @@ end
 -------------------------------------------------------------------------------
 function OnPopupMessage(popupInfo)
     --If popup type isn't events, exit
-    if popupInfo.Type ~= ButtonPopupTypes.BUTTONPOPUP_MODDER_0 then
+    if popupInfo.Type ~= ButtonPopupTypes.BUTTONPOPUP_EVENT then
         return;
     end
 	--print(string.format("Popup is Event"));
@@ -91,7 +91,7 @@ function ShowHideHandler( bIsHide, bInitState )
         if( not bIsHide ) then
         	Events.SerialEventGameMessagePopupShown(m_PopupInfo);
         else
-            Events.SerialEventGameMessagePopupProcessed.CallImmediate(ButtonPopupTypes.BUTTONPOPUP_MODDER_0, 0);
+            Events.SerialEventGameMessagePopupProcessed.CallImmediate(ButtonPopupTypes.BUTTONPOPUP_EVENT, 0);
         end
     end
 end
@@ -249,7 +249,7 @@ function BuildOptionRadio(eOption)
 	local option = eOption.Option;
 	--print(string.format("Inside BuildOptionRadio"));
 	instance.EventOption:GetTextButton():LocalizeAndSetText(option.Description);
-	if option.bOverrideTooltip ~= 0 then
+	if (option.bOverrideTooltip) then
 		--print(string.format("Tooltip Overridden"));
 		if option.Help ~= nil then
 			--print(string.format("Help String Exists"));
@@ -272,9 +272,14 @@ end
 -------------------------------------------------------------------------------
 function BuildOptionTooltip(eOption)
 	--print(string.format("Inside BuildOptionTooltip"));
-	local strToolTipString = "Effects go here, in due time";
+	local strToolTipString = "";
 	strToolTipString = strToolTipString .. "[NEWLINE]----------------[NEWLINE]";
-	strToolTipString = strToolTipString .. Locale.ConvertTextKey(eOption.Option.Help);
+	if (eOption.Option.Help ~= nil) then
+		strToolTipString = strToolTipString .. Locale.ConvertTextKey(eOption.Option.Help);
+	end
+	local pPlayer = Players[Game:GetActivePlayer()];
+	local pEvent = pPlayer:GetEvent(g_PlayerEventIndex);
+	strToolTipString = strToolTipString .. pEvent:GetToolTipByOptionID(eOption.Option.ID);
 	eOption.Button.EventOption:SetToolTipString(strToolTipString);
 end
 ContextPtr:SetHide(true);

@@ -918,6 +918,13 @@ void CvUnit::reset(int iID, UnitTypes eUnit, PlayerTypes eOwner, bool bConstruct
 	m_iNumGoodyHutsPopped = 0;
 	m_iLastGameTurnAtFullHealth = -1;
 
+	// EventEngine - v0.1, Snarko
+	m_aEventEffects.clear();
+
+	m_asziFlags.clear();
+	// END EventEngine
+
+
 	if(!bConstructorCall)
 	{
 		m_Promotions.Reset();
@@ -6786,7 +6793,13 @@ bool CvUnit::CanSpreadReligion(const CvPlot* pPlot) const
 //	--------------------------------------------------------------------------------
 bool CvUnit::DoSpreadReligion()
 {
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int iScienceBonus = 0;
+	*/
+	int iYieldBonus = 0;
+	// END Revamped yields
 
 	CvCity* pCity = GetSpreadReligionTargetCity();
 
@@ -6802,6 +6815,9 @@ bool CvUnit::DoSpreadReligion()
 				const CvReligion* pReligion = pReligions->GetReligion(eReligion, getOwner());
 				if(pReligion)
 				{
+					// Revamped yields - v0.1, Snarko
+					// No longer used
+					/* Original code
 					iScienceBonus = pReligion->m_Beliefs.GetSciencePerOtherReligionFollower();
 					if(iScienceBonus > 0)
 					{
@@ -6816,6 +6832,22 @@ bool CvUnit::DoSpreadReligion()
 							iScienceBonus = 0;
 						}
 					}
+					*/
+					for (int iI = 0; iI < NUM_YIELD_TYPES; iI++)
+					{
+						iYieldBonus = pReligion->m_Beliefs.GetYieldPerOtherReligionFollower((YieldTypes)iI);
+						if(iYieldBonus > 0)
+						{
+							// Requires majority for this city to be another religion
+							ReligionTypes eCurrentReligion = pCity->GetCityReligions()->GetReligiousMajority();
+							if (eCurrentReligion != NO_RELIGION && eCurrentReligion != eReligion)
+							{
+								iYieldBonus *= pCity->GetCityReligions()->GetFollowersOtherReligions(eReligion);
+								GET_PLAYER(m_eOwner).ChangeImmediateYield((YieldTypes)iI, iYieldBonus, pCity->plot() && pCity->plot()->GetActiveFogOfWarMode() == FOGOFWARMODE_OFF, pCity->getX(), pCity->getY());
+							}
+						}
+					}
+					// END Revamped yields
 				}
 			}
 
@@ -6842,6 +6874,9 @@ bool CvUnit::DoSpreadReligion()
 				DLLUI->AddPopupText(pCity->getX(), pCity->getY(), text, fDelay);
 			}
 
+			// Revamped yields - v0.1, Snarko
+			// No longer used
+			/* Original code
 			if (iScienceBonus > 0)
 			{
 				CvPlayer &kPlayer = GET_PLAYER(m_eOwner);
@@ -6865,6 +6900,8 @@ bool CvUnit::DoSpreadReligion()
 					DLLUI->AddPopupText(pCity->getX(), pCity->getY(), text, fDelay);
 				}
 			}
+			*/
+			// END Revamped yields
 
 			bool bShow = plot()->isActiveVisible(false);
 			if(bShow)
@@ -12741,10 +12778,15 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 				auto_ptr<ICvUnit1> pDllUnit(new CvDllUnit(this));
 				gDLL->GameplayUnitVisibility(pDllUnit.get(), pNewPlot != NULL && !this->isInvisible(activeTeam, false));
 
-				if (GetBaseCombatStrength(true/*bIgnoreEmbarked*/) > 0 && getDomainType() == DOMAIN_LAND)
+				// Revamped yields - v0.1, Snarko
+				// No longer used
+				/* Original code
+				if (GetBaseCombatStrength(true/*bIgnoreEmbarked*//*) > 0 && getDomainType() == DOMAIN_LAND)
 				{
 					pOldPlot->getPlotCity()->ChangeJONSCulturePerTurnFromPolicies(-(GET_PLAYER(getOwner()).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_CULTURE_FROM_GARRISON)));
 				}
+				*/
+				// END Revamped yields
 			}
 
 			if (canChangeVisibility())
@@ -12796,10 +12838,15 @@ void CvUnit::setXY(int iX, int iY, bool bGroup, bool bUpdate, bool bShow, bool b
 			auto_ptr<ICvUnit1> pDllUnit(new CvDllUnit(this));
 			gDLL->GameplayUnitVisibility(pDllUnit.get(), false /*bVisible*/);
 			
-			if (GetBaseCombatStrength(true/*bIgnoreEmbarked*/) > 0 && getDomainType() == DOMAIN_LAND)
+			// Revamped yields - v0.1, Snarko
+			// No longer used
+			/* Original code
+			if (GetBaseCombatStrength(true/*bIgnoreEmbarked*//*) > 0 && getDomainType() == DOMAIN_LAND)
 			{
 				pNewPlot->getPlotCity()->ChangeJONSCulturePerTurnFromPolicies((GET_PLAYER(getOwner()).GetPlayerPolicies()->GetNumericModifier(POLICYMOD_CULTURE_FROM_GARRISON)));
 			}
+			*/
+			// END Revamped yields
 		}
 
 		setFortifyTurns(0);
@@ -16855,6 +16902,15 @@ bool CvUnit::canAcquirePromotion(PromotionTypes ePromotion) const
 		}
 	}
 
+	// EventEngine - v0.1, Snarko
+	for (int iI = 0; iI < pkPromotionInfo->getNumFlagPrereqs(); iI++)
+	{
+		std::string szFlag = pkPromotionInfo->getFlagPrereq(iI);
+		if (getFlag(szFlag) < pkPromotionInfo->getFlagPrereqValue(iI) && GET_PLAYER(getOwner()).getFlag(szFlag) < pkPromotionInfo->getFlagPrereqValue(iI))
+			return false;
+	}
+	// END EventEngine
+
 	if(!isPromotionValid(ePromotion))
 	{
 		return false;
@@ -20756,15 +20812,33 @@ bool CvUnit::canChangeVisibility() const
 }
 //	--------------------------------------------------------------------------------
 // EventEngine - v0.1, Snarko
+void CvUnit::setFlag(std::string szFlag, int iValue)
+{
+	m_asziFlags[szFlag] = iValue;
+}
+
+void CvUnit::changeFlag(std::string szFlag, int iValue)
+{
+	setFlag(szFlag, getFlag(szFlag) + iValue);
+}
+
+int CvUnit::getFlag(std::string szFlag) const
+{
+	std::map<std::string, int>::const_iterator it = m_asziFlags.find(szFlag);
+	if (it == m_asziFlags.end())
+		return NULL;
+	else
+		return it->second;
+}
+// END
+
 void CvUnit::doEvents()
 {
 	bool bValid;
 	CvPlayer &pPlayer = GET_PLAYER(getOwner());
-	std::map<std::string, std::vector<int> > asziScopes;
 
 	for (int i = 0; i < GC.getNumEventInfos(); i++)
 	{
-		asziScopes.clear();
 		bValid = true;
 		CvEventInfo* kEvent = GC.getEventInfo((EventTypes)i);
 		if (kEvent->getEventType() != EVENT_UNIT)
@@ -20783,7 +20857,7 @@ void CvUnit::doEvents()
 			}
 			else if (kRequirement.getModifierType() > EVENTMOD_PLAYER_START && kRequirement.getModifierType() < EVENTMOD_PLAYER_END)
 			{
-				if (!pPlayer.checkEventModifier(kRequirement, asziScopes))
+				if (!pPlayer.checkEventModifier(kRequirement))
 				{
 					bValid = false;
 					break;
@@ -20797,14 +20871,345 @@ void CvUnit::doEvents()
 		}
 		if (bValid)
 		{
-			pPlayer.doEventChance(*kEvent, asziScopes, NULL, this);
+			pPlayer.doEventChance(*kEvent, NULL, this);
 		}
 	}
 }
-bool CvUnit::checkEventModifier(CvEventModifierInfo& kModifier)
+bool CvUnit::checkEventModifier(CvEventModifierInfo& kModifier, bool bRequirement)
 {
-	//TODO
-	return true;
+	int iValue = 0;
+	switch(kModifier.getModifierType())
+	{
+	case EVENTMOD_UNIT_TYPE:
+		return GC.EventBoolEval(getUnitType() == (UnitTypes)kModifier.getTypeToCompare(), kModifier);
+		break;
+
+	case EVENTMOD_UNIT_CLASS:
+		return GC.EventBoolEval(getUnitClassType() == (UnitClassTypes)kModifier.getTypeToCompare(), kModifier);
+		break;
+
+	case EVENTMOD_UNIT_COMBAT:
+		return GC.EventBoolEval(getUnitCombatType() == (UnitCombatTypes)kModifier.getTypeToCompare(), kModifier);
+		break;
+
+	case EVENTMOD_UNIT_DOMAIN:
+		return GC.EventBoolEval(getDomainType() == (DomainTypes)kModifier.getTypeToCompare(), kModifier);
+		break;
+
+	case EVENTMOD_UNIT_CIVILIAN:
+		return GC.EventBoolEval(!IsCombatUnit(), kModifier);
+		break;
+
+	case EVENTMOD_UNIT_GARRISONED:
+		return GC.EventBoolEval(IsGarrisoned(), kModifier);
+		break;
+
+	case EVENTMOD_UNIT_REQ_RESOURCE:
+		{
+			if (kModifier.getSet() != "default")
+			{
+				return GET_PLAYER(getOwner()).testSetItems(kModifier, GC.getNumResourceInfos(), bRequirement, NULL, this);
+			}
+			// Specific resource
+			else if (kModifier.getTypeToCompare() != -1)
+			{
+				return GC.EventBoolEval(m_pUnitInfo->GetResourceQuantityRequirement(kModifier.getTypeToCompare()), kModifier);
+			}
+			// Any resource 
+			else
+			{
+				for(int iResourceLoop = 0; iResourceLoop < GC.getNumResourceInfos(); iResourceLoop++)
+				{
+					if (GC.EventBoolEval(m_pUnitInfo->GetResourceQuantityRequirement(iResourceLoop), kModifier))
+						return true;
+				}
+				return false;
+			}
+		}
+		break;
+
+	case EVENTMOD_UNIT_FORTIFIED:
+		iValue = getFortifyTurns();
+		break;
+
+	case EVENTMOD_UNIT_LEVEL:
+		iValue = getLevel();
+		break;
+
+	case EVENTMOD_UNIT_EXPERIENCE:
+		iValue = getExperience();
+		break;
+
+	case EVENTMOD_UNIT_MOVES:
+		if (kModifier.getTypeToCompare() != -1)
+			iValue = baseMoves(getDomainType());
+		else
+			iValue = baseMoves();
+		break;
+
+	case EVENTMOD_UNIT_DAMAGE:
+		iValue = getDamage();
+		break;
+
+	case EVENTMOD_UNIT_BASE_STRENGTH:
+		iValue = GetBaseCombatStrength();
+		break;
+
+	case EVENTMOD_UNIT_ATTACK_STRENGTH:
+		iValue = GetMaxAttackStrength(NULL, NULL, NULL);
+		break;
+
+	case EVENTMOD_UNIT_DEFENSE_STRENGTH:
+		if (kModifier.getTypeToCompare() != -1)
+			iValue = GetMaxDefenseStrength(plot(), NULL);
+		else
+			iValue = GetMaxDefenseStrength(NULL, NULL);
+		break;
+
+	case EVENTMOD_UNIT_COMBAT_LIMIT:
+		iValue = GetCombatLimit();
+		break;
+
+	case EVENTMOD_UNIT_RANGED_BASE_STRENGTH:
+		iValue = GetBaseRangedCombatStrength();
+		break;
+
+	case EVENTMOD_UNIT_RANGED_ATTACK_STRENGTH:
+		iValue = GetMaxRangedCombatStrength(NULL, NULL, true, true);
+
+	case EVENTMOD_UNIT_RANGED_DEFENSE_STRENGTH:
+		{
+			CvPlot* pPlot = NULL;
+			if (kModifier.getTypeToCompare() != -1)
+				pPlot = plot();
+			// Use Ranged combat value for defender, UNLESS it's a boat
+			// Why? Not a clue! But that's the way it's done, so that's the way I'm doing it.
+			if(GetMaxRangedCombatStrength(NULL, NULL, false, false) > 0 && !getDomainType() == DOMAIN_SEA)
+				iValue = GetMaxRangedCombatStrength(NULL, NULL, false, false);
+			else
+				iValue = GetMaxDefenseStrength(pPlot, NULL, true);
+		}
+		break;
+
+	case EVENTMOD_UNIT_RANGE:
+		iValue = GetRange();
+		break;
+
+	case EVENTMOD_UNIT_RANGED_COMBAT_LIMIT:
+		iValue = GetRangedCombatLimit();
+		break;
+
+	case EVENTMOD_UNIT_INTERCEPT_CHANCE:
+		iValue = maxInterceptionProbability();
+		break;
+
+	case EVENTMOD_UNIT_INTERCEPT_RANGE:
+		iValue = getUnitInfo().GetAirInterceptRange();
+		break;
+
+	case EVENTMOD_UNIT_PROMOTION:
+		{
+			if (kModifier.getSet() != "default")
+			{
+				return GET_PLAYER(getOwner()).testSetItems(kModifier, GC.getNumPromotionInfos(), bRequirement, NULL, this);
+			}
+			// Specific promotion
+			else if (kModifier.getTypeToCompare() != -1)
+			{
+				return GC.EventBoolEval(isHasPromotion((PromotionTypes)kModifier.getTypeToCompare()), kModifier);
+			}
+			// Any promotion (why would you ever do this?) 
+			else
+			{
+				for(int iPromotionLoop = 0; iPromotionLoop < GC.getNumPromotionInfos(); iPromotionLoop++)
+				{
+					if (GC.EventBoolEval(isHasPromotion((PromotionTypes)iPromotionLoop), kModifier))
+						return true;
+				}
+				return false;
+			}
+		}
+		break;
+
+	// These share code so much we make one case for them.
+	case EVENTMOD_UNIT_NUM_FEATURE_IN_RANGE:
+	case EVENTMOD_UNIT_NUM_IMPROVEMENT_IN_RANGE:
+	case EVENTMOD_UNIT_NUM_RESOURCE_IN_RANGE:
+	case EVENTMOD_UNIT_NUM_TERRAIN_IN_RANGE:
+		{
+			int iMaxRange = kModifier.getNumberToCompare();
+			int iDX, iDY;
+			CvPlot* pLoopPlot;
+			int iItem;
+
+			std::vector<int> iNumItems;
+			if (kModifier.getModifierType() == EVENTMOD_UNIT_NUM_FEATURE_IN_RANGE)
+				iNumItems.resize(GC.getNumFeatureInfos(), 0);
+			else if (kModifier.getModifierType() == EVENTMOD_UNIT_NUM_IMPROVEMENT_IN_RANGE)
+				iNumItems.resize(GC.getNumImprovementInfos(), 0);
+			else if (kModifier.getModifierType() == EVENTMOD_UNIT_NUM_RESOURCE_IN_RANGE)
+				iNumItems.resize(GC.getNumResourceInfos(), 0);
+			else // EVENTMOD_UNIT_NUM_TERRAIN_IN_RANGE
+				iNumItems.resize(GC.getNumTerrainInfos(), 0);
+
+			for (iDX = -iMaxRange; iDX <= iMaxRange; iDX++)
+			{
+				for (iDY = -iMaxRange; iDY <= iMaxRange; iDY++)
+				{
+					pLoopPlot = plotXYWithRangeCheck(getX(), getY(), iDX, iDY, iMaxRange);
+					if (pLoopPlot != NULL)
+					{
+						if (kModifier.getModifierType() == EVENTMOD_UNIT_NUM_FEATURE_IN_RANGE)
+							iItem = (int)pLoopPlot->getFeatureType();
+						else if (kModifier.getModifierType() == EVENTMOD_UNIT_NUM_IMPROVEMENT_IN_RANGE)
+							iItem = (int)pLoopPlot->getImprovementType();
+						else if (kModifier.getModifierType() == EVENTMOD_UNIT_NUM_RESOURCE_IN_RANGE)
+							iItem = (int)pLoopPlot->getResourceType(getTeam());
+						else // EVENTMOD_UNIT_NUM_TERRAIN_IN_RANGE
+							iItem = (int)pLoopPlot->getTerrainType();
+						if (iItem != -1)
+							iNumItems[iItem]++;
+					}
+				}
+			}
+			// This is a special case for Sets
+			// We can't call testSetItems because we need to check all plots in a range
+			if (kModifier.getSet() != "default")
+			{
+				bool bPassed = false;
+				std::vector< std::pair<int, int> > aSets;
+				GET_PLAYER(getOwner()).getSet(kModifier.getSet(), aSets);
+				if (!aSets.empty())
+				{
+					std::vector< std::pair<int, int> >::iterator iter = aSets.begin();
+					while (iter != aSets.end())
+					{
+						if (GC.EventIntEval(iNumItems[iter->first], kModifier))
+						{
+							++iter;
+							bPassed = true;
+							if (!bRequirement)
+							{
+								if (kModifier.getFactor() == 0)
+									iter->second = 0;
+								else
+								{
+									// Change the modifier by the inverse of the modifier.
+									// We do this because it makes it easier to do a weighted random list later on.
+									// Then we just inverse the modifier again when we want to alter the event chance.
+									iter->second *= 100;
+									iter->second /= kModifier.getFactor();
+								}
+							}
+						}
+						// Remove it if this is a requirement. It did not meet the requirement.
+						else if (bRequirement)
+							iter = aSets.erase(iter);
+						// If this is a modifier we want to keep it, even if it failed this specific modifier.
+						else
+							++iter;
+					}
+				}
+				else if (bRequirement)
+				{
+					for (uint iI = 0; iI < iNumItems.size(); iI++)
+					{
+						if (GC.EventIntEval(iNumItems[iI], kModifier))
+						{
+							bPassed = true;
+							aSets.push_back(std::make_pair(iI, BASE_MODIFIER_CHANCE_SETS));
+						}
+					}
+				}
+				if (aSets.empty() || !bPassed)
+				{
+					return false;
+				}
+				else
+				{
+					// Requirements modify how many values we have (or add them in the first place), modifiers changes the chance.
+					// Either way we need to update the map with the new data.
+					GET_PLAYER(getOwner()).setSet(kModifier.getSet(), aSets);
+					return true;
+				}
+			}
+			// Check a specific item.
+			else if (kModifier.getTypeToCompare() != -1)
+			{
+				iValue = iNumItems[kModifier.getTypeToCompare()];
+			}
+			// Any item that matches.
+			else
+			{
+				for (uint iI = 0; iI < iNumItems.size(); iI++)
+				{
+					if (GC.EventIntEval(iNumItems[iI], kModifier))
+						return true;
+				}
+				return false;
+			}
+		}
+		break;
+
+	default:
+		FAssert(false);
+		return false;
+
+	}
+	return GC.EventIntEval(iValue, kModifier);
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::addTempEventEffect(CvEventEffect& kEventEffect)
+{
+	m_aEventEffects.push_back(kEventEffect);
+}
+
+//	--------------------------------------------------------------------------------
+int CvUnit::getNumTempEventEffects() const
+{
+	return m_aEventEffects.size();
+}
+
+//	--------------------------------------------------------------------------------
+CvEventEffect& CvUnit::getTempEventEffect(int index)
+{
+	return m_aEventEffects[index];
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::doTempEventEffects()
+{
+	std::vector<CvEventEffect>::iterator it = m_aEventEffects.begin();
+	while (it != m_aEventEffects.end())
+	{
+		it->changeNumTurns(-1);
+		if (it->getNumTurns() <= 0)
+		{
+			unprocessTempEventEffect(it);
+			it = m_aEventEffects.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+}
+
+//	--------------------------------------------------------------------------------
+void CvUnit::unprocessTempEventEffect(std::vector<CvEventEffect>::iterator& kEventEffects)
+{
+	EventActionTypeTypes eAction = kEventEffects->getEventAction();
+	CvEventActionInfo* pAction = GC.getEventActionInfo(kEventEffects->getAction());
+	switch(eAction)
+	{
+	case EVENTACTION_UNIT_PROMOTION:
+		setHasPromotion((PromotionTypes)kEventEffects->getTypeToAction(), !pAction->getBool1());
+
+	default:
+		FAssertMsg(false, "Unknown EventActionTypeTypes in CvUnit::unprocessTempEventEffect");
+		break;
+	}
 }
 // END EventEngine
 

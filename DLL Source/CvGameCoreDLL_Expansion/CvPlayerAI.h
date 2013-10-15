@@ -56,6 +56,10 @@ public:
 
 	void AI_considerAnnex();
 
+	// EventEngine - v0.1, Snarko
+	void AI_chooseEventOption(int iEvent);
+	// END EventEngine
+
 	int AI_plotTargetMissionAIs(CvPlot* pPlot, MissionAITypes eMissionAI, int iRange = 0);
 
 	virtual void AI_launch(VictoryTypes eVictory);

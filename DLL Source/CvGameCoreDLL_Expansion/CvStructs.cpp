@@ -164,6 +164,23 @@ FDataStream& operator<<(FDataStream& kStream, const BuildingGreatWork& readFrom)
 	return kStream;
 }
 
+// Revamped yields - v0.1, Snarko
+FDataStream& operator>>(FDataStream& kStream, LeagueRewardYieldModifier& writeTo)
+{
+	kStream >> writeTo.eYield;
+	kStream >> writeTo.iChange;
+	kStream >> writeTo.iTurns;
+	return kStream;
+}
+FDataStream& operator<<(FDataStream& kStream, const LeagueRewardYieldModifier& readFrom)
+{
+	kStream << readFrom.eYield;
+	kStream << readFrom.iChange;
+	kStream << readFrom.iTurns;
+	return kStream;
+}
+// END Revamped yields
+
 void checkBattleUnitType(BattleUnitTypes unitType)
 {
 	DEBUG_VARIABLE(unitType);

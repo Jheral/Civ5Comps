@@ -25,9 +25,17 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iGridY(0),
 	m_iLevel(0),
 	m_iPolicyCostModifier(0),
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piCityYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCulturePerCity(0),
 	m_iCulturePerWonder(0),
 	m_iCultureWonderMultiplier(0),
+	*/
+	m_piYieldPerWonder(NULL),
+	m_piYieldWonderMultiplier(NULL),
+	// END Revamped yields
 	m_iCulturePerTechResearched(0),
 	m_iCultureImprovementChange(0),
 	m_iCultureFromKills(0),
@@ -73,7 +81,13 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iFreeUnitsPopulationPercent(0),
 	m_iFreeMilitaryUnitsPopulationPercent(0),
 	m_iHappinessPerGarrisonedUnit(0),
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piYieldFromGarrison
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCulturePerGarrisonedUnit(0),
+	*/
+	// END Revamped yields
 	m_iHappinessPerTradeRoute(0),
 	m_iHappinessPerXPopulation(0),
 	m_iExtraHappinessPerLuxury(0),
@@ -86,7 +100,14 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iGarrisonedCityRangeStrikeModifier(0),
 	m_iUnitPurchaseCostModifier(0),
 	m_iBuildingPurchaseCostModifier(0),
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piCityConnectionTradeRouteYieldModifier
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCityConnectionTradeRouteGoldModifier(0),
+	*/
+	m_piCityConnectionTradeRouteYieldModifier(NULL),
+	// END Revamped yields
 	m_iTradeMissionGoldModifier(0),
 	m_iFaithCostModifier(0),
 	m_iCulturalPlunderMultiplier(0),
@@ -140,8 +161,16 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_bEnablesSSPartPurchase(false),
 	m_iPolicyBranchType(NO_POLICY_BRANCH_TYPE),
 	m_iNumExtraBranches(0),
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piHappinessToYields
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iHappinessToCulture(0),
 	m_iHappinessToScience(0),
+	*/
+	m_piHappinessToYields(NULL),
+	m_piHappyYieldMultiplier(NULL),
+	// END Revamped yields
 	m_iNumCitiesFreeCultureBuilding(0),
 	m_iNumCitiesFreeFoodBuilding(0),
 	m_bHalfSpecialistUnhappiness(false),
@@ -170,7 +199,14 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_pabFreePromotion(NULL),
 	m_paiUnitCombatProductionModifiers(NULL),
 	m_paiUnitCombatFreeExperiences(NULL),
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_ppiBuildingClassYieldChanges
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_paiBuildingClassCultureChanges(NULL),
+	*/
+	m_piYieldFromGarrison(NULL),
+	// END Revamped yields
 	m_paiBuildingClassProductionModifiers(NULL),
 	m_paiBuildingClassTourismModifiers(NULL),
 	m_paiBuildingClassHappiness(NULL),
@@ -183,6 +219,9 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_ppiBuildingClassYieldChanges(NULL),
 	m_piFlavorValue(NULL),
 	m_eFreeBuildingOnConquest(NO_BUILDING)
+	// EventEngine - v0.1, Snarko
+	, m_asziFlagPrereqs(NULL)
+	// END EventEngine
 {
 }
 
@@ -203,7 +242,19 @@ CvPolicyEntry::~CvPolicyEntry(void)
 	SAFE_DELETE_ARRAY(m_pabFreePromotion);
 	SAFE_DELETE_ARRAY(m_paiUnitCombatProductionModifiers);
 	SAFE_DELETE_ARRAY(m_paiUnitCombatFreeExperiences);
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_ppiBuildingClassYieldChanges
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	SAFE_DELETE_ARRAY(m_paiBuildingClassCultureChanges);
+	*/
+	SAFE_DELETE_ARRAY(m_piYieldFromGarrison);
+	SAFE_DELETE_ARRAY(m_piYieldPerWonder);
+	SAFE_DELETE_ARRAY(m_piYieldWonderMultiplier);
+	SAFE_DELETE_ARRAY(m_piHappinessToYields);
+	SAFE_DELETE_ARRAY(m_piHappyYieldMultiplier);
+	SAFE_DELETE_ARRAY(m_piCityConnectionTradeRouteYieldModifier);
+	// END Revamped yields
 	SAFE_DELETE_ARRAY(m_paiBuildingClassProductionModifiers);
 	SAFE_DELETE_ARRAY(m_paiBuildingClassTourismModifiers);
 	SAFE_DELETE_ARRAY(m_paiBuildingClassHappiness);
@@ -231,9 +282,35 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iGridY = kResults.GetInt("GridY");
 	m_iLevel = kResults.GetInt("Level");
 	m_iPolicyCostModifier = kResults.GetInt("PolicyCostModifier");
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piCityYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCulturePerCity = kResults.GetInt("CulturePerCity");
 	m_iCulturePerWonder = kResults.GetInt("CulturePerWonder");
 	m_iCultureWonderMultiplier = kResults.GetInt("CultureWonderMultiplier");
+	*/
+	kUtility.SetYields(m_piYieldPerWonder, "Policy_YieldPerWonder", "PolicyType", GetType());
+	kUtility.SetYields(m_piYieldWonderMultiplier, "Policy_YieldWonderMultiplier", "PolicyType", GetType());
+
+	int iCulturePerWonder = kResults.GetInt("CulturePerWonder");
+	if (iCulturePerWonder != 0)
+	{
+		if (m_piYieldPerWonder == NULL)
+			kUtility.InitializeArray(m_piYieldPerWonder, NUM_YIELD_TYPES, 0);
+
+		m_piYieldPerWonder[YIELD_CULTURE] = iCulturePerWonder;
+	}
+
+	int iCultureWonderMultiplier = kResults.GetInt("CultureWonderMultiplier");
+	if (iCultureWonderMultiplier != 0)
+	{
+		if (m_piYieldWonderMultiplier == NULL)
+			kUtility.InitializeArray(m_piYieldWonderMultiplier, NUM_YIELD_TYPES, 0);
+
+		m_piYieldWonderMultiplier[YIELD_CULTURE] = iCultureWonderMultiplier;
+	}
+	// END Revamped yields
 	m_iCulturePerTechResearched = kResults.GetInt("CulturePerTechResearched");
 	m_iCultureImprovementChange = kResults.GetInt("CultureImprovementChange");
 	m_iCultureFromKills = kResults.GetInt("CultureFromKills");
@@ -279,7 +356,13 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iFreeUnitsPopulationPercent = kResults.GetInt("FreeUnitsPopulationPercent");
 	m_iFreeMilitaryUnitsPopulationPercent = kResults.GetInt("FreeMilitaryUnitsPopulationPercent");
 	m_iHappinessPerGarrisonedUnit = kResults.GetInt("HappinessPerGarrisonedUnit");
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piYieldFromGarrison
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCulturePerGarrisonedUnit = kResults.GetInt("CulturePerGarrisonedUnit");
+	*/
+	// END Revamped yields
 	m_iHappinessPerTradeRoute = kResults.GetInt("HappinessPerTradeRoute");
 	m_iHappinessPerXPopulation = kResults.GetInt("HappinessPerXPopulation");
 	m_iExtraHappinessPerLuxury = kResults.GetInt("ExtraHappinessPerLuxury");
@@ -292,7 +375,23 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iGarrisonedCityRangeStrikeModifier = kResults.GetInt("GarrisonedCityRangeStrikeModifier");
 	m_iUnitPurchaseCostModifier = kResults.GetInt("UnitPurchaseCostModifier");
 	m_iBuildingPurchaseCostModifier = kResults.GetInt("BuildingPurchaseCostModifier");
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piCityConnectionTradeRouteYieldModifier
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCityConnectionTradeRouteGoldModifier = kResults.GetInt("CityConnectionTradeRouteGoldModifier");
+	*/
+	kUtility.SetYields(m_piCityConnectionTradeRouteYieldModifier, "Policy_CityConnectionYieldModifiers", "PolicyType", GetType());
+
+	int iCityConnectionTradeRouteGoldModifier = kResults.GetInt("CityConnectionTradeRouteGoldModifier");
+	if (iCityConnectionTradeRouteGoldModifier != 0)
+	{
+		if (m_piCityConnectionTradeRouteYieldModifier == NULL)
+			kUtility.InitializeArray(m_piCityConnectionTradeRouteYieldModifier, NUM_YIELD_TYPES, 0);
+
+		m_piCityConnectionTradeRouteYieldModifier[YIELD_GOLD] += iCityConnectionTradeRouteGoldModifier;
+	}
+	// END Revamped yields
 	m_iTradeMissionGoldModifier = kResults.GetInt("TradeMissionGoldModifier");
 	m_iFaithCostModifier = kResults.GetInt("FaithCostModifier");
 	m_iCulturalPlunderMultiplier = kResults.GetInt("CulturalPlunderMultiplier");
@@ -313,8 +412,34 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iUnitGoldMaintenanceMod = kResults.GetInt("UnitGoldMaintenanceMod");
 	m_iUnitSupplyMod = kResults.GetInt("UnitSupplyMod");
 	m_iHappyPerMilitaryUnit = kResults.GetInt("HappyPerMilitaryUnit");
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piHappinessToYields
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iHappinessToCulture = kResults.GetInt("HappinessToCulture");
 	m_iHappinessToScience = kResults.GetInt("HappinessToScience");
+	*/
+	kUtility.SetYields(m_piHappinessToYields, "Policy_HappinessToYields", "PolicyType", GetType());
+	kUtility.SetYields(m_piHappyYieldMultiplier, "Policy_HappyYieldMultiplier", "PolicyType", GetType());
+
+	int iHappinessToCulture = kResults.GetInt("HappinessToCulture");
+	if (iHappinessToCulture != 0)
+	{
+		if (m_piHappinessToYields == NULL)
+			kUtility.InitializeArray(m_piHappinessToYields, NUM_YIELD_TYPES, 0);
+
+		m_piHappinessToYields[YIELD_CULTURE] = iHappinessToCulture;
+	}
+
+	int iHappinessToScience = kResults.GetInt("HappinessToScience");
+	if (iHappinessToScience != 0)
+	{
+		if (m_piHappyYieldMultiplier == NULL)
+			kUtility.InitializeArray(m_piHappyYieldMultiplier, NUM_YIELD_TYPES, 0);
+
+		m_piHappyYieldMultiplier[YIELD_SCIENCE] = iHappinessToScience;
+	}
+	// END Revamped yields
 	m_iNumCitiesFreeCultureBuilding = kResults.GetInt("NumCitiesFreeCultureBuilding");
 	m_iNumCitiesFreeFoodBuilding = kResults.GetInt("NumCitiesFreeFoodBuilding");
 	m_bHalfSpecialistUnhappiness = kResults.GetBool("HalfSpecialistUnhappiness");
@@ -383,6 +508,28 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	const char* szPolicyType = GetType();
 	kUtility.SetYields(m_piYieldModifier, "Policy_YieldModifiers", "PolicyType", szPolicyType);
 	kUtility.SetYields(m_piCityYieldChange, "Policy_CityYieldChanges", "PolicyType", szPolicyType);
+
+	// Revamped yields - v0.1, Snarko
+	// m_iCulturePerCity is no longer used but the XML tag is kept for backwards compatibility.
+	int iCulturePerCity = kResults.GetInt("CulturePerCity");
+	if (iCulturePerCity != 0)
+	{
+		if (m_piCityYieldChange == NULL)
+			kUtility.InitializeArray(m_piCityYieldChange, NUM_YIELD_TYPES, 0);
+		m_piCityYieldChange[YIELD_CULTURE] += iCulturePerCity;
+	}
+
+	kUtility.SetYields(m_piYieldFromGarrison, "Policy_YieldFromGarrison", "PolicyType", szPolicyType);
+
+	int iCulturePerGarrisonedUnit = kResults.GetInt("CulturePerGarrisonedUnit");
+	if (iCulturePerGarrisonedUnit != 0)
+	{
+		if (m_piYieldFromGarrison == NULL)
+			kUtility.InitializeArray(m_piYieldFromGarrison, NUM_YIELD_TYPES);
+		m_piYieldFromGarrison[YIELD_CULTURE] = iCulturePerGarrisonedUnit;
+	}
+	// END Revamped yields
+
 	kUtility.SetYields(m_piCoastalCityYieldChange, "Policy_CoastalCityYieldChanges", "PolicyType", szPolicyType);
 	kUtility.SetYields(m_piCapitalYieldChange, "Policy_CapitalYieldChanges", "PolicyType", szPolicyType);
 	kUtility.SetYields(m_piCapitalYieldPerPopChange, "Policy_CapitalYieldPerPopChanges", "PolicyType", szPolicyType);
@@ -400,7 +547,15 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	kUtility.PopulateArrayByValue(m_paiUnitCombatFreeExperiences, "UnitCombatInfos", "Policy_UnitCombatFreeExperiences", "UnitCombatType", "PolicyType", szPolicyType, "FreeExperience");
 	kUtility.PopulateArrayByValue(m_paiUnitCombatProductionModifiers, "UnitCombatInfos", "Policy_UnitCombatProductionModifiers", "UnitCombatType", "PolicyType", szPolicyType, "ProductionModifier");
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_ppiBuildingClassYieldChanges
+	// XML tag still kept for backwards compatibility
+	int* iBuildingClassCultureChanges;
+	kUtility.PopulateArrayByValue(iBuildingClassCultureChanges, "BuildingClasses", "Policy_BuildingClassCultureChanges", "BuildingClassType", "PolicyType", szPolicyType, "CultureChange");
+	/* Original code
 	kUtility.PopulateArrayByValue(m_paiBuildingClassCultureChanges, "BuildingClasses", "Policy_BuildingClassCultureChanges", "BuildingClassType", "PolicyType", szPolicyType, "CultureChange");
+	*/
+	// END Revamped yields
 	kUtility.PopulateArrayByValue(m_paiBuildingClassProductionModifiers, "BuildingClasses", "Policy_BuildingClassProductionModifiers", "BuildingClassType", "PolicyType", szPolicyType, "ProductionModifier");
 	kUtility.PopulateArrayByValue(m_paiBuildingClassTourismModifiers, "BuildingClasses", "Policy_BuildingClassTourismModifiers", "BuildingClassType", "PolicyType", szPolicyType, "TourismModifier");
 	kUtility.PopulateArrayByValue(m_paiBuildingClassHappiness, "BuildingClasses", "Policy_BuildingClassHappiness", "BuildingClassType", "PolicyType", szPolicyType, "Happiness");
@@ -453,6 +608,15 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 			m_ppiBuildingClassYieldChanges[BuildingClassID][iYieldID] = iYieldChange;
 		}
 	}
+
+	// Revamped yields - v0.1, Snarko
+	// m_paiBuildingClassCultureChanges is no longer used but the XML tag is kept for backwards compatibility.
+	// Could probably use GC.getNumBuildingClassInfos here, but never know if it will always remain loaded before policies
+	for (int i = 0; i < kUtility.MaxRows("BuildingClasses"); i++)
+	{
+		m_ppiBuildingClassYieldChanges[YIELD_CULTURE][i] += iBuildingClassCultureChanges[i];
+	}
+	// END Revamped yields
 
 	//ImprovementYieldChanges
 	{
@@ -576,6 +740,27 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 		pResults->Reset();
 	}
 
+	// EventEngine - v0.1, Snarko
+	{
+		m_asziFlagPrereqs.clear();
+		std::string strKey("Policy_PrereqFlags");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from Policy_PrereqFlags where PolicyType = ?");
+		}
+
+		pResults->Bind(1, szPolicyType);
+
+		while(pResults->Step())
+		{
+			std::string szFlag = pResults->GetText("Flag");
+			int iMinimumValue = pResults->GetInt("MinimumValue");
+			m_asziFlagPrereqs.push_back(std::make_pair(szFlag, iMinimumValue));
+		}
+	}
+	// END EventEngine
+
 	return true;
 }
 
@@ -609,6 +794,10 @@ int CvPolicyEntry::GetPolicyCostModifier() const
 	return m_iPolicyCostModifier;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used, use GetCityYieldChange
+// XML tag still kept for backwards compatibility
+/* Original code
 /// Amount of Culture each City gets for free
 int CvPolicyEntry::GetCulturePerCity() const
 {
@@ -626,6 +815,23 @@ int CvPolicyEntry::GetCultureWonderMultiplier() const
 {
 	return m_iCultureWonderMultiplier;
 }
+*/
+/// Amount of extra Yield each Wonder gets
+int CvPolicyEntry::GetYieldPerWonder(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldPerWonder ? m_piYieldPerWonder[i] : 0;
+}
+
+/// Yield multiplier for a city with a wonder
+int CvPolicyEntry::GetYieldWonderMultiplier(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYieldWonderMultiplier ? m_piYieldWonderMultiplier[i] : 0;
+}
+// END Revamped yields
 
 /// Amount of Culture provided when a Tech is researched
 int CvPolicyEntry::GetCulturePerTechResearched() const
@@ -897,11 +1103,17 @@ int CvPolicyEntry::GetHappinessPerGarrisonedUnit() const
 	return m_iHappinessPerGarrisonedUnit;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used, use GetYieldFromGarrison
+// XML tag still kept for backwards compatibility
+/* Original code
 /// Culture from each City with a Garrison
 int CvPolicyEntry::GetCulturePerGarrisonedUnit() const
 {
 	return m_iCulturePerGarrisonedUnit;
 }
+*/
+// END Revamped yields
 
 /// Happiness from each City with a Trade Route to the capital
 int CvPolicyEntry::GetHappinessPerTradeRoute() const
@@ -975,11 +1187,24 @@ int CvPolicyEntry::GetBuildingPurchaseCostModifier() const
 	return m_iBuildingPurchaseCostModifier;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used, use m_piCityConnectionTradeRouteYieldModifier
+// XML tag still kept for backwards compatibility
+/* Original code
 /// How much more Gold do we make from Trade Routes
 int CvPolicyEntry::GetCityConnectionTradeRouteGoldModifier() const
 {
 	return m_iCityConnectionTradeRouteGoldModifier;
 }
+*/
+/// How much more of a yield do we make from Trade Routes
+int CvPolicyEntry::GetCityConnectionTradeRouteYieldModifier(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piCityConnectionTradeRouteYieldModifier[i];
+}
+// END Revamped yields
 
 /// How much more Gold do we make from Trade Missions?
 int CvPolicyEntry::GetTradeMissionGoldModifier() const
@@ -1268,6 +1493,11 @@ int CvPolicyEntry::GetNumExtraBranches() const
 	return m_iNumExtraBranches;
 }
 
+
+// Revamped yields - v0.1, Snarko
+// No longer used, use GetHappinessToYield
+// XML tag still kept for backwards compatibility
+/* Original code
 /// Excess Happiness converted into Culture
 int CvPolicyEntry::GetHappinessToCulture() const
 {
@@ -1279,6 +1509,22 @@ int CvPolicyEntry::GetHappinessToScience() const
 {
 	return m_iHappinessToScience;
 }
+*/
+
+int CvPolicyEntry::GetHappinessToYield(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piHappinessToYields ? m_piHappinessToYields[i] : 0;
+}
+
+int CvPolicyEntry::GetHappyYieldMultiplier(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piHappyYieldMultiplier ? m_piHappyYieldMultiplier[i] : 0;
+}
+// END Revamped yields
 
 /// Cities that receive a free culture building
 int CvPolicyEntry::GetNumCitiesFreeCultureBuilding() const
@@ -1402,6 +1648,18 @@ void CvPolicyEntry::SetWeLoveTheKingKey(const char* szVal)
 }
 
 // ARRAYS
+// Revamped yields - v0.1, Snarko
+int CvPolicyEntry::GetYieldFromGarrison(int i) const
+{
+	return m_piYieldFromGarrison ? m_piYieldFromGarrison[i] : 0;
+}
+
+int* CvPolicyEntry::GetYieldFromGarrisonArray() const
+{
+	return m_piYieldFromGarrison;
+}
+// END Revamped yields
+
 
 /// Prerequisite policies with OR
 int CvPolicyEntry::GetPrereqOrPolicies(int i) const
@@ -1576,6 +1834,10 @@ int CvPolicyEntry::GetUnitCombatFreeExperiences(int i) const
 	return m_paiUnitCombatFreeExperiences ? m_paiUnitCombatFreeExperiences[i] : -1;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used, use GetBuildingClassYieldChanges
+// XML tag still kept for backwards compatibility
+/* Original code
 /// Amount of extra Culture per turn a BuildingClass provides
 int CvPolicyEntry::GetBuildingClassCultureChange(int i) const
 {
@@ -1583,6 +1845,8 @@ int CvPolicyEntry::GetBuildingClassCultureChange(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_paiBuildingClassCultureChanges ? m_paiBuildingClassCultureChanges[i] : -1;
 }
+*/
+// END Revamped yields
 
 /// Amount of extra Culture per turn a BuildingClass provides
 int CvPolicyEntry::GetBuildingClassHappiness(int i) const
@@ -1700,6 +1964,28 @@ BuildingTypes CvPolicyEntry::GetFreeBuildingOnConquest() const
 	return m_eFreeBuildingOnConquest;
 }
 
+// EventEngine - v0.1, Snarko
+//------------------------------------------------------------------------------
+int CvPolicyEntry::getNumFlagPrereqs() const
+{
+	return m_asziFlagPrereqs.size();
+}
+//------------------------------------------------------------------------------
+std::string CvPolicyEntry::getFlagPrereq(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].first;
+}
+//------------------------------------------------------------------------------
+int CvPolicyEntry::getFlagPrereqValue(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].second;
+}
+// END EventEngine
+
 //=====================================
 // CvPolicyBranchEntry
 //=====================================
@@ -1715,6 +2001,9 @@ CvPolicyBranchEntry::CvPolicyBranchEntry(void):
 	m_iFirstAdopterFreePolicies(0),
 	m_iSecondAdopterFreePolicies(0),
 	m_piPolicyBranchDisables(NULL)
+	// EventEngine - v0.1, Snarko
+	, m_asziFlagPrereqs(NULL)
+	// END EventEngine
 {
 }
 
@@ -1787,6 +2076,27 @@ bool CvPolicyBranchEntry::CacheResults(Database::Results& kResults, CvDatabaseUt
 
 	//PolicyBranch_VictoryTypes
 	kUtility.PopulateArrayByExistence(m_pbVictoryTypes, "Victories", "PolicyBranch_VictoryTypes", "VictoryType", "PolicyBranchType", GetType());
+
+	// EventEngine - v0.1, Snarko
+	{
+		m_asziFlagPrereqs.clear();
+		std::string strKey("PolicyBranch_PrereqFlags");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from PolicyBranch_PrereqFlags where PolicyBranchType = ?");
+		}
+
+		pResults->Bind(1, szPolicyBranchType);
+
+		while(pResults->Step())
+		{
+			std::string szFlag = pResults->GetText("Flag");
+			int iMinimumValue = pResults->GetInt("MinimumValue");
+			m_asziFlagPrereqs.push_back(std::make_pair(szFlag, iMinimumValue));
+		}
+	}
+	// END EventEngine
 
 	return true;
 }
@@ -1868,6 +2178,27 @@ bool CvPolicyBranchEntry::IsDelayWhenNoScience() const
 {
 	return m_bDelayWhenNoScience;
 }
+// EventEngine - v0.1, Snarko
+//------------------------------------------------------------------------------
+int CvPolicyBranchEntry::getNumFlagPrereqs() const
+{
+	return m_asziFlagPrereqs.size();
+}
+//------------------------------------------------------------------------------
+std::string CvPolicyBranchEntry::getFlagPrereq(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].first;
+}
+//------------------------------------------------------------------------------
+int CvPolicyBranchEntry::getFlagPrereqValue(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].second;
+}
+// END EventEngine
 
 // AdvancementScreen - v1.0, Snarko
 PolicyBranchClassTypes CvPolicyBranchEntry::GetPolicyBranchClass() const
@@ -1894,6 +2225,9 @@ CvString CvPolicyBranchEntry::GetPolicyBranchIcon() const
 CvPolicyBranchClassEntry::CvPolicyBranchClassEntry(void):
 	m_iMaxBranches(0),
 	m_szStyle("")
+	// EventEngine - v0.1, Snarko
+	, m_asziFlagPrereqs(NULL)
+	// END EventEngine
 {
 }
 
@@ -1912,6 +2246,27 @@ bool CvPolicyBranchClassEntry::CacheResults(Database::Results& kResults, CvDatab
 	m_iMaxBranches = kResults.GetInt("iMaxBranches");
 	m_szStyle = kResults.GetText("Style");
 
+	// EventEngine - v0.1, Snarko
+	{
+		m_asziFlagPrereqs.clear();
+		std::string strKey("PolicyBranchClass_PrereqFlags");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from PolicyBranchClass_PrereqFlags where PolicyBranchClassType = ?");
+		}
+
+		pResults->Bind(1, GetType());
+
+		while(pResults->Step())
+		{
+			std::string szFlag = pResults->GetText("Flag");
+			int iMinimumValue = pResults->GetInt("MinimumValue");
+			m_asziFlagPrereqs.push_back(std::make_pair(szFlag, iMinimumValue));
+		}
+	}
+	// END EventEngine
+
 	return true;
 }
 
@@ -1925,7 +2280,27 @@ std::string CvPolicyBranchClassEntry::GetStyle()
 	return m_szStyle;
 }
 
-
+// EventEngine - v0.1, Snarko
+//------------------------------------------------------------------------------
+int CvPolicyBranchClassEntry::getNumFlagPrereqs() const
+{
+	return m_asziFlagPrereqs.size();
+}
+//------------------------------------------------------------------------------
+std::string CvPolicyBranchClassEntry::getFlagPrereq(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].first;
+}
+//------------------------------------------------------------------------------
+int CvPolicyBranchClassEntry::getFlagPrereqValue(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].second;
+}
+// END EventEngine
 // END AdvancementScreen
 
 
@@ -2530,9 +2905,14 @@ int CvPlayerPolicies::GetNumericModifier(PolicyModifierType eType)
 			case POLICYMOD_GOLD_FROM_KILLS:
 				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetGoldFromKills();
 				break;
+			// Revamped yields - v0.1, Snarko
+			// No longer used
+			/* Original code
 			case POLICYMOD_CULTURE_FROM_GARRISON:
 				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetCulturePerGarrisonedUnit();
 				break;
+			*/
+			// END Revamped yields
 			case POLICYMOD_UNIT_FREQUENCY_MODIFIER:
 				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetCityStateUnitFrequencyModifier();
 				break;
@@ -2715,10 +3095,15 @@ bool CvPlayerPolicies::HasPolicyEncouragingGarrisons() const
 			{
 				return true;
 			}
+			// Revamped yields - v0.1, Snarko
+			// No longer used
+			/* Original code
 			else if(pPolicy->GetCulturePerGarrisonedUnit() > 0)
 			{
 				return true;
 			}
+			*/
+			// END Revamped yields
 			else if(pPolicy->GetHappinessPerGarrisonedUnit() > 0)
 			{
 				return true;
@@ -2727,6 +3112,13 @@ bool CvPlayerPolicies::HasPolicyEncouragingGarrisons() const
 			{
 				return true;
 			}
+			// Revamped yields - v0.1, Snarko
+			for (int i = 0; i < NUM_YIELD_TYPES; i++)
+			{
+				if (pPolicy->GetYieldFromGarrison(i) > 0)
+					return true;
+			}
+			// END Revamped yields
 		}
 	}
 
@@ -2947,6 +3339,15 @@ bool CvPlayerPolicies::CanAdoptPolicy(PolicyTypes eIndex, bool bIgnoreCost) cons
 		}
 	}
 
+	// EventEngine - v0.1, Snarko
+	for (int iI = 0; iI < pkPolicyEntry->getNumFlagPrereqs(); iI++)
+	{
+		std::string szFlag = pkPolicyEntry->getFlagPrereq(iI);
+		if (m_pPlayer->getFlag(szFlag) < pkPolicyEntry->getFlagPrereqValue(iI))
+			return false;
+	}
+	// END EventEngine
+
 	// Other Policies as Prereqs
 
 	bool bFoundPossible = false;
@@ -3143,12 +3544,31 @@ bool CvPlayerPolicies::CanUnlockPolicyBranch(PolicyBranchTypes eBranchType)
 			}
 		}
 
+		// EventEngine - v0.1, Snarko
+		for (int iI = 0; iI < pkBranchEntry->getNumFlagPrereqs(); iI++)
+		{
+			std::string szFlag = pkBranchEntry->getFlagPrereq(iI);
+			if (GetPlayer()->getFlag(szFlag) < pkBranchEntry->getFlagPrereqValue(iI))
+				return false;
+		}
+		// END EventEngine
+
 		// AdvancementScreen - v1.0, Snarko
 		if (pkBranchEntry->GetPolicyBranchClass() != NO_POLICY_BRANCH_CLASS_TYPE)
 		{
 			CvPolicyBranchClassEntry* pkBranchClassEntry = m_pPolicies->GetPolicyBranchClassEntry(pkBranchEntry->GetPolicyBranchClass());
+
+			// EventEngine - v0.1, Snarko
+			for (int iI = 0; iI < pkBranchClassEntry->getNumFlagPrereqs(); iI++)
+			{
+				std::string szFlag = pkBranchClassEntry->getFlagPrereq(iI);
+				if (GetPlayer()->getFlag(szFlag) < pkBranchClassEntry->getFlagPrereqValue(iI))
+					return false;
+			}
+			// END EventEngine
+
 			int iMax = pkBranchClassEntry->GetMaxBranches();
-			if (iMax == 0) //Classes that are granted to the player in other ways.
+			if (iMax == 0) // Classes that are granted to the player in other ways.
 			{
 				return false;
 			}
@@ -3156,16 +3576,16 @@ bool CvPlayerPolicies::CanUnlockPolicyBranch(PolicyBranchTypes eBranchType)
 			{
 				int iAdopted = 0;
 				CvPolicyBranchEntry* pkBranchTestEntry;
-				for (int i = 0; i < GC.getNumPolicyBranchInfos(); i++)
+				for (int iI = 0; iI < GC.getNumPolicyBranchInfos(); iI++)
 				{
-					pkBranchTestEntry = m_pPolicies->GetPolicyBranchEntry(i);
-					if (pkBranchTestEntry->GetPolicyBranchClass() == pkBranchEntry->GetPolicyBranchClass() && IsPolicyBranchUnlocked((PolicyBranchTypes)i))
+					pkBranchTestEntry = m_pPolicies->GetPolicyBranchEntry(iI);
+					if (pkBranchTestEntry->GetPolicyBranchClass() == pkBranchEntry->GetPolicyBranchClass() && IsPolicyBranchUnlocked((PolicyBranchTypes)iI))
 					{
 						iAdopted++;	
-						if (iAdopted >= iMax)
-							return false;
 					}
 				}
+				if (iAdopted >= iMax)
+					return false;
 			}
 		}
 		// END AdvancementScreen
@@ -3920,6 +4340,8 @@ PolicyBranchTypes CvPlayerPolicies::GetLateGamePolicyTree() const
 /// Is the player far enough into Industrialization that they need to choose an Ideology?
 bool CvPlayerPolicies::IsTimeToChooseIdeology() const
 {
+	// AdvancementScreen - v1.0, Snarko
+	/* Original code
 	PolicyBranchTypes eFreedomBranch = (PolicyBranchTypes)GC.getPOLICY_BRANCH_FREEDOM();
 	PolicyBranchTypes eAutocracyBranch = (PolicyBranchTypes)GC.getPOLICY_BRANCH_AUTOCRACY();
 	PolicyBranchTypes eOrderBranch = (PolicyBranchTypes)GC.getPOLICY_BRANCH_ORDER();
@@ -3927,6 +4349,8 @@ bool CvPlayerPolicies::IsTimeToChooseIdeology() const
 	{
 		return false;
 	}
+	*/
+	// END AdvancementScreen
 
 	if (m_pPlayer->GetCurrentEra() > GC.getInfoTypeForString("ERA_INDUSTRIAL"))
 	{

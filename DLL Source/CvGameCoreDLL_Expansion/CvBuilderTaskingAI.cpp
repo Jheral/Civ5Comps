@@ -274,7 +274,14 @@ void CvBuilderTaskingAI::ConnectCitiesToCapital(CvCity* pPlayerCapital, CvCity* 
 	int iGoldForRoute = 0;
 	if(!bMajorMinorConnection)
 	{
+		// Revamped yields - v0.1, Snarko
+		// TODO make this take into account other yields
+		// No longer used
+		/*
 		iGoldForRoute = m_pPlayer->GetTreasury()->GetCityConnectionRouteGoldTimes100(pTargetCity) / 100;
+		*/
+		iGoldForRoute = m_pPlayer->GetCityConnectionRouteYieldTimes100(YIELD_GOLD, pTargetCity) / 100;
+		// END Revamped yields
 	}
 
 	CvRouteInfo* pRouteInfo = GC.getRouteInfo(eRoute);
@@ -1023,6 +1030,9 @@ void CvBuilderTaskingAI::AddImprovingPlotsDirectives(CvUnit* pUnit, CvPlot* pPlo
 		}
 	}
 
+	// Revamped yields - v0.1, Snarko
+	// TODO: write code which uses the new system.
+	/* Original code
 	// celtic rule: if this is a forest tile next to a city, do not improve this tile with a normal improvement
 	if (m_pPlayer->GetPlayerTraits()->IsFaithFromUnimprovedForest() && eExistingImprovement == NO_IMPROVEMENT)
 	{
@@ -1035,6 +1045,8 @@ void CvBuilderTaskingAI::AddImprovingPlotsDirectives(CvUnit* pUnit, CvPlot* pPlo
 			}
 		}
 	}
+	*/
+	// END Revamped yields
 
 	CvCity* pCity = GetWorkingCity(pPlot);
 	if(!pCity)
@@ -1377,6 +1389,9 @@ void CvBuilderTaskingAI::AddChopDirectives(CvUnit* pUnit, CvPlot* pPlot, int iMo
 		return;
 	}
 
+	// Revamped yields - v0.1, Snarko
+	// TODO write code which uses the new system.
+	/* Original code
 	// celtic rule: if this is a forest tile next to a city, do not chop the trees
 	if (m_pPlayer->GetPlayerTraits()->IsFaithFromUnimprovedForest())
 	{
@@ -1389,6 +1404,8 @@ void CvBuilderTaskingAI::AddChopDirectives(CvUnit* pUnit, CvPlot* pPlot, int iMo
 			}
 		}
 	}
+	*/
+	// END Revamped yields
 
 	BuildTypes eChopBuild = NO_BUILD;
 	for(int iBuildIndex = 0; iBuildIndex < GC.getNumBuildInfos(); iBuildIndex++)
@@ -1494,10 +1511,15 @@ void CvBuilderTaskingAI::AddChopDirectives(CvUnit* pUnit, CvPlot* pPlot, int iMo
 	{
 		iWeight = iWeight / 4;
 	}
+	// Revamped yields - v0.1, Snarko
+	// TODO write code that uses the new system.
+	/* Original code
 	if (m_pPlayer->GetPlayerTraits()->IsFaithFromUnimprovedForest() && eFeature == FEATURE_FOREST)
 	{
 		iWeight = iWeight / 4;
 	}
+	*/
+	// END Revamped yields
 	// this doesn't actually help them, but adds some historical flavor
 	if (m_pPlayer->GetPlayerTraits()->IsEmbarkedAllWater() && (eFeature == FEATURE_FOREST || eFeature == FEATURE_JUNGLE))
 	{

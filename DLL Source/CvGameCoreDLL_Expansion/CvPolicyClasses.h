@@ -36,9 +36,17 @@ public:
 	int GetGridY() const;
 	int GetLevel() const;
 	int GetPolicyCostModifier() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use GetCityYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetCulturePerCity() const;
 	int GetCulturePerWonder() const;
 	int GetCultureWonderMultiplier() const;
+	*/
+	int GetYieldPerWonder(int i) const;
+	int GetYieldWonderMultiplier(int i) const;
+	// END Revamped yields
 	int GetCulturePerTechResearched() const;
 	int GetCultureImprovementChange() const;
 	int GetCultureFromKills() const;
@@ -84,7 +92,13 @@ public:
 	int GetFreeUnitsPopulationPercent() const;
 	int GetFreeMilitaryUnitsPopulationPercent() const;
 	int GetHappinessPerGarrisonedUnit() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use GetYieldFromGarrison
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetCulturePerGarrisonedUnit() const;
+	*/
+	// END Revamped yields
 	int GetHappinessPerTradeRoute() const;
 	int GetHappinessPerXPopulation() const;
 	int GetExtraHappinessPerLuxury() const;
@@ -97,7 +111,13 @@ public:
 	int GetGarrisonedCityRangeStrikeModifier() const;
 	int GetUnitPurchaseCostModifier() const;
 	int GetBuildingPurchaseCostModifier() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use GetCityConnectionTradeRouteGoldModifier(int i)
+	/* Original code
 	int GetCityConnectionTradeRouteGoldModifier() const;
+	*/
+	int GetCityConnectionTradeRouteYieldModifier(int i) const;
+	// END Revamped yields
 	int GetTradeMissionGoldModifier() const;
 	int GetFaithCostModifier() const;
 	int GetCulturalPlunderMultiplier() const;
@@ -146,8 +166,16 @@ public:
 	bool IsMinorResourceBonus() const;
 	int GetPolicyBranchType() const;
 	int GetNumExtraBranches() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use GetHappinessToYield
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetHappinessToCulture() const;
 	int GetHappinessToScience() const;
+	*/
+	int GetHappinessToYield(int i) const;
+	int GetHappyYieldMultiplier(int i) const;
+	// END Revamped yields
 	int GetNumCitiesFreeCultureBuilding() const;
 	int GetNumCitiesFreeFoodBuilding() const;
 	bool IsHalfSpecialistUnhappiness() const;
@@ -173,6 +201,10 @@ public:
 	void SetWeLoveTheKingKey(const char* szVal);
 
 	// Accessor Functions (Arrays)
+	// Revamped yields - v0.1, Snarko
+	int GetYieldFromGarrison(int i) const;
+	int* GetYieldFromGarrisonArray() const;
+	// END Revamped yields
 	int GetPrereqOrPolicies(int i) const;
 	int GetPrereqAndPolicies(int i) const;
 	int GetPolicyDisables(int i) const;
@@ -196,7 +228,13 @@ public:
 	bool IsFreePromotionUnitCombat(const int promotionID, const int unitCombatID) const;
 	int GetUnitCombatProductionModifiers(int i) const;
 	int GetUnitCombatFreeExperiences(int i) const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use GetBuildingClassYieldChanges
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetBuildingClassCultureChange(int i) const;
+	*/
+	// END Revamped yields
 	int GetBuildingClassHappiness(int i) const;
 	int GetBuildingClassProductionModifier(int i) const;
 	int GetBuildingClassTourismModifier(int i) const;
@@ -216,6 +254,12 @@ public:
 
 	BuildingTypes GetFreeBuildingOnConquest() const;
 
+	// EventEngine - v0.1, Snarko
+	int getNumFlagPrereqs() const;
+	std::string getFlagPrereq(int i) const;
+	int getFlagPrereqValue(int i) const;
+	// END EventEngine
+
 private:
 	int m_iTechPrereq;
 	int m_iCultureCost;
@@ -223,9 +267,17 @@ private:
 	int m_iGridY;
 	int m_iLevel;
 	int m_iPolicyCostModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piCityYieldChange
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iCulturePerCity;
 	int m_iCulturePerWonder;
 	int m_iCultureWonderMultiplier;
+	*/
+	int* m_piYieldPerWonder;
+	int* m_piYieldWonderMultiplier;
+	// END Revamped yields
 	int m_iCulturePerTechResearched;
 	int m_iCultureImprovementChange;
 	int m_iCultureFromKills;
@@ -271,7 +323,13 @@ private:
 	int m_iFreeUnitsPopulationPercent;
 	int m_iFreeMilitaryUnitsPopulationPercent;
 	int m_iHappinessPerGarrisonedUnit;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piYieldFromGarrison
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iCulturePerGarrisonedUnit;
+	*/
+	// END Revamped yields
 	int m_iHappinessPerTradeRoute;
 	int m_iHappinessPerXPopulation;
 	int m_iExtraHappinessPerLuxury;
@@ -284,7 +342,14 @@ private:
 	int m_iGarrisonedCityRangeStrikeModifier;
 	int m_iUnitPurchaseCostModifier;
 	int m_iBuildingPurchaseCostModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piCityConnectionTradeRouteYieldModifier
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iCityConnectionTradeRouteGoldModifier;
+	*/
+	int* m_piCityConnectionTradeRouteYieldModifier;
+	// END Revamped yields
 	int m_iTradeMissionGoldModifier;
 	int m_iFaithCostModifier;
 	int m_iCulturalPlunderMultiplier;
@@ -335,8 +400,16 @@ private:
 	int m_iWoundedUnitDamageMod;
 	int m_iUnitUpgradeCostMod;
 	int m_iBarbarianCombatBonus;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piHappinessToYields
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iHappinessToCulture;
 	int m_iHappinessToScience;
+	*/
+	int* m_piHappinessToYields;
+	int* m_piHappyYieldMultiplier;
+	// END Revamped yields
 	int m_iNumCitiesFreeCultureBuilding;
 	int m_iNumCitiesFreeFoodBuilding;
 
@@ -363,6 +436,9 @@ private:
 
 	// Arrays
 	std::multimap<int, int> m_FreePromotionUnitCombats;
+	// Revamped yields - v0.1, Snarko
+	int* m_piYieldFromGarrison;
+	// END Revamped yields
 	int* m_piPrereqOrPolicies;
 	int* m_piPrereqAndPolicies;
 	int* m_piPolicyDisables;
@@ -379,7 +455,13 @@ private:
 	int* m_paiUnitCombatProductionModifiers;
 	int* m_paiUnitCombatFreeExperiences;
 	int* m_paiHurryModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_ppiBuildingClassYieldChanges
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int* m_paiBuildingClassCultureChanges;
+	*/
+	// END Revamped yields
 	int* m_paiBuildingClassProductionModifiers;
 	int* m_paiBuildingClassTourismModifiers;
 	int* m_paiBuildingClassHappiness;
@@ -392,6 +474,10 @@ private:
 	int** m_ppiBuildingClassYieldModifiers;
 	int** m_ppiBuildingClassYieldChanges;
 	int* m_piFlavorValue;
+
+	// EventEngine - v0.1, Snarko
+	std::vector<std::pair<std::string, int > > m_asziFlagPrereqs;
+	// END EventEngine
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -429,6 +515,12 @@ public:
 	// Accessor Functions (Arrays)
 	int GetPolicyBranchDisables(int i) const;
 
+	// EventEngine - v0.1, Snarko
+	int getNumFlagPrereqs() const;
+	std::string getFlagPrereq(int i) const;
+	int getFlagPrereqValue(int i) const;
+	// END EventEngine
+
 private:
 	int m_iEraPrereq;
 	int m_iFreePolicy;
@@ -451,6 +543,10 @@ private:
 
 	// Arrays
 	int* m_piPolicyBranchDisables;
+
+	// EventEngine - v0.1, Snarko
+	std::vector<std::pair<std::string, int > > m_asziFlagPrereqs;
+	// END EventEngine
 };
 
 // AdvancementScreen - v1.0, Snarko
@@ -470,10 +566,19 @@ public:
 	int GetMaxBranches();
 	std::string GetStyle();
 
+	// EventEngine - v0.1, Snarko
+	int getNumFlagPrereqs() const;
+	std::string getFlagPrereq(int i) const;
+	int getFlagPrereqValue(int i) const;
+	// END EventEngine
+
 private:
 
 	int m_iMaxBranches;
 	std::string m_szStyle;
+	// EventEngine - v0.1, Snarko
+	std::vector<std::pair<std::string, int > > m_asziFlagPrereqs;
+	// END EventEngine
 
 };
 // END AdvancementScreen

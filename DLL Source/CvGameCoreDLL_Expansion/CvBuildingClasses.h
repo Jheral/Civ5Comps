@@ -50,6 +50,9 @@ public:
 	bool IsRequiresSamePlayer() {return m_bRequiresSamePlayer;};
 	bool IsRequiresUniquePlayers() {return m_bRequiresUniquePlayers;};
 	int GetAIPriority() {return m_iAIPriority;};
+	// Revamped yields - v0.1, Snarko
+	YieldTypes GetYieldType() {return m_eYieldType;};
+	// END Revamped yields
 
 protected:
 	int m_iBonus;
@@ -64,6 +67,9 @@ protected:
 	bool m_bRequiresSamePlayer;
 	bool m_bRequiresUniquePlayers;
 	int m_iAIPriority;
+	// Revamped yields - v0.1, Snarko
+	YieldTypes m_eYieldType;
+	// END Revamped yields
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -102,7 +108,13 @@ public:
 	int GetPolicyBranchType() const;
 	int GetSpecialistType() const;
 	int GetSpecialistCount() const;
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	int GetSpecialistExtraCulture() const;
+	*/
+	// END Revamped yields
 	int GetGreatPeopleRateChange() const;
 	GreatWorkSlotType GetGreatWorkSlotType() const;
 	int GetGreatWorkCount() const;
@@ -119,12 +131,25 @@ public:
 	int GetHurryCostModifier() const;
 	int GetNumCitiesPrereq() const;
 	int GetUnitLevelPrereq() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use GetYieldModifier, GetGlobalYieldModifier
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetCultureRateModifier() const;
 	int GetGlobalCultureRateModifier() const;
+	*/
+	// END Revamped yields
 	int GetGreatPeopleRateModifier() const;
 	int GetGlobalGreatPeopleRateModifier() const;
 	int GetGreatGeneralRateModifier() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetGreatPersonExpendGold() const;
+	*/
+	int GetGreatPersonExpendYield(int i) const;
+	// END Revamped yields
 	int GetUnitUpgradeCostMod() const;
 	int GetGoldenAgeModifier() const;
 	int GetFreeExperience() const;
@@ -140,7 +165,13 @@ public:
 	int GetGlobalSpaceProductionModifier() const;
 	int GetBuildingProductionModifier() const;
 	int GetWonderProductionModifier() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use GetCityConnectionTradeRouteModifier(int i)
+	/* Original code
 	int GetCityConnectionTradeRouteModifier() const;
+	*/
+	int GetCityConnectionTradeRouteModifier(int i) const;
+	// END Revamped yields
 	int GetCapturePlunderModifier() const;
 	int GetPolicyCostModifier() const;
 	int GetGlobalPlotCultureCostModifier() const;
@@ -267,8 +298,16 @@ public:
 	int GetPrereqAndTechs(int i) const;
 	int GetResourceQuantityRequirement(int i) const;
 	int GetResourceQuantity(int i) const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_ppaiResourceYieldChange
+	// XML tag REMOVED because this actually changes what it does
+	// This is a small nerf to buildings that previously used this tag,
+	// but it would be redundant to have a seperate table just for changes to building gains based on local resources.
+	/* Original code
 	int GetResourceCultureChange(int i) const;
 	int GetResourceFaithChange(int i) const;
+	*/
+	// END Revamped yields
 	int GetProductionTraits(int i) const;
 	int GetPrereqNumOfBuildingClass(int i) const;
 	int GetFlavorValue(int i) const;
@@ -294,6 +333,12 @@ public:
 	CvThemingBonusInfo *GetThemingBonusInfo(int i) const;
 	int GetNumThemingBonuses() const {return m_iNumThemingBonuses;};
 
+	// EventEngine - v0.1, Snarko
+	int getNumFlagPrereqs() const;
+	std::string getFlagPrereq(int i) const;
+	int getFlagPrereqValue(int i) const;
+	// END EventEngine
+
 private:
 	int m_iBuildingClassType;
 	const CvBuildingClassInfo* m_pkBuildingClassInfo;
@@ -313,7 +358,13 @@ private:
 	int m_iPolicyBranchType;
 	int m_iSpecialistType;
 	int m_iSpecialistCount;
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	int m_iSpecialistExtraCulture;
+	*/
+	// END Revamped yields
 	int m_iGreatPeopleRateChange;
 	GreatWorkSlotType m_eGreatWorkSlotType;
 	int m_iGreatWorkCount;
@@ -330,12 +381,25 @@ private:
 	int m_iHurryCostModifier;
 	int m_iNumCitiesPrereq;
 	int m_iUnitLevelPrereq;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piYieldModifier, m_piGlobalYieldModifier
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iCultureRateModifier;
 	int m_iGlobalCultureRateModifier;
+	*/
+	// END Revamped yields
 	int m_iGreatPeopleRateModifier;
 	int m_iGlobalGreatPeopleRateModifier;
 	int m_iGreatGeneralRateModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iGreatPersonExpendGold;
+	*/
+	int* m_piGreatPersonExpendYield;
+	// END Revamped yields
 	int m_iUnitUpgradeCostMod;
 	int m_iGoldenAgeModifier;
 	int m_iFreeExperience;
@@ -351,7 +415,14 @@ private:
 	int m_iGlobalSpaceProductionModifier;
 	int m_iBuildingProductionModifier;
 	int m_iWonderProductionModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piCityConnectionTradeRouteModifier
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iCityConnectionTradeRouteModifier;
+	*/
+	int* m_piCityConnectionTradeRouteModifier;
+	// END Revamped yields
 	int m_iCapturePlunderModifier;
 	int m_iPolicyCostModifier;
 	int m_iGlobalPlotCultureCostModifier;
@@ -449,8 +520,16 @@ private:
 	int* m_piPrereqAndTechs;
 	int* m_piResourceQuantityRequirements;
 	int* m_piResourceQuantity;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_ppaiResourceYieldChange
+	// XML tag REMOVED because this actually changes what it does
+	// This is a small nerf to buildings that previously used this tag,
+	// but it would be redundant to have a seperate table just for changes to building gains based on local resources.
+	/* Original code
 	int* m_piResourceCultureChanges;
 	int* m_piResourceFaithChanges;
+	*/
+	// END Revamped yields
 	int* m_piProductionTraits;
 	int* m_piSeaPlotYieldChange;
 	int* m_piRiverPlotYieldChange;
@@ -487,6 +566,10 @@ private:
 
 	CvThemingBonusInfo* m_paThemingBonusInfo;
 	int m_iNumThemingBonuses;
+
+	// EventEngine - v0.1, Snarko
+	std::vector<std::pair<std::string, int > > m_asziFlagPrereqs;
+	// END EventEngine
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -594,7 +677,13 @@ public:
 	bool GetNextAvailableGreatWorkSlot(BuildingClassTypes *eBuildingClass, int *iSlot) const;
 	bool GetNextAvailableGreatWorkSlot(GreatWorkSlotType eGreatWorkSlot, BuildingClassTypes *eBuildingClass, int *iSlot) const;
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int GetCultureFromGreatWorks() const;
+	*/
+	int GetYieldFromGreatWorks(YieldTypes eYield) const;
+	// END Revamped yields
 	int GetNumGreatWorks() const;
 	int GetNumGreatWorks(GreatWorkSlotType eGreatWorkSlot) const;
 
@@ -603,7 +692,12 @@ public:
 	int GetGreatWorksTourismModifier() const;
 	void ChangeGreatWorksTourismModifier(int iChange);
 
+	// Revamped yields - v0.1, Snarko
+	/* Original code
 	int GetThemingBonuses() const;
+	*/
+	int GetThemingBonuses(YieldTypes eYield = NO_YIELD) const;
+	// END Revamped yields
 	int GetNumBuildingsFromFaith() const;
 
 	int GetBuildingProductionModifier() const;

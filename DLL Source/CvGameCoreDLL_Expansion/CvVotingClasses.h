@@ -101,19 +101,34 @@ struct CvResolutionEffects
 
 	bool bDiplomaticVictory;
 	bool bChangeLeagueHost;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int iOneTimeGold;
+	*/
+	// END Revamped yields
 	int iOneTimeGoldPercent;
 	bool bRaiseCityStateInfluenceToNeutral;
 	LeagueProjectTypes eLeagueProjectEnabled;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int iGoldPerTurn;
+	*/
+	// END Revamped yields
 	int iResourceQuantity;
 	bool bEmbargoCityStates;
 	bool bEmbargoPlayer;
 	bool bNoResourceHappiness;
 	int iUnitMaintenanceGoldPercent;
 	int iMemberDiscoveredTechMod;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int iCulturePerWonder;
 	int iCulturePerNaturalWonder;
+	*/
+	// END Revamped yields
 	bool bNoTrainingNuclearWeapons;
 	int iVotesForFollowingReligion;
 	int iHolyCityTourism;
@@ -122,8 +137,19 @@ struct CvResolutionEffects
 	int iOtherIdeologyRebellionMod;
 	int iArtsyGreatPersonRateMod;
 	int iScienceyGreatPersonRateMod;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int iGreatPersonTileImprovementCulture;
 	int iLandmarkCulture;
+	*/
+	std::vector<int> m_aiOneTimeYield;
+	std::vector<int> m_aiYieldPerTurn;
+	std::vector<int> m_aiYieldPerWonder;
+	std::vector<int> m_aiYieldPerNaturalWonder;
+	std::vector<int> m_aiYieldGPTileImprovement;
+	std::vector<int> m_aiYieldPerLandmark;
+	// END Revamped yields
 };
 
 FDataStream& operator>>(FDataStream&, CvResolutionEffects&);
@@ -1066,7 +1092,15 @@ public:
 	BuildingTypes GetBuilding() const;
 	int GetHappiness() const;
 	int GetFreeSocialPolicies() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use GetYieldModifiers
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetCultureBonusTurns() const;
+	*/
+	int GetNumYieldModifiers() const;
+	std::vector<LeagueRewardYieldModifier> GetYieldModifiers() const;
+	// END Revamped yields
 	int GetTourismBonusTurns() const;
 	int GetGoldenAgePoints() const;
 	int GetCityStateInfluenceBoost() const;
@@ -1077,7 +1111,14 @@ protected:
 	BuildingTypes m_eBuilding;
 	int m_iHappiness;
 	int m_iFreeSocialPolicies;
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piYieldBonusTurns
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iCultureBonusTurns;
+	*/
+	std::vector<LeagueRewardYieldModifier> m_aYieldBonusTurns;
+	// END Revamped yields
 	int m_iTourismBonusTurns;
 	int m_iGoldenAgePoints;
 	int m_iCityStateInfluenceBoost;
@@ -1206,19 +1247,37 @@ public:
 	int GetLeadersVoteBonusOnFail() const;
 	bool IsDiplomaticVictory() const;
 	bool IsChangeLeagueHost() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetOneTimeGold() const;
+	*/
+	// END Revamped yields
 	int GetOneTimeGoldPercent() const;
 	bool IsRaiseCityStateInfluenceToNeutral() const;
 	LeagueProjectTypes GetLeagueProjectEnabled() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetGoldPerTurn() const;
+	*/
+	// END Revamped yields
 	int GetResourceQuantity() const;
 	bool IsEmbargoCityStates() const;
 	bool IsEmbargoPlayer() const;
 	bool IsNoResourceHappiness() const;
 	int GetUnitMaintenanceGoldPercent() const;
 	int GetMemberDiscoveredTechMod() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetCulturePerWonder() const;
 	int GetCulturePerNaturalWonder() const;
+	*/
+	// END Revamped yields
 	bool IsNoTrainingNuclearWeapons() const;
 	int GetVotesForFollowingReligion() const;
 	int GetHolyCityTourism() const;
@@ -1227,8 +1286,21 @@ public:
 	int GetOtherIdeologyRebellionMod() const;
 	int GetArtsyGreatPersonRateMod() const;
 	int GetScienceyGreatPersonRateMod() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int GetGreatPersonTileImprovementCulture() const;
 	int GetLandmarkCulture() const;
+	*/
+	int* GetOneTimeYield() const;
+	int* GetOneTimeYieldPercent() const;
+	int* GetYieldPerTurn() const;
+	int* GetYieldPerWonder() const;
+	int* GetYieldPerNaturalWonder() const;
+	int* GetYieldGPTileImprovement() const;
+	int* GetYieldPerLandmark() const;
+	// END Revamped yields
 
 protected:
 	ResolutionDecisionTypes m_eVoterDecision;
@@ -1241,19 +1313,37 @@ protected:
 	int m_iLeadersVoteBonusOnFail;
 	bool m_bDiplomaticVictory;
 	bool m_bChangeLeagueHost;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iOneTimeGold;
+	*/
+	// END Revamped yields
 	int m_iOneTimeGoldPercent;
 	bool m_bRaiseCityStateInfluenceToNeutral;
 	LeagueProjectTypes m_eLeagueProjectEnabled;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iGoldPerTurn;
+	*/
+	// END Revamped yields
 	int m_iResourceQuantity;
 	bool m_bEmbargoCityStates;
 	bool m_bEmbargoPlayer;
 	bool m_bNoResourceHappiness;
 	int m_iUnitMaintenanceGoldPercent;
 	int m_iMemberDiscoveredTechMod;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iCulturePerWonder;
 	int m_iCulturePerNaturalWonder;
+	*/
+	// END Revamped yields
 	bool m_bNoTrainingNuclearWeapons;
 	int m_iVotesForFollowingReligion;
 	int m_iHolyCityTourism;
@@ -1262,8 +1352,20 @@ protected:
 	int m_iOtherIdeologyRebellionMod;
 	int m_iArtsyGreatPersonRateMod;
 	int m_iScienceyGreatPersonRateMod;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	int m_iGreatPersonTileImprovementCulture;
 	int m_iLandmarkCulture;
+	*/
+	int* m_aiOneTimeYield;
+	int* m_aiYieldPerTurn;
+	int* m_aiYieldPerWonder;
+	int* m_aiYieldPerNaturalWonder;
+	int* m_aiYieldGPTileImprovement;
+	int* m_aiYieldPerLandmark;
+	// END Revamped yields
 
 private:
 	CvResolutionEntry(const CvResolutionEntry&);

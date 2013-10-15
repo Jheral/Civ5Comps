@@ -77,6 +77,9 @@ class CvEventActionInfo;
 // END EventEngine
 class CvVoteSourceInfo;
 class CvMultiUnitFormationInfo;
+// Revamped yields - v0.1, Snarko
+class CvGreatWorkClassInfo;
+// END Revamped yields
 class CvEconomicAIStrategyXMLEntries;
 class CvEconomicAIStrategyXMLEntry;
 class CvCitySpecializationXMLEntries;
@@ -591,9 +594,14 @@ public:
 	std::map<std::string, int>& getEventActionTypes();
 	EventActionTypeTypes getEventActionType(std::string szEventActionType);
 
-	bool EventBoolEval(bool bBool, CvEventModifierInfo& kModifier);
-	bool EventIntEval(int iInt, CvEventModifierInfo& kModifier);
+	bool EventBoolEval(bool bBool, CvEventModifierInfo& kModifier) const;
+	bool EventIntEval(int iInt, CvEventModifierInfo& kModifier) const;
 	// END EventEngine
+	// Revamped yields - v0.1, Snarko
+	int getNumGreatWorkClassInfos();
+	std::vector<CvGreatWorkClassInfo*>& getGreatWorkClassInfo();
+	_Ret_maybenull_ CvGreatWorkClassInfo* getGreatWorkClassInfo(GreatWorkClass eGreatWorkClass);
+	// END Revamped yields
 
 	//
 	// Global Types
@@ -7355,6 +7363,34 @@ public:
 	{
 		return m_fLEAGUE_PROJECT_REWARD_TIER_2_THRESHOLD;
 	}
+	// Softcoding - v0.1, Snarko
+	inline int getCITY_CAPTURE_WARMONGER_OFFSET()
+	{
+		return m_iCITY_CAPTURE_WARMONGER_OFFSET;
+	}
+	inline int getSEA_TRADEROUTE_MODIFIER()
+	{
+		return m_iSEA_TRADEROUTE_MODIFIER;
+	}
+	inline int getLAND_TRADEROUTE_MODIFIER()
+	{
+		return m_iLAND_TRADEROUTE_MODIFIER;
+	}
+	inline int getBASE_TRADE_RANGE_SEA()
+	{
+		return m_iBASE_TRADE_RANGE_SEA;
+	}
+	inline int getBASE_TRADE_RANGE_LAND()
+	{
+		return m_iBASE_TRADE_RANGE_LAND;
+	}
+	// END Softcoding
+	// AIMOD - v0.1, Snarko
+	inline bool getUSE_AIMOD()
+	{
+		return m_bUSE_AIMOD;
+	}
+	// END AIMOD
 
 	////////////// END DEFINES //////////////////
 
@@ -7573,6 +7609,9 @@ protected:
 	CvLeagueProjectRewardXMLEntries* m_pLeagueProjectRewards;
 	CvResolutionXMLEntries* m_pResolutions;
 	CvNotificationXMLEntries* m_pNotifications;
+	// Revamped yields - v0.1, Snarko
+	std::vector<CvGreatWorkClassInfo*> m_paGreatWorkClassInfo;
+	// END Revamped yields
 
 	//////////////////////////////////////////////////////////////////////////
 	// GLOBAL TYPES
@@ -9137,6 +9176,16 @@ protected:
 	int m_iCOMBAT_CAPTURE_MIN_CHANCE;
 	int m_iCOMBAT_CAPTURE_MAX_CHANCE;
 	int m_iCOMBAT_CAPTURE_RATIO_MULTIPLIER;
+	// Softcoding - v0.1, Snarko
+	int m_iCITY_CAPTURE_WARMONGER_OFFSET;
+	int m_iSEA_TRADEROUTE_MODIFIER;
+	int m_iLAND_TRADEROUTE_MODIFIER;
+	int m_iBASE_TRADE_RANGE_SEA;
+	int m_iBASE_TRADE_RANGE_LAND;
+	// END Softcoding
+	// AIMOD - v0.1, Snarko
+	bool m_bUSE_AIMOD;
+	// END AIMOD
 
 	// -- floats --
 

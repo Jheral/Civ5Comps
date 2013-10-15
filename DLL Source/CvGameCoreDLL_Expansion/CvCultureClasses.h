@@ -311,7 +311,12 @@ public:
 	CvString GetTotalSlotsTooltip();
 
 	bool IsThemingBonusPossible(BuildingClassTypes eBuildingClass) const;
+	// Revamped yields - v0.1, Snarko
+	/* Original code
 	int GetThemingBonus(BuildingClassTypes eBuildingClass) const;
+	*/
+	int GetThemingBonus(BuildingClassTypes eBuildingClass, YieldTypes eYield = NO_YIELD) const;
+	// END Revamped yields
 	CvString GetThemingTooltip(BuildingClassTypes eBuildingClass) const;
 
 	int GetCultureFromWonders() const;
@@ -338,5 +343,22 @@ namespace CultureHelpers
 	int FindWorkNotChosen(vector<CvGreatWorkInMyEmpire> &aWorks, vector<int> &aWorksChosen);
 	void SendArtSwapNotification(GreatWorkSlotType eType, bool bArt, PlayerTypes eOriginator, PlayerTypes eReceipient, int iWorkFromOriginator, int iWorkFromRecipient);
 }
+
+// Revamped yields - v0.1, Snarko
+class CvGreatWorkClassInfo : public CvBaseInfo
+{
+public:
+	CvGreatWorkClassInfo();
+	virtual ~CvGreatWorkClassInfo();
+
+	virtual bool CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility);
+
+	int GetYield(int i) const;
+
+private:
+	int* m_piYields;
+
+};
+// END Revamped yields
 
 #endif //CIV5_CULTURE_CLASSES_H

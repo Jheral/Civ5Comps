@@ -226,21 +226,32 @@ protected:
 
 	static int lGetJONSCulturePerTurn(lua_State* L);
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	static int lGetBaseJONSCulturePerTurn(lua_State* L);
+	
 	static int lGetJONSCulturePerTurnFromBuildings(lua_State* L);
 	static int lChangeJONSCulturePerTurnFromBuildings(lua_State* L);
+
 	static int lGetJONSCulturePerTurnFromPolicies(lua_State* L);
 	static int lChangeJONSCulturePerTurnFromPolicies(lua_State* L);
+
 	static int lGetJONSCulturePerTurnFromSpecialists(lua_State* L);
 	static int lChangeJONSCulturePerTurnFromSpecialists(lua_State* L);
+
 	static int lGetJONSCulturePerTurnFromGreatWorks(lua_State* L);
+
 	static int lGetJONSCulturePerTurnFromTraits(lua_State* L);
 	static int lGetJONSCulturePerTurnFromReligion(lua_State* L);
 	static int lChangeJONSCulturePerTurnFromReligion(lua_State* L);
+	
 	static int lGetJONSCulturePerTurnFromLeagues(lua_State* L);
 
 	static int lGetCultureRateModifier(lua_State* L);
 	static int lChangeCultureRateModifier(lua_State* L);
+	*/
+	// END Revamped yields
 
 	static int lGetNumGreatWorks(lua_State* L);
 	static int lGetNumGreatWorkSlots(lua_State* L);
@@ -257,11 +268,18 @@ protected:
 	static int lGetThemingTooltip(lua_State* L);
 
 	static int lGetFaithPerTurn(lua_State* L);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	static int lGetFaithPerTurnFromBuildings(lua_State* L);
 	static int lGetFaithPerTurnFromPolicies(lua_State* L);
 	static int lGetFaithPerTurnFromTraits(lua_State* L);
 	static int lGetFaithPerTurnFromReligion(lua_State* L);
 	static int lChangeFaithPerTurnFromReligion(lua_State* L);
+	*/
+	static int lGetYieldPerTurnFromTraits(lua_State* L);
+	static int lGetYieldPerReligionTimes100(lua_State* L);
+	// END Revamped yields
 
 	static int lIsReligionInCity(lua_State* L);
 	static int lIsHolyCityForReligion(lua_State* L);
@@ -327,6 +345,10 @@ protected:
 	static int lGetHappinessFromBuildings(lua_State* L);
 	static int lGetHappiness(lua_State* L);
 	static int lGetLocalHappiness(lua_State* L);
+	// EventEngine - v0.1, Snarko
+	static int lGetHappinessFromEvents(lua_State* L);
+	static int lChangeHappinessFromEvents(lua_State* L);
+	// END EventEngine
 
 	static int lIsNeverLost(lua_State* L);
 	static int lSetNeverLost(lua_State* L);
@@ -354,6 +376,9 @@ protected:
 	static int lGetRiverPlotYield(lua_State* L);
 	static int lGetLakePlotYield(lua_State* L);
 
+	// Revamped yields - v0.1, Snarko
+	static int lGetWonderExtraYield(lua_State* L);
+	// END Revamped yields
 	static int lGetBaseYieldRate(lua_State* L);
 
 	static int lGetBaseYieldRateFromTerrain(lua_State* L);
@@ -371,6 +396,14 @@ protected:
 	static int lGetBaseYieldRateFromReligion(lua_State* L);
 	static int lChangeBaseYieldRateFromReligion(lua_State* L);
 
+	// EventEngine - v0.1, Snarko
+	static int lGetBaseYieldRateFromEvents(lua_State* L);
+	static int lChangeBaseYieldRateFromEvents(lua_State* L);
+
+	static int lGetEventYieldRateModifier(lua_State* L);
+	static int lChangeEventYieldRateModifier(lua_State* L);
+	// END EventEngine
+
 	static int lGetYieldPerPopTimes100(lua_State* L);
 
 	static int lGetBaseYieldRateModifier(lua_State* L);
@@ -380,6 +413,10 @@ protected:
 
 	static int lGetExtraSpecialistYield(lua_State* L);
 	static int lGetExtraSpecialistYieldOfType(lua_State* L);
+	// EventEngine - v0.1, Snarko
+	static int lGetCitySpecialistExtraYield(lua_State* L);
+	static int lChangeCitySpecialistExtraYield(lua_State* L);
+	// END EventEngine
 
 	static int lGetDomainFreeExperience(lua_State* L);
 	static int lGetDomainProductionModifier(lua_State* L);

@@ -115,6 +115,9 @@ CvUnitEntry::CvUnitEntry(void) :
 	m_bUnitArtInfoCulturalVariation(false),
 	m_iUnitFlagIconOffset(0),
 	m_iUnitPortraitOffset(0)
+	// EventEngine - v0.1, Snarko
+	, m_asziFlagPrereqs(NULL)
+	// END EventEngine
 {
 }
 
@@ -402,6 +405,27 @@ bool CvUnitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 		pMovementRates->Reset();
 
 	}
+
+	// EventEngine - v0.1, Snarko
+	{
+		m_asziFlagPrereqs.clear();
+		std::string strKey("Unit_PrereqFlags");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from Unit_PrereqFlags where UnitType = ?");
+		}
+
+		pResults->Bind(1, szUnitType);
+
+		while(pResults->Step())
+		{
+			std::string szFlag = pResults->GetText("Flag");
+			int iMinimumValue = pResults->GetInt("MinimumValue");
+			m_asziFlagPrereqs.push_back(std::make_pair(szFlag, iMinimumValue));
+		}
+	}
+	// END EventEngine
 
 	// Calculate military Power and cache it
 	DoUpdatePower();
@@ -1094,6 +1118,28 @@ int CvUnitEntry::GetUnitPortraitOffset() const
 {
 	return m_iUnitPortraitOffset;
 }
+
+// EventEngine - v0.1, Snarko
+//------------------------------------------------------------------------------
+int CvUnitEntry::getNumFlagPrereqs() const
+{
+	return m_asziFlagPrereqs.size();
+}
+//------------------------------------------------------------------------------
+std::string CvUnitEntry::getFlagPrereq(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].first;
+}
+//------------------------------------------------------------------------------
+int CvUnitEntry::getFlagPrereqValue(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].second;
+}
+// END EventEngine
 
 
 // DERIVED FIELDS

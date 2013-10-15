@@ -41,8 +41,13 @@ public:
 	void ChangeGoldTimes100(int iChange);
 
 	// Gold from Cities
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/*
 	int GetGoldFromCities() const;
 	int GetGoldFromCitiesTimes100(bool bExcludeTradeRoutes = false) const;
+	*/
+	// END Revamped yields
 
 	// Diplomacy
 	int GetGoldPerTurnFromDiplomacy() const;
@@ -50,6 +55,9 @@ public:
 	void ChangeGoldPerTurnFromDiplomacy(int iChange);
 
 	// City connections
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/*
 	int GetCityConnectionRouteGoldTimes100(CvCity* pNonCapitalCity) const;
 	int GetCityConnectionGold() const;
 	int GetCityConnectionGoldTimes100() const;
@@ -60,15 +68,22 @@ public:
 	void ChangeCityConnectionTradeRouteGoldModifier(int iChange);
 	int GetCityConnectionTradeRouteGoldChange() const;
 	void ChangeCityConnectionTradeRouteGoldChange(int iChange);
+	*/
+	// END Revamped yields
 	bool HasCityConnectionRouteBetweenCities(CvCity* pFirstCity, CvCity* pSecondCity, bool bBestRoute = false) const;
 
 	// Gold from international trade routes
 	int GetGoldPerTurnFromTradeRoutes() const;
 	int GetGoldPerTurnFromTradeRoutesTimes100() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int GetGoldPerTurnFromTraits() const;
 
 	// Religion
 	int GetGoldPerTurnFromReligion() const;
+	*/
+	// END Revamped yields
 
 	// Calculations ported over from CvPlayer
 	int CalculateGrossGold();

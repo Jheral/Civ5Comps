@@ -311,8 +311,8 @@ void CvPolicyAI::DoChooseIdeology(CvPlayer *pPlayer)
 	int iPolicyBranch;
 	int iValue;
 	int iTotal = 0;
-	//Victories.
-	//TODO: add a new logging function
+	// Victories.
+	// TODO: add a new logging function
 	itIdeology = aiiIdeologies.begin();
 	bool bDelete;
 	while (itIdeology != aiiIdeologies.end())
@@ -328,7 +328,7 @@ void CvPolicyAI::DoChooseIdeology(CvPlayer *pPlayer)
 			{
 				if (!entry->IsVictoryType(j))
 				{
-					//If a victory type is dominating and the ideology does not support it then remove it from the map.
+					// If a victory type is dominating and the ideology does not support it then remove it from the map.
 					if (bConquestDominating && GC.getVictoryInfo((VictoryTypes)j)->isConquest())
 					{
 						bDelete = true;
@@ -344,7 +344,7 @@ void CvPolicyAI::DoChooseIdeology(CvPlayer *pPlayer)
 						bDelete = true;
 						break;
 					}
-					//Sorry for this but I don't want to make a big rewrite to get which victory is spaceship, when I will have to rewrite this again anyway once I tackle the AI.
+					// Sorry for this but I don't want to make a big rewrite to get which victory is spaceship, when I will have to rewrite this again anyway once I tackle the AI.
 					else if (bTechDominating && (j == GC.getInfoTypeForString("VICTORY_SPACE_RACE", true)))
 					{
 						bDelete = true;
@@ -353,7 +353,7 @@ void CvPolicyAI::DoChooseIdeology(CvPlayer *pPlayer)
 				}
 				else
 				{
-					//No combo-victories for now. Wait for larger AI rewrite. ETA not a clue, so much to do before then.
+					// No combo-victories for now. Wait for larger AI rewrite. ETA not a clue, so much to do before then.
 					if (GC.getVictoryInfo((VictoryTypes)j)->isConquest())
 					{
 						iValue += iConquestPriority;
@@ -383,7 +383,7 @@ void CvPolicyAI::DoChooseIdeology(CvPlayer *pPlayer)
 			++itIdeology;
 	}
 
-	//Modify value based on total value.
+	// Modify value based on total value.
 	int iPriorityToDivide = GC.getIDEOLOGY_SCORE_GRAND_STRATS();
 	if (iTotal > 0)
 	{
@@ -393,7 +393,7 @@ void CvPolicyAI::DoChooseIdeology(CvPlayer *pPlayer)
 		}
 	}
 
-	//Third loop, things not victory related.
+	// Third loop, things not victory related.
 	for (itIdeology = aiiIdeologies.begin() ; itIdeology != aiiIdeologies.end(); ++itIdeology)
 	{
 		iPolicyBranch = itIdeology->first;
@@ -412,7 +412,6 @@ void CvPolicyAI::DoChooseIdeology(CvPlayer *pPlayer)
 		}
 
 		// -- Happiness we'd lose through Public Opinion
-		//TODO: rewrite ComputeHypotheticalPublicOpinionUnhappiness to the new system.
 		iHappinessDelta = max (0, 100 - pPlayer->GetCulture()->ComputeHypotheticalPublicOpinionUnhappiness((PolicyBranchTypes)iPolicyBranch));
 		itIdeology->second += iHappinessDelta * iHappinessModifier;
 
@@ -421,7 +420,7 @@ void CvPolicyAI::DoChooseIdeology(CvPlayer *pPlayer)
 		itIdeology->second += GC.getGame().getJonRandNum(10, "Ideology random priority bump");
 	}
 
-	//Finally, a loop through players.
+	// Finally, a loop through players.
 	PlayerTypes eLoopPlayer;
 	for (int iPlayerLoop = 0; iPlayerLoop < MAX_MAJOR_CIVS; iPlayerLoop++)
 	{
@@ -430,15 +429,15 @@ void CvPolicyAI::DoChooseIdeology(CvPlayer *pPlayer)
 		{
 			CvPlayer &kOtherPlayer = GET_PLAYER(eLoopPlayer);
 			PolicyBranchTypes eOtherPlayerIdeology;
-			//TODO: make multiple ideologies possible.
+			// TODO: make multiple ideologies possible.
 			eOtherPlayerIdeology = kOtherPlayer.GetPlayerPolicies()->GetLateGamePolicyTree();
 			if (aiiIdeologies.find((int)eOtherPlayerIdeology) == aiiIdeologies.end())
 			{
-				//It's not in the map, so we aren't choosing it anyway
+				// It's not in the map, so we aren't choosing it anyway
 				continue;
 			}
 
-			//Bugfix: base something as important as this on our real feeling towards players.
+			// Bugfix: base something as important as this on our real feeling towards players.
 			switch(pPlayer->GetDiplomacyAI()->GetMajorCivApproach(eLoopPlayer, /*bHideTrueFeelings*/ false))
 			{
 			case MAJOR_CIV_APPROACH_HOSTILE:

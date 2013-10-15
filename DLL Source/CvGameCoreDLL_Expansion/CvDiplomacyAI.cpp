@@ -11700,14 +11700,20 @@ void CvDiplomacyAI::DoContactMinorCivs()
 	else
 	{
 		int iThreshold = iDiplomacyFlavor* /*5*/ GC.getMC_SOMETIMES_GIFT_RAND_MULTIPLIER();
-		//Snarko AIMod Start 02-11-2012
-		//Make it more likely if we have a good economy and vice versa.
-		//Actually, is this ever called in the first place? Seems leaders have 4 or higher for diplomacy flavor.
-		/* ORIGINAL CODE
-		int iRandRoll = GC.getGame().getJonRandNum(100, "Diplomacy AI: good turn to make a gold gift to a minor?");
-		ORIGINAL CODE END */
-		int iRandRoll = GC.getGame().getJonRandNum(120, "Diplomacy AI: good turn to make a gold gift to a minor?") - m_pPlayer->calculateGoldRate();
-		//Snarko AIMod End
+		// AIMOD - v0.1, Snarko
+		int iRandRoll;
+		if (GC.getUSE_AIMOD())
+		{
+			// Make it more likely if we have a good economy and vice versa.
+			// Actually, is this ever called in the first place? Seems leaders have 4 or higher for diplomacy flavor.
+			iRandRoll = GC.getGame().getJonRandNum(120, "Diplomacy AI: good turn to make a gold gift to a minor?") - m_pPlayer->calculateGoldRate();
+		}
+		else
+		{
+			// Original code
+			iRandRoll = GC.getGame().getJonRandNum(100, "Diplomacy AI: good turn to make a gold gift to a minor?");
+		}
+		// END AIMOD
 
 		// Threshold will be 15 for a player (3 flavor * 5)
 		// Threshold will be 5 for non-diplomatic player (2 flavor * 5) //Snarko: 2*5 is 10.
@@ -12159,13 +12165,18 @@ void CvDiplomacyAI::DoContactMinorCivs()
 						}
 						// Not going to lose status, so not worth going after this guy
 						else if(!IsGoingForDiploVictory() || !GC.getGame().IsUnitedNationsActive())
-							//Snarko AIMod Start 02-11-2012
-							//Still ally with them, if we have a good reason to.
-							/* ORIGINAL CODE
-							iValue = 0;
-							ORIGINAL CODE END */
-							iValue /= 2;
-							//Snarko AIMod End
+							// AIMOD - v0.1, Snarko
+							if (GC.getUSE_AIMOD())
+							{
+								// Still ally with them, if we have a good reason to.
+								iValue /= 2;
+							}
+							else
+							{
+								// Original code
+								iValue = 0;
+							}
+							// END AIMOD
 					}
 
 					// Did we bully you recently?  If so, giving you gold now would be very odd.
@@ -12177,14 +12188,21 @@ void CvDiplomacyAI::DoContactMinorCivs()
 					//antonjs: consider: different behavior to CS that have been bullied by others, bullied by rival, etc.
 
 					// Do we want it enough?
-					//Snarko AIMod Start 02-11-2012
-					//Take into account how rich we are. If we are really rich we can just spam city states with money. If we are poor we shouldn't be doing that.
-					//0 gpt +10 to threshold; 20 gpt no change; 50 gpt -15 to threshold; 100 gpt -40 to threshold; 218 gpt or more makes the default threshold 1.
-					/* ORIGINAL CODE
-					if(iValue > GC.getMC_GIFT_WEIGHT_THRESHOLD())
-					ORIGINAL CODE END */
-					if(iValue > max(1, (GC.getMC_GIFT_WEIGHT_THRESHOLD() - ((m_pPlayer->calculateGoldRate() - 20) / 2))))
-					//Snarko AIMod End
+					// AIMOD - v0.1, Snarko
+					bool bPass;
+					if (GC.getUSE_AIMOD())
+					{
+						// Take into account how rich we are. If we are really rich we can just spam city states with money. If we are poor we shouldn't be doing that.
+						// 0 gpt +10 to threshold; 20 gpt no change; 50 gpt -15 to threshold; 100 gpt -40 to threshold; 218 gpt or more makes the default threshold 1.
+						bPass = (iValue > max(1, (GC.getMC_GIFT_WEIGHT_THRESHOLD() - ((m_pPlayer->calculateGoldRate() - 20) / 2))));
+					}
+					else
+					{
+						// Original code
+						bPass = (iValue > GC.getMC_GIFT_WEIGHT_THRESHOLD());
+					}
+					if (bPass)
+					// END AIMOD
 					{
 						veMinorsToGiveGold.push_back(sGiftInfo, iValue);
 						bWantsToGiveGoldToThisMinor = true;
@@ -12391,11 +12409,14 @@ void CvDiplomacyAI::DoContactMinorCivs()
 					iPriority += GC.getAI_GOLD_PRIORITY_DIPLOMACY_PER_FLAVOR_POINT() * iDiplomacyFlavor;
 					GetPlayer()->GetEconomicAI()->StartSaveForPurchase(PURCHASE_TYPE_MINOR_CIV_GIFT, iAmountToSaveFor, iPriority);
 				}
-				//Snarko AIMod Start 02-11-2012
-				//Not much reason to continue here.
-				//Maybe we could give a small gift to someone needing a quick boost but it would be to a minor with lower priority, so let's save.
-				break;
-				//Snarko AIMod End
+				// AIMOD - v0.1, Snarko
+				if (GC.getUSE_AIMOD())
+				{
+					// Not much reason to continue here.
+					// Maybe we could give a small gift to someone needing a quick boost but it would be to a minor with lower priority, so let's save.
+					break;
+				}
+				// END AIMOD
 			}
 		}
 	}

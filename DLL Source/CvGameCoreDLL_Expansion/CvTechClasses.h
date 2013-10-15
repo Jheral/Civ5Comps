@@ -98,6 +98,12 @@ public:
 	int GetPrereqOrTechs(int i) const;
 	int GetPrereqAndTechs(int i) const;
 
+	// EventEngine - v0.1, Snarko
+	int getNumFlagPrereqs() const;
+	std::string getFlagPrereq(int i) const;
+	int getFlagPrereqValue(int i) const;
+	// END EventEngine
+
 private:
 	int m_iAIWeight;
 	int m_iAITradeModifier;
@@ -156,6 +162,10 @@ private:
 	int* m_piPrereqOrTechs;
 	int* m_piPrereqAndTechs;
 	bool* m_pabFreePromotion;
+
+	// EventEngine - v0.1, Snarko
+	std::vector<std::pair<std::string, int > > m_asziFlagPrereqs;
+	// END EventEngine
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

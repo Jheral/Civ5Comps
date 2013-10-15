@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created by ModBuddy on 10/15/2013 11:25:46 AM -->
+<GameData>
+	<Defines>
+		<Row Name="USE_AIMOD">
+			<Value>0</Value>
+		</Row>
+	</Defines>
+</GameData>

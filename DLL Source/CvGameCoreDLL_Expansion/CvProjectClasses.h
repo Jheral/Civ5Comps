@@ -53,6 +53,12 @@ public:
 	int GetVictoryMinThreshold(int i) const;
 	int GetProjectsNeeded(int i) const;
 
+	// EventEngine - v0.1, Snarko
+	int getNumFlagPrereqs() const;
+	std::string getFlagPrereq(int i) const;
+	int getFlagPrereqValue(int i) const;
+	// END EventEngine
+
 protected:
 	int m_iVictoryPrereq;
 	int m_iTechPrereq;
@@ -78,6 +84,10 @@ protected:
 	int* m_piVictoryMinThreshold;
 	int* m_piProjectsNeeded;
 	int* m_piFlavorValue;
+
+	// EventEngine - v0.1, Snarko
+	std::vector<std::pair<std::string, int > > m_asziFlagPrereqs;
+	// END EventEngine
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

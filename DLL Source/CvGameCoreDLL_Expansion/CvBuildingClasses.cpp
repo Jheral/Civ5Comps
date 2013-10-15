@@ -38,7 +38,13 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iPolicyBranchType(NO_POLICY_BRANCH_TYPE),
 	m_iSpecialistType(NO_SPECIALIST),
 	m_iSpecialistCount(0),
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	m_iSpecialistExtraCulture(0),
+	*/
+	// END Revamped yields
 	m_iGreatPeopleRateChange(0),
 	m_eGreatWorkSlotType(NO_GREAT_WORK_SLOT),
 	m_iGreatWorkCount(0),
@@ -55,12 +61,25 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_iHurryCostModifier(0),
 	m_iNumCitiesPrereq(0),
 	m_iUnitLevelPrereq(0),
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piYieldModifier, m_piGlobalYieldModifier
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCultureRateModifier(0),
 	m_iGlobalCultureRateModifier(0),
+	*/
+	// END Revamped yields
 	m_iGreatPeopleRateModifier(0),
 	m_iGlobalGreatPeopleRateModifier(0),
 	m_iGreatGeneralRateModifier(0),
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iGreatPersonExpendGold(0),
+	*/
+	m_piGreatPersonExpendYield(NULL),
+	// END Revamped yields
 	m_iUnitUpgradeCostMod(0),
 	m_iGoldenAgeModifier(0),
 	m_iFreeExperience(0),
@@ -153,8 +172,16 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_piPrereqAndTechs(NULL),
 	m_piResourceQuantityRequirements(NULL),
 	m_piResourceQuantity(NULL),
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_ppaiResourceYieldChange
+	// XML tag REMOVED because this actually changes what it does
+	// This is a small nerf to buildings that previously used this tag,
+	// but it would be redundant to have a seperate table just for changes to building gains based on local resources.
+	/* Original code
 	m_piResourceCultureChanges(NULL),
 	m_piResourceFaithChanges(NULL),
+	*/
+	// END Revamped yields
 	m_piProductionTraits(NULL),
 	m_piSeaPlotYieldChange(NULL),
 	m_piRiverPlotYieldChange(NULL),
@@ -189,8 +216,14 @@ CvBuildingEntry::CvBuildingEntry(void):
 	m_ppaiTerrainYieldChange(NULL),
 	m_ppiBuildingClassYieldChanges(NULL),
 	m_paiBuildingClassHappiness(NULL),
+	// Revamped yields - v0.1, Snarko
+	m_piCityConnectionTradeRouteModifier(NULL),
+	// END Revamped yields
 	m_paThemingBonusInfo(NULL),
 	m_iNumThemingBonuses(0)
+	// EventEngine - v0.1, Snarko
+	, m_asziFlagPrereqs(NULL)
+	// END EventEngine
 {
 }
 
@@ -201,8 +234,16 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piPrereqAndTechs);
 	SAFE_DELETE_ARRAY(m_piResourceQuantityRequirements);
 	SAFE_DELETE_ARRAY(m_piResourceQuantity);
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_ppaiResourceYieldChange
+	// XML tag REMOVED because this actually changes what it does
+	// This is a small nerf to buildings that previously used this tag,
+	// but it would be redundant to have a seperate table just for changes to building gains based on local resources.
+	/* Original code
 	SAFE_DELETE_ARRAY(m_piResourceCultureChanges);
 	SAFE_DELETE_ARRAY(m_piResourceFaithChanges);
+	*/
+	// END Revamped yields
 	SAFE_DELETE_ARRAY(m_piProductionTraits);
 	SAFE_DELETE_ARRAY(m_piSeaPlotYieldChange);
 	SAFE_DELETE_ARRAY(m_piRiverPlotYieldChange);
@@ -229,6 +270,10 @@ CvBuildingEntry::~CvBuildingEntry(void)
 	SAFE_DELETE_ARRAY(m_piNumFreeUnits);
 	SAFE_DELETE_ARRAY(m_paiBuildingClassHappiness);
 	SAFE_DELETE_ARRAY(m_paThemingBonusInfo);
+	// Revamped yields - v0.1, Snarko
+	SAFE_DELETE_ARRAY(m_piCityConnectionTradeRouteModifier);
+	SAFE_DELETE_ARRAY(m_piGreatPersonExpendYield);
+	// END Revamped yields
 
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiResourceYieldChange);
 	CvDatabaseUtility::SafeDelete2DArray(m_ppaiFeatureYieldChange);
@@ -284,12 +329,33 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iConquestProbability = kResults.GetInt("ConquestProb");
 	m_iNumCitiesPrereq = kResults.GetInt("CitiesPrereq");
 	m_iUnitLevelPrereq = kResults.GetInt("LevelPrereq");
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piYieldModifier, m_piGlobalYieldModifier
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCultureRateModifier = kResults.GetInt("CultureRateModifier");
 	m_iGlobalCultureRateModifier = kResults.GetInt("GlobalCultureRateModifier");
+	*/
+	// END Revamped yields
 	m_iGreatPeopleRateModifier = kResults.GetInt("GreatPeopleRateModifier");
 	m_iGlobalGreatPeopleRateModifier = kResults.GetInt("GlobalGreatPeopleRateModifier");
 	m_iGreatGeneralRateModifier = kResults.GetInt("GreatGeneralRateModifier");
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iGreatPersonExpendGold = kResults.GetInt("GreatPersonExpendGold");
+	*/
+	kUtility.SetYields(m_piGreatPersonExpendYield, "Building_GreatPersonExpendedYield", "BuildingType", GetType());
+
+	int iGreatPersonExpendGold = kResults.GetInt("GreatPersonExpendGold");
+	if (iGreatPersonExpendGold != 0)
+	{
+		if (m_piGreatPersonExpendYield == NULL)
+			kUtility.InitializeArray(m_piGreatPersonExpendYield, NUM_YIELD_TYPES, 0);
+		m_piGreatPersonExpendYield[YIELD_GOLD] += iGreatPersonExpendGold;
+	}
+	// END Revamped yields
 	m_iUnitUpgradeCostMod = kResults.GetInt("UnitUpgradeCostMod");
 	m_iGoldenAgeModifier = kResults.GetInt("GoldenAgeModifier");
 	m_iFreeExperience = kResults.GetInt("Experience");
@@ -313,7 +379,23 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	m_iGlobalSpaceProductionModifier = kResults.GetInt("GlobalSpaceProductionModifier");
 	m_iBuildingProductionModifier = kResults.GetInt("BuildingProductionModifier");
 	m_iWonderProductionModifier = kResults.GetInt("WonderProductionModifier");
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_piCityConnectionTradeRouteModifier
+	// XML tag still kept for backwards compatibility
+	/* Original code
 	m_iCityConnectionTradeRouteModifier = kResults.GetInt("CityConnectionTradeRouteModifier");
+	*/
+	kUtility.SetYields(m_piCityConnectionTradeRouteModifier, "Building_CityConnectionYieldModifiers", "BuildingType", GetType());
+
+	int iCityConnectionTradeRouteModifier = kResults.GetInt("CityConnectionTradeRouteModifier");
+	if (iCityConnectionTradeRouteModifier != 0)
+	{
+		if (m_piCityConnectionTradeRouteModifier == NULL)
+			kUtility.InitializeArray(m_piCityConnectionTradeRouteModifier, NUM_YIELD_TYPES, 0);
+
+		m_piCityConnectionTradeRouteModifier[YIELD_GOLD] += iCityConnectionTradeRouteModifier;
+	}
+	// END Revamped yields
 	m_iCapturePlunderModifier = kResults.GetInt("CapturePlunderModifier");
 	m_iPolicyCostModifier = kResults.GetInt("PolicyCostModifier");
 	m_iPlotCultureCostModifier = kResults.GetInt("PlotCultureCostModifier");
@@ -429,7 +511,13 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	szTextVal = kResults.GetText("SpecialistType");
 	m_iSpecialistType = GC.getInfoTypeForString(szTextVal, true);
 	m_iSpecialistCount = kResults.GetInt("SpecialistCount");
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	m_iSpecialistExtraCulture = kResults.GetInt("SpecialistExtraCulture");
+	*/
+	// END Revamped yields
 	m_iGreatPeopleRateChange= kResults.GetInt("GreatPeopleRateChange");
 
 	szTextVal = kResults.GetText("GreatWorkSlotType");
@@ -455,10 +543,42 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 	kUtility.SetYields(m_piGlobalYieldModifier, "Building_GlobalYieldModifiers", "BuildingType", szBuildingType);
 	kUtility.SetYields(m_piTechEnhancedYieldChange, "Building_TechEnhancedYieldChanges", "BuildingType", szBuildingType);
 
+	// Revamped yields - v0.1, Snarko
+	int iCultureRateModifier = kResults.GetInt("CultureRateModifier");
+	if (iCultureRateModifier != 0)
+	{
+		if (m_piYieldModifier == NULL)
+		{
+			kUtility.InitializeArray(m_piYieldModifier, NUM_YIELD_TYPES, 0);
+		}
+
+		m_piYieldModifier[YIELD_CULTURE] += iCultureRateModifier;
+	}
+
+	int iGlobalCultureRateModifier = kResults.GetInt("GlobalCultureRateModifier");
+	if (iGlobalCultureRateModifier != 0)
+	{
+		if (m_piGlobalYieldModifier == NULL)
+		{
+			kUtility.InitializeArray(m_piGlobalYieldModifier, NUM_YIELD_TYPES, 0);
+		}
+
+		m_piGlobalYieldModifier[YIELD_CULTURE] += iGlobalCultureRateModifier;
+	}
+	// END Revamped yields
+
 	kUtility.PopulateArrayByValue(m_piResourceQuantityRequirements, "Resources", "Building_ResourceQuantityRequirements", "ResourceType", "BuildingType", szBuildingType, "Cost");
 	kUtility.PopulateArrayByValue(m_piResourceQuantity, "Resources", "Building_ResourceQuantity", "ResourceType", "BuildingType", szBuildingType, "Quantity");
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use m_ppaiResourceYieldChange
+	// XML tag REMOVED because this actually changes what it does
+	// This is a small nerf to buildings that previously used this tag,
+	// but it would be redundant to have a seperate table just for changes to building gains based on local resources.
+	/* Original code
 	kUtility.PopulateArrayByValue(m_piResourceCultureChanges, "Resources", "Building_ResourceCultureChanges", "ResourceType", "BuildingType", szBuildingType, "CultureChange");
 	kUtility.PopulateArrayByValue(m_piResourceFaithChanges, "Resources", "Building_ResourceFaithChanges", "ResourceType", "BuildingType", szBuildingType, "FaithChange");
+	*/
+	// END Revamped yields
 
 	kUtility.PopulateArrayByValue(m_paiHurryModifier, "HurryInfos", "Building_HurryModifiers", "HurryType", "BuildingType", szBuildingType, "HurryCostModifier");
 
@@ -651,6 +771,9 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 			pThemingInfo.m_bRequiresSamePlayer = pResourceTypes->GetBool("RequiresSamePlayer");
 			pThemingInfo.m_bRequiresUniquePlayers = pResourceTypes->GetBool("RequiresUniquePlayers");
 			pThemingInfo.m_iAIPriority = pResourceTypes->GetInt("AIPriority");
+			// Revamped yields - v0.1, Snarko
+			pThemingInfo.m_eYieldType = (YieldTypes)pResourceTypes->GetInt("YieldType");
+			// END Revamped yields
 
 			idx++;
 		}
@@ -658,6 +781,27 @@ bool CvBuildingEntry::CacheResults(Database::Results& kResults, CvDatabaseUtilit
 		m_iNumThemingBonuses = idx;
 		pResourceTypes->Reset();
 	}
+
+	// EventEngine - v0.1, Snarko
+	{
+		m_asziFlagPrereqs.clear();
+		std::string strKey("Building_PrereqFlags");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from Building_PrereqFlags where BuildingType = ?");
+		}
+
+		pResults->Bind(1, szBuildingType);
+
+		while(pResults->Step())
+		{
+			std::string szFlag = pResults->GetText("Flag");
+			int iMinimumValue = pResults->GetInt("MinimumValue");
+			m_asziFlagPrereqs.push_back(std::make_pair(szFlag, iMinimumValue));
+		}
+	}
+	// END EventEngine
 
 	return true;
 }
@@ -773,11 +917,17 @@ int CvBuildingEntry::GetSpecialistCount() const
 	return m_iSpecialistCount;
 }
 
+// Revamped yields - v0.1, Snarko
+// REMOVED
+// This tag is not used in base civ 5 and there's little reason to keep it.
+/* Original code
 /// Extra culture from every specialist
 int CvBuildingEntry::GetSpecialistExtraCulture() const
 {
 	return m_iSpecialistExtraCulture;
 }
+*/
+// END Revamped yields
 
 /// How many GPP does this Building provide (linked to the SpecialistType)
 int CvBuildingEntry::GetGreatPeopleRateChange() const
@@ -875,6 +1025,10 @@ int CvBuildingEntry::GetUnitLevelPrereq() const
 	return m_iUnitLevelPrereq;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used, use GetYieldModifier, GetGlobalYieldModifier
+// XML tag still kept for backwards compatibility
+/* Original code
 /// Multiplier to the rate of accumulating culture for policies
 int CvBuildingEntry::GetCultureRateModifier() const
 {
@@ -886,6 +1040,8 @@ int CvBuildingEntry::GetGlobalCultureRateModifier() const
 {
 	return m_iGlobalCultureRateModifier;
 }
+*/
+// END Revamped yields
 
 /// Change in spawn rate for great people
 int CvBuildingEntry::GetGreatPeopleRateModifier() const
@@ -905,11 +1061,22 @@ int CvBuildingEntry::GetGreatGeneralRateModifier() const
 	return m_iGreatGeneralRateModifier;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 /// Gold received when great person expended
 int CvBuildingEntry::GetGreatPersonExpendGold() const
 {
 	return m_iGreatPersonExpendGold;
 }
+*/
+int CvBuildingEntry::GetGreatPersonExpendYield(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piGreatPersonExpendYield ? m_piGreatPersonExpendYield[i] : 0;
+}
+// END Revamped yields
 
 /// Reduces cost of unit upgrades?
 int CvBuildingEntry::GetUnitUpgradeCostMod() const
@@ -1001,11 +1168,23 @@ int CvBuildingEntry::GetWonderProductionModifier() const
 	return m_iWonderProductionModifier;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used, use GetCityConnectionTradeRouteModifier(int i)
+/* Original code
 /// Trade route gold modifier
 int CvBuildingEntry::GetCityConnectionTradeRouteModifier() const
 {
 	return m_iCityConnectionTradeRouteModifier;
 }
+*/
+/// Trade route yield modifier
+int CvBuildingEntry::GetCityConnectionTradeRouteModifier(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piCityConnectionTradeRouteModifier[i];
+}
+// END Revamped yields
 
 /// Increased plunder if city captured
 int CvBuildingEntry::GetCapturePlunderModifier() const
@@ -1779,6 +1958,12 @@ int CvBuildingEntry::GetResourceQuantity(int i) const
 	return m_piResourceQuantity ? m_piResourceQuantity[i] : -1;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used, use GetResourceYieldChange
+// XML tag REMOVED because this actually changes what it does
+// This is a small nerf to buildings that previously used this tag,
+// but it would be redundant to have a seperate table just for changes to building gains based on local resources.
+/* Original code
 /// Boost in Culture for each of these Resources
 int CvBuildingEntry::GetResourceCultureChange(int i) const
 {
@@ -1794,6 +1979,8 @@ int CvBuildingEntry::GetResourceFaithChange(int i) const
 	CvAssertMsg(i > -1, "Index out of bounds");
 	return m_piResourceFaithChanges ? m_piResourceFaithChanges[i] : -1;
 }
+*/
+// END Revamped yields
 
 /// Boost in production for leader with this trait
 int CvBuildingEntry::GetProductionTraits(int i) const
@@ -1981,6 +2168,28 @@ CvThemingBonusInfo *CvBuildingEntry::GetThemingBonusInfo(int i) const
 		return &m_paThemingBonusInfo[i];
 	}
 }
+
+// EventEngine - v0.1, Snarko
+//------------------------------------------------------------------------------
+int CvBuildingEntry::getNumFlagPrereqs() const
+{
+	return m_asziFlagPrereqs.size();
+}
+//------------------------------------------------------------------------------
+std::string CvBuildingEntry::getFlagPrereq(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].first;
+}
+//------------------------------------------------------------------------------
+int CvBuildingEntry::getFlagPrereqValue(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].second;
+}
+// END EventEngine
 
 //=====================================
 // CvBuildingXMLEntries
@@ -3063,6 +3272,9 @@ bool CvCityBuildings::GetNextAvailableGreatWorkSlot(GreatWorkSlotType eGreatWork
 	return false;
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 /// Accessor: How much culture are we generating from Great Works in our buildings?
 int CvCityBuildings::GetCultureFromGreatWorks() const
 {
@@ -3074,6 +3286,32 @@ int CvCityBuildings::GetCultureFromGreatWorks() const
 
 	return iRtnValue;
 }
+*/
+int CvCityBuildings::GetYieldFromGreatWorks(YieldTypes eYield) const
+{
+	int iYield = 0;
+
+	for(std::vector<BuildingGreatWork>::const_iterator it = m_aBuildingGreatWork.begin(); it != m_aBuildingGreatWork.end(); ++it)
+	{
+		int iIndex = (*it).iGreatWorkIndex;
+
+		GreatWorkClass eClass = GC.getGame().GetGameCulture()->GetGreatWorkClass(iIndex);
+		CvGreatWorkClassInfo* kWorkClassInfo = GC.getGreatWorkClassInfo(eClass);
+
+		int iTemp = kWorkClassInfo->GetYield((int)eYield);
+		if (iTemp != 0)
+		{
+			iYield += iTemp;
+			iYield += GET_PLAYER(m_pCity->getOwner()).GetGreatWorkYieldChange(eYield);
+		}
+	}
+
+	iYield += GetThemingBonuses(eYield);
+
+	return iYield;
+}
+
+// END Revamped yields
 
 /// Accessor: How many Great Works of specific slot type present in this city?
 int CvCityBuildings::GetNumGreatWorks() const
@@ -3144,7 +3382,12 @@ void CvCityBuildings::ChangeGreatWorksTourismModifier(int iChange)
 }
 
 /// Accessor: Total theming bonus from all buildings in the city
+// Revamped yields - v0.1, Snarko
+/* Original code
 int CvCityBuildings::GetThemingBonuses() const
+*/
+int CvCityBuildings::GetThemingBonuses(YieldTypes eYield) const
+// END Revamped yields
 {
 	int iBonus = 0;
 
@@ -3159,7 +3402,12 @@ int CvCityBuildings::GetThemingBonuses() const
 			{
 				if (GetNumBuilding(eBuilding) > 0)
 				{
+					// Revamped yields - v0.1, Snarko
+					/* Original code
 					iBonus += m_pCity->GetCityCulture()->GetThemingBonus(eLoopBuildingClass);
+					*/
+					iBonus += m_pCity->GetCityCulture()->GetThemingBonus(eLoopBuildingClass, eYield);
+					// END Revamped yields
 				}
 			}
 		}

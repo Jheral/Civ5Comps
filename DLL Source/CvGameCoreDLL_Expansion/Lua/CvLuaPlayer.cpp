@@ -193,16 +193,39 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(ChangeGold);
 	Method(CalculateGrossGold);
 	Method(GetLifetimeGrossGold);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/*
 	Method(GetGoldFromCitiesTimes100);
 	Method(GetGoldFromCitiesMinusTradeRoutesTimes100);
+	*/
+	// END Revamped yields
 	Method(GetGoldPerTurnFromDiplomacy);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/*
 	Method(GetCityConnectionRouteGoldTimes100);
 	Method(GetCityConnectionGold);
 	Method(GetCityConnectionGoldTimes100);
 	Method(GetGoldPerTurnFromReligion);
+	*/
+	Method(GetCityConnectionTradeRouteYieldModifier);
+	Method(ChangeCityConnectionTradeRouteYieldModifier);
+	Method(GetCityConnectionTradeRouteYieldChange);
+	Method(ChangeCityConnectionTradeRouteYieldChange);
+	Method(GetCityConnectionYield);
+	Method(GetCityConnectionYieldTimes100);
+	Method(DoUpdateCityConnectionYield);
+	Method(GetCityConnectionRouteYieldTimes100);
+	// END Revamped yields
 	Method(GetGoldPerTurnFromTradeRoutes);
 	Method(GetGoldPerTurnFromTradeRoutesTimes100);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/*
 	Method(GetGoldPerTurnFromTraits);
+	*/
+	// END Revamped yields
 
 	// Culture
 
@@ -210,22 +233,64 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(GetJONSCulturePerTurnFromCities);
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/*
 	Method(GetJONSCulturePerTurnFromExcessHappiness);
 	Method(GetJONSCulturePerTurnFromTraits);
-
 	Method(GetCultureWonderMultiplier);
+	*/
+	Method(GetYieldPerWonder);
+	Method(ChangeYieldPerWonder);
+	Method(GetYieldWonderMultiplier);
+	Method(ChangeYieldWonderMultiplier);
+	Method(GetYieldFromGarrison);
+	Method(ChangeYieldFromGarrison);
+	Method(GetGreatPersonExpendYield);
+	Method(ChangeGreatPersonExpendYield);
 
+	Method(ChangeImmediateYield);
+
+	Method(GetReligionYieldModifier);
+	Method(GetYieldFromReligion);
+	Method(GetYieldFromTraits);
+	Method(GetYieldFromCities);
+	Method(GetYieldFromCitiesTimes100);
+	Method(GetGenericYieldModifiers);
+	Method(GetGenericYieldsPerTurn);
+	Method(GetGenericYieldsPerTurnTimes100);
+	Method(GetYieldPerTurnFromExcessHappiness);
+	Method(GetYieldFromHappinessTimes100);
+
+	Method(GetHappinessToYield);
+	Method(ChangeHappinessToYield);
+	Method(GetHappyYieldMultiplier);
+	Method(ChangeHappyYieldMultiplier);
+	// END Revamped yields
+
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	Method(GetJONSCulturePerTurnForFree);
 	Method(ChangeJONSCulturePerTurnForFree);
+	*/
+	// END Revamped yields
 
 	Method(GetJONSCulturePerTurnFromMinorCivs);
 	Method(ChangeJONSCulturePerTurnFromMinorCivs);
 	Method(GetCulturePerTurnFromMinorCivs);
 	Method(GetCulturePerTurnFromMinor);
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	Method(GetCulturePerTurnFromReligion);
 	Method(GetCulturePerTurnFromBonusTurns);
+	
 	Method(GetCultureCityModifier);
+	*/
+	// END Revamped yields
 
 	Method(GetJONSCulture);
 	Method(SetJONSCulture);
@@ -266,7 +331,12 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetTotalFaithPerTurn);
 	Method(GetFaithPerTurnFromCities);
 	Method(GetFaithPerTurnFromMinorCivs);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	Method(GetFaithPerTurnFromReligion);
+	*/
+	// END Revamped yields
 	Method(HasCreatedPantheon);
 	Method(GetBeliefInPantheon);
 	Method(HasCreatedReligion);
@@ -334,7 +404,12 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(SetHappinessPerTradeRoute);
 	Method(ChangeHappinessPerTradeRoute);
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/*
 	Method(GetCityConnectionTradeRouteGoldModifier);
+	*/
+	// END Revamped yields
 
 	Method(GetHappinessFromMinorCivs);
 	Method(GetHappinessFromMinor);
@@ -401,7 +476,15 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 	Method(GetAdvancedStartVisibilityCost);
 
 	Method(GetAttackBonusTurns);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	Method(GetCultureBonusTurns);
+	*/
+	Method(GetYieldFromLeagueReward);
+	Method(GetYieldBonusTurns);
+	Method(GetYieldFromResolutions);
+	// END Revamped yields
 	Method(GetTourismBonusTurns);
 
 	Method(GetGoldenAgeProgressThreshold);
@@ -644,7 +727,12 @@ void CvLuaPlayer::PushMethods(lua_State* L, int t)
 
 	Method(GetScienceFromCitiesTimes100);
 	Method(GetScienceFromOtherPlayersTimes100);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	Method(GetScienceFromHappinessTimes100);
+	*/
+	// END Revamped yields
 	Method(GetScienceFromResearchAgreementsTimes100);
 	Method(GetScienceFromBudgetDeficitTimes100);
 
@@ -2107,6 +2195,9 @@ int CvLuaPlayer::lGetLifetimeGrossGold(lua_State* L)
 	return 1;
 }
 //------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// No longer used
+/*
 //int GetGoldFromCitiesTimes100();
 int CvLuaPlayer::lGetGoldFromCitiesTimes100(lua_State* L)
 {
@@ -2122,7 +2213,8 @@ int CvLuaPlayer::lGetGoldFromCitiesMinusTradeRoutesTimes100(lua_State* L)
 	lua_pushinteger(L, iResult);
 	return 1;
 }
-
+*/
+// END Revamped yields
 //------------------------------------------------------------------------------
 //int GetGoldPerTurnFromDiplomacy();
 int CvLuaPlayer::lGetGoldPerTurnFromDiplomacy(lua_State* L)
@@ -2132,6 +2224,9 @@ int CvLuaPlayer::lGetGoldPerTurnFromDiplomacy(lua_State* L)
 	return 1;
 }
 //------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 //int GetCityConnectionRouteGoldTimes100(CvCity* pCity);
 int CvLuaPlayer::lGetCityConnectionRouteGoldTimes100(lua_State* L)
 {
@@ -2164,6 +2259,47 @@ int CvLuaPlayer::lGetGoldPerTurnFromReligion(lua_State* L)
 	lua_pushinteger(L, pkPlayer->GetTreasury()->GetGoldPerTurnFromReligion());
 	return 1;
 }
+*/
+int CvLuaPlayer::lGetCityConnectionTradeRouteYieldModifier(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetCityConnectionTradeRouteYieldModifier);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lChangeCityConnectionTradeRouteYieldModifier(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::ChangeCityConnectionTradeRouteYieldModifier);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetCityConnectionTradeRouteYieldChange(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetCityConnectionTradeRouteYieldChange);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lChangeCityConnectionTradeRouteYieldChange(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::ChangeCityConnectionTradeRouteYieldChange);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetCityConnectionYield(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetCityConnectionYield);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetCityConnectionYieldTimes100(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetCityConnectionYieldTimes100);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lDoUpdateCityConnectionYield(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::DoUpdateCityConnectionYield);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetCityConnectionRouteYieldTimes100(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetCityConnectionRouteYieldTimes100);
+}
+// END Revamped yields
 //------------------------------------------------------------------------------
 //int GetGoldPerTurnFromTradeRoutes();
 int CvLuaPlayer::lGetGoldPerTurnFromTradeRoutes(lua_State* L)
@@ -2180,6 +2316,9 @@ int CvLuaPlayer::lGetGoldPerTurnFromTradeRoutesTimes100(lua_State* L)
 	lua_pushinteger(L, pkPlayer->GetTreasury()->GetGoldPerTurnFromTradeRoutesTimes100());
 	return 1;
 }
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 //------------------------------------------------------------------------------
 //int GetGoldPerTurnFromTraits();
 int CvLuaPlayer::lGetGoldPerTurnFromTraits(lua_State* L)
@@ -2188,6 +2327,8 @@ int CvLuaPlayer::lGetGoldPerTurnFromTraits(lua_State* L)
 	lua_pushinteger(L, pkPlayer->GetTreasury()->GetGoldPerTurnFromTraits());
 	return 1;
 }
+*/
+// END Revamped yields
 //------------------------------------------------------------------------------
 //int GetTotalJONSCulturePerTurn();
 int CvLuaPlayer::lGetTotalJONSCulturePerTurn(lua_State* L)
@@ -2201,6 +2342,9 @@ int CvLuaPlayer::lGetJONSCulturePerTurnFromCities(lua_State* L)
 	return BasicLuaMethod(L, &CvPlayerAI::GetJONSCulturePerTurnFromCities);
 }
 //------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 //int getJONSCulturePerTurnFromExcessHappiness();
 int CvLuaPlayer::lGetJONSCulturePerTurnFromExcessHappiness(lua_State* L)
 {
@@ -2218,7 +2362,109 @@ int CvLuaPlayer::lGetCultureWonderMultiplier(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::GetCultureWonderMultiplier);
 }
+*/
 //------------------------------------------------------------------------------
+int CvLuaPlayer::lGetYieldPerWonder(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetYieldPerWonder);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lChangeYieldPerWonder(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::ChangeYieldPerWonder);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetYieldWonderMultiplier(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetYieldWonderMultiplier);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lChangeYieldWonderMultiplier(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::ChangeYieldWonderMultiplier);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetYieldFromGarrison(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::getYieldFromGarrison);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lChangeYieldFromGarrison(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::changeYieldFromGarrison);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetGreatPersonExpendYield(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetGreatPersonExpendYield);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lChangeGreatPersonExpendYield(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::ChangeGreatPersonExpendYield);
+}
+
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetReligionYieldModifier(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetReligionYieldModifier);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetYieldFromReligion(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetYieldPerTurnFromReligion);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetYieldFromTraits(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetYieldPerTurnFromTraits);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetYieldFromCities(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetYieldFromCities);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetYieldFromCitiesTimes100(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetYieldFromCitiesTimes100);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetGenericYieldModifiers(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetGenericYieldModifiers);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetGenericYieldsPerTurn(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetGenericYieldsPerTurn);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetGenericYieldsPerTurnTimes100(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetGenericYieldsPerTurnTimes100);
+}
+
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lChangeImmediateYield(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	int iYield = lua_tointeger(L, 2);
+	int iChange = lua_tointeger(L, 3);
+	bool bDisplay = lua_toboolean(L, 4);
+	int iX = lua_tointeger(L, 5);
+	int iY = lua_tointeger(L, 6);
+	pkPlayer->ChangeImmediateYield((YieldTypes)iYield, iChange, bDisplay, iX, iY);
+
+	return 1;
+}
+// END Revamped yields
+
+//------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// REMOVED
+// This tag is not used in base civ 5 and there's little reason to keep it.
+/* Original code
 //int getJONSCulturePerTurnForFree();
 int CvLuaPlayer::lGetJONSCulturePerTurnForFree(lua_State* L)
 {
@@ -2230,6 +2476,8 @@ int CvLuaPlayer::lChangeJONSCulturePerTurnForFree(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::ChangeJONSCulturePerTurnForFree);
 }
+*/
+// END Revamped yields
 //------------------------------------------------------------------------------
 // DEPRECATED, use lGetCulturePerTurnFromMinorCivs instead
 //int getJONSCulturePerTurnFromMinorCivs();
@@ -2257,6 +2505,9 @@ int CvLuaPlayer::lGetCulturePerTurnFromMinor(lua_State* L)
 	return BasicLuaMethod(L, &CvPlayerAI::GetCulturePerTurnFromMinor);
 }
 //------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 //int GetCulturePerTurnFromReligion();
 int CvLuaPlayer::lGetCulturePerTurnFromReligion(lua_State* L)
 {
@@ -2268,12 +2519,15 @@ int CvLuaPlayer::lGetCulturePerTurnFromBonusTurns(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::GetCulturePerTurnFromBonusTurns);
 }
+
 //------------------------------------------------------------------------------
 //int GetCultureCityModifier();
 int CvLuaPlayer::lGetCultureCityModifier(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::GetJONSCultureCityModifier);
 }
+*/
+// END Revamped yields
 
 //------------------------------------------------------------------------------
 //int getJONSCulture();
@@ -2570,11 +2824,16 @@ int CvLuaPlayer::lGetFaithPerTurnFromMinorCivs(lua_State* L)
 	return BasicLuaMethod(L, &CvPlayerAI::GetFaithPerTurnFromMinorCivs);
 }
 //------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 //int GetFaithPerTurnFromReligion();
 int CvLuaPlayer::lGetFaithPerTurnFromReligion(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::GetFaithPerTurnFromReligion);
 }
+*/
+// END Revamped yields
 //------------------------------------------------------------------------------
 //bool HasCreatedPantheon();
 int CvLuaPlayer::lHasCreatedPantheon(lua_State* L)
@@ -3046,6 +3305,9 @@ int CvLuaPlayer::lChangeHappinessPerTradeRoute(lua_State* L)
 	return BasicLuaMethod(L, &CvPlayerAI::ChangeHappinessPerTradeRoute);
 }
 //------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// No longer used
+/*
 //void GetTradeRouteModifier ()
 int CvLuaPlayer::lGetCityConnectionTradeRouteGoldModifier(lua_State* L)
 {
@@ -3054,6 +3316,8 @@ int CvLuaPlayer::lGetCityConnectionTradeRouteGoldModifier(lua_State* L)
 	lua_pushinteger(L, iResult);
 	return 1;
 }
+*/
+// END Revamped yields
 //------------------------------------------------------------------------------
 //void GetInternationalTradeRoutePlotToolTip ()
 int CvLuaPlayer::lGetInternationalTradeRoutePlotToolTip(lua_State* L)
@@ -4968,11 +5232,81 @@ int CvLuaPlayer::lGetAttackBonusTurns(lua_State* L)
 }
 
 //------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// No longer used, use GetYieldBonus or GetYieldBonusTurns
+/* Original code
 //int GetCultureBonusTurns();
 int CvLuaPlayer::lGetCultureBonusTurns(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::GetCultureBonusTurns);
 }
+*/
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetYieldFromLeagueReward(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetYieldFromLeagueReward);
+}
+
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetYieldBonusTurns(lua_State* L)
+{
+	CvPlayerAI* pkPlayer = GetInstance(L);
+	YieldTypes eYield = (YieldTypes)lua_tointeger(L, 2);
+	std::vector<LeagueRewardYieldModifier> aYields = pkPlayer->GetYieldBonusTurns(eYield);
+
+	lua_createtable(L, 0, 0);
+	int index = 1;
+	for (std::vector<LeagueRewardYieldModifier>::const_iterator it = aYields.begin(); it != aYields.end(); ++it)
+	{
+		lua_createtable(L, 0, 0);
+		const int t = lua_gettop(L);
+		lua_pushinteger(L, it->iChange);
+		lua_setfield(L, t, "Change");
+		lua_pushinteger(L, it->iTurns);
+		lua_setfield(L, t, "Turns");
+		lua_rawseti(L, -2, index++);
+	}
+	return 1;
+}
+
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetYieldFromResolutions(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetYieldFromResolutions);
+}
+
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetYieldPerTurnFromExcessHappiness(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetYieldPerTurnFromExcessHappiness);
+}
+
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetYieldFromHappinessTimes100(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::GetYieldFromHappinessTimes100);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetHappinessToYield(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::getHappinessToYield);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lChangeHappinessToYield(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::changeHappinessToYield);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lGetHappyYieldMultiplier(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::getHappyYieldMultiplier);
+}
+//------------------------------------------------------------------------------
+int CvLuaPlayer::lChangeHappyYieldMultiplier(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvPlayerAI::changeHappyYieldMultiplier);
+}
+// END Revamped yields
 
 //------------------------------------------------------------------------------
 //int GetTourismBonusTurns();
@@ -6709,11 +7043,16 @@ int CvLuaPlayer::lGetScienceFromOtherPlayersTimes100(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::GetScienceFromOtherPlayersTimes100);
 }
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 //int GetScienceFromHappinessTimes100();
 int CvLuaPlayer::lGetScienceFromHappinessTimes100(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvPlayerAI::GetScienceFromHappinessTimes100);
 }
+*/
+// END Revamped yields
 //int GetScienceFromResearchAgreementsTimes100();
 int CvLuaPlayer::lGetScienceFromResearchAgreementsTimes100(lua_State* L)
 {
@@ -10795,9 +11134,7 @@ int CvLuaPlayer::lCheckEventModifier(lua_State* L)
 	{
 		CvEventInfo* kEvent = GC.getEventInfo((EventTypes)lua_tointeger(L, 2));
 		CvEventModifierInfo kEventModifier = *GC.getEventModifierInfo(kEvent->getModifier(lua_tointeger(L, 3)));
-		//TODO: make this function actually return aaScopes to lua, since we might have multiple acceptable answers.
-		std::map<std::string, std::vector<int> > asziScopes;
-		bool bPass = pkPlayer->checkEventModifier(kEventModifier, asziScopes);
+		bool bPass = pkPlayer->checkEventModifier(kEventModifier);
 		lua_pushboolean(L, bPass);
 	}
 	return 1;
@@ -10891,7 +11228,7 @@ int CvLuaPlayer::lGetTempEventEffect(lua_State* L)
 	CvPlayerAI* pkPlayer = GetInstance(L);
 	const int id = lua_tointeger(L, 2);
 
-	CvEventEffects* pkEventEffect = &(pkPlayer->getTempEventEffect(id));
+	CvEventEffect* pkEventEffect = &(pkPlayer->getTempEventEffect(id));
 	CvLuaEventEffects::Push(L, pkEventEffect);
 	return 1;
 }

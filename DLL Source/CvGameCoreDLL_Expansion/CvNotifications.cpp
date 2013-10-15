@@ -1102,7 +1102,7 @@ void CvNotifications::Activate(Notification& notification)
 	case NOTIFICATION_EVENT:
 	{
 		EventTypes eEvent = (EventTypes) notification.m_iGameDataIndex;
-		CvPopupInfo kPopup(BUTTONPOPUP_MODDER_0, m_ePlayer, eEvent, notification.m_iExtraGameData);
+		CvPopupInfo kPopup(BUTTONPOPUP_EVENT, m_ePlayer, eEvent, notification.m_iExtraGameData);
 		GC.GetEngineUserInterface()->AddPopup(kPopup);
 	}
 	break;
@@ -1790,6 +1790,15 @@ bool CvNotifications::IsNotificationExpired(int iIndex)
 		}
 	}
 	break;
+
+	// EventEngine - v0.1, Snarko
+	case NOTIFICATION_EVENT:
+	{
+		// If getEvent return a NULL pointer the event no longer exist.
+		if (!GET_PLAYER(m_ePlayer).getEvent(m_aNotifications[iIndex].m_iGameDataIndex))
+			return true;
+	}
+	// END EventEngine
 
 	default:	// don't expire
 	{

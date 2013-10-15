@@ -111,6 +111,11 @@ public:
 	int GetNumForcedDefaultSpecialists() const;
 	void ChangeNumForcedDefaultSpecialists(int iChange);
 
+	// EventEngine - v0.1, Snarko
+	int GetNumFreeSpecialist(SpecialistTypes eIndex) const;
+	void ChangeNumFreeSpecialist(SpecialistTypes eIndex, int iChange);
+	// END EventEngine
+
 	int GetSpecialistCount(SpecialistTypes eIndex) const;
 	int GetTotalSpecialistCount() const;
 
@@ -156,6 +161,10 @@ private:
 	int* m_aiNumSpecialistsInBuilding;
 	int* m_aiNumForcedSpecialistsInBuilding;
 	int* m_piBuildingGreatPeopleRateChanges;
+
+	// EventEngine - v0.1, Snarko
+	std::vector<int> m_aiNumFreeSpecialists;
+	// END EventEngine
 
 	bool m_bInited;
 

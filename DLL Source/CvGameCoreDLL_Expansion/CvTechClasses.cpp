@@ -67,6 +67,9 @@ CvTechEntry::CvTechEntry(void):
 	m_piPrereqOrTechs(NULL),
 	m_piPrereqAndTechs(NULL),
 	m_pabFreePromotion(NULL)
+	// EventEngine - v0.1, Snarko
+	, m_asziFlagPrereqs(NULL)
+	// END EventEngine
 {
 }
 
@@ -200,6 +203,27 @@ bool CvTechEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 
 		pResults->Reset();
 	}
+
+	// EventEngine - v0.1, Snarko
+	{
+		m_asziFlagPrereqs.clear();
+		std::string strKey("Technology_PrereqFlags");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from Technology_PrereqFlags where TechnologyType = ?");
+		}
+
+		pResults->Bind(1, szTechType);
+
+		while(pResults->Step())
+		{
+			std::string szFlag = pResults->GetText("Flag");
+			int iMinimumValue = pResults->GetInt("MinimumValue");
+			m_asziFlagPrereqs.push_back(std::make_pair(szFlag, iMinimumValue));
+		}
+	}
+	// END EventEngine
 
 	return true;
 }
@@ -533,6 +557,28 @@ int CvTechEntry::GetPrereqAndTechs(int i) const
 {
 	return m_piPrereqAndTechs ? m_piPrereqAndTechs[i] : -1;
 }
+
+// EventEngine - v0.1, Snarko
+//------------------------------------------------------------------------------
+int CvTechEntry::getNumFlagPrereqs() const
+{
+	return m_asziFlagPrereqs.size();
+}
+//------------------------------------------------------------------------------
+std::string CvTechEntry::getFlagPrereq(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].first;
+}
+//------------------------------------------------------------------------------
+int CvTechEntry::getFlagPrereqValue(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].second;
+}
+// END EventEngine
 
 //=====================================
 // CvTechXMLEntries
@@ -1169,6 +1215,15 @@ bool CvPlayerTechs::CanResearch(TechTypes eTech, bool bTrade) const
 	{
 		return false;
 	}
+
+	// EventEngine - v0.1, Snarko
+	for (int iI = 0; iI < pkTechEntry->getNumFlagPrereqs(); iI++)
+	{
+		std::string szFlag = pkTechEntry->getFlagPrereq(iI);
+		if (m_pPlayer->getFlag(szFlag) < pkTechEntry->getFlagPrereqValue(iI))
+			return false;
+	}
+	// END EventEngine
 
 	ICvEngineScriptSystem1* pkScriptSystem = gDLL->GetScriptSystem();
 	if(pkScriptSystem)

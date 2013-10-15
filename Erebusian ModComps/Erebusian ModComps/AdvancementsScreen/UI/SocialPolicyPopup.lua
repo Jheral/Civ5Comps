@@ -196,8 +196,7 @@ function UpdateDisplay() -- TODO: Make this work with ideologies
 			iTurns = "?";
 		else
 			iTurns = iCultureNeeded / pPlayer:GetTotalJONSCulturePerTurn();
-			iTurns = iTurns + 1;
-			iTurns = math.floor(iTurns);
+			iTurns = math.ceil(iTurns);
 		end
     end
 

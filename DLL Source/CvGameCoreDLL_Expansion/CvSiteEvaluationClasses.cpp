@@ -439,6 +439,9 @@ int CvCitySiteEvaluator::PlotFoundValue(CvPlot* pPlot, CvPlayer* pPlayer, YieldT
 		}
 	}
 
+	// Revamped yields - v0.1, Snarko
+	// TODO write code that uses the new system.
+	/* Original code
 	if (pPlayer->GetPlayerTraits()->IsFaithFromUnimprovedForest())
 	{
 		if (iCelticForestCount >= 3)
@@ -454,6 +457,12 @@ int CvCitySiteEvaluator::PlotFoundValue(CvPlot* pPlot, CvPlayer* pPlayer, YieldT
 	{
 		rtnValue += iIroquoisForestCount * 10;	
 	}
+	*/
+	if (pPlayer->GetPlayerTraits()->IsMoveFriendlyWoodsAsRoad())
+	{
+		rtnValue += iIroquoisForestCount * 10;	
+	}
+	// END Revamped yields
 
 	if (rtnValue < 0) rtnValue = 0;
 
@@ -994,7 +1003,12 @@ int CvSiteEvaluatorForStart::PlotFoundValue(CvPlot* pPlot, CvPlayer* pPlayer, Yi
 	int rtnValue = 0;
 	int iI;
 	CvPlot* pLoopPlot(NULL);
+	// Revamped yields - v0.1, Snarko
+	// TODO write code that uses the new system.
+	/* Original code
 	int iCelticForestCount = 0;
+	*/
+	// END Revamped yields
 
 	CvAssert(pPlot);
 	if(!pPlot) return rtnValue;
@@ -1042,6 +1056,9 @@ int CvSiteEvaluatorForStart::PlotFoundValue(CvPlot* pPlot, CvPlayer* pPlayer, Yi
 				rtnValue += iRingModifier * ComputeStrategicValue(pLoopPlot, pPlayer, iDistance) * /*1*/ GC.getSTART_AREA_STRATEGIC_MULTIPLIER();
 			}
 
+			// Revamped yields - v0.1, Snarko
+			// TODO write code that uses the new system.
+			/* Original code
 			if (pPlayer)
 			{
 				if (iDistance == 1 && pLoopPlot->getFeatureType() == FEATURE_FOREST)
@@ -1052,9 +1069,14 @@ int CvSiteEvaluatorForStart::PlotFoundValue(CvPlot* pPlot, CvPlayer* pPlayer, Yi
 					}
 				}
 			}
+			*/
+			// END Revamped yields
 		}
 	}
 
+	// Revamped yields - v0.1, Snarko
+	// TODO write code that uses the new system.
+	/* Original code
 	if (iCelticForestCount >= 3)
 	{
 		rtnValue += 2 * 1000 * m_iFlavorMultiplier[YIELD_FAITH];
@@ -1063,6 +1085,8 @@ int CvSiteEvaluatorForStart::PlotFoundValue(CvPlot* pPlot, CvPlayer* pPlayer, Yi
 	{
 		rtnValue += 1 * 1000 * m_iFlavorMultiplier[YIELD_FAITH];
 	}
+	*/
+	// END Revamped yields
 
 	if(rtnValue < 0) rtnValue = 0;
 

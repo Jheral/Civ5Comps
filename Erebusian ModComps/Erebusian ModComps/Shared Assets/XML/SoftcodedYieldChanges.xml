@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created by ModBuddy on 8/24/2013 12:07:19 PM -->
+<GameData>
+	<Table name="LeagueProjectRewards_YieldTurnChanges">
+		<Column name="LeagueProjectRewardType" type="text" reference="LeagueProjectRewards(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="iBonusValue" type="integer" default="100"/>
+		<Column name="iTurns" type="integer"/>
+	</Table>
+	<Table name="Resolutions_OneTimeYieldChanges">
+		<Column name="ResolutionType" type="text" reference="Resolutions(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Resolutions_YieldPerTurn">
+		<Column name="ResolutionType" type="text" reference="Resolutions(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Resolutions_YieldPerWonder">
+		<Column name="ResolutionType" type="text" reference="Resolutions(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Resolutions_YieldPerNaturalWonder">
+		<Column name="ResolutionType" type="text" reference="Resolutions(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Resolutions_GPTileImprovementYield">
+		<Column name="ResolutionType" type="text" reference="Resolutions(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Resolutions_YieldPerLandmark">
+		<Column name="ResolutionType" type="text" reference="Resolutions(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Policy_YieldFromGarrison">
+		<Column name="PolicyType" type="text" reference="Policies(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Policy_YieldPerWonder">
+		<Column name="PolicyType" type="text" reference="Policies(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Policy_YieldWonderMultiplier">
+		<Column name="PolicyType" type="text" reference="Policies(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Policy_HappinessToYields">
+		<Column name="PolicyType" type="text" reference="Policies(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Policy_HappyYieldMultiplier">
+		<Column name="PolicyType" type="text" reference="Policies(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Policy_CityConnectionYieldModifiers">
+		<Column name="PolicyType" type="text" reference="Policies(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="GreatWorkClass_Yields">
+		<Column name="GreatWorkClass" type="text" reference="GreatWorkClasses(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Building_CityConnectionYieldModifiers">
+		<Column name="BuildingType" type="text" reference="Buildings(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Building_GreatPersonExpendedYield">
+		<Column name="BuildingType" type="text" reference="Buildings(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Belief_PlayerYieldModifier">
+		<Column name="BeliefType" type="text" reference="Beliefs(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Belief_YieldPerFollowingCity">
+		<Column name="BeliefType" type="text" reference="Beliefs(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Belief_YieldPerXFollowers">
+		<Column name="BeliefType" type="text" reference="Beliefs(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Belief_YieldWhenCityAdopts">
+		<Column name="BeliefType" type="text" reference="Beliefs(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Belief_YieldPerOtherReligionFollower">
+		<Column name="BeliefType" type="text" reference="Beliefs(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Belief_GreatPersonExpendedYield">
+		<Column name="BeliefType" type="text" reference="Beliefs(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Trait_CityConnectionYieldChanges">
+		<Column name="TraitType" type="text" reference="Traits(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+	</Table>
+	<Table name="Trait_YieldFromFeatures">
+		<Column name="TraitType" type="text" reference="Traits(Type)"/>
+		<Column name="Type" type="text"/>
+		<Column name="Range" type="integer" default="1"/>
+		<Column name="bRequiresImprovement" type="boolean" default="false"/>
+		<Column name="bRequiresNoImprovement" type="boolean" default="false"/>
+	</Table>
+	<Table name="Trait_YieldFromFeature_Features">
+		<Column name="Trait_YieldFromFeaturesType" type="text" reference="Trait_YieldFromFeatures(Type)"/>
+		<Column name="FeatureType" type="text" reference="Features(Type)"/>
+	</Table>
+	<Table name="Trait_YieldFromFeature_Yields">
+		<Column name="Trait_YieldFromFeaturesType" type="text" reference="Trait_YieldFromFeatures(Type)"/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="Yield" type="integer"/>
+		<Column name="NumFeaturesRequired" type="integer"/>
+	</Table>
+	<Building_ResourceCultureChanges>
+		<Delete/>
+	</Building_ResourceCultureChanges>
+	<Building_ResourceYieldChanges>
+		<Row>
+			<BuildingType>BUILDING_MONASTERY</BuildingType>
+			<ResourceType>RESOURCE_INCENSE</ResourceType>
+			<YieldType>YIELD_CULTURE</YieldType>
+			<Yield>2</Yield>
+		</Row>
+		<Row>
+			<BuildingType>BUILDING_MONASTERY</BuildingType>
+			<ResourceType>RESOURCE_WINE</ResourceType>
+			<YieldType>YIELD_CULTURE</YieldType>
+			<Yield>2</Yield>
+		</Row>
+	</Building_ResourceYieldChanges>
+	<GreatWorkClass_Yields>
+		<Row>
+			<GreatWorkClass>GREAT_WORK_ART</GreatWorkClass>
+			<YieldType>YIELD_CULTURE</YieldType>
+			<Yield>2</Yield>
+		</Row>
+		<Row>
+			<GreatWorkClass>GREAT_WORK_ARTIFACT</GreatWorkClass>
+			<YieldType>YIELD_CULTURE</YieldType>
+			<Yield>2</Yield>
+		</Row>
+		<Row>
+			<GreatWorkClass>GREAT_WORK_LITERATURE</GreatWorkClass>
+			<YieldType>YIELD_CULTURE</YieldType>
+			<Yield>2</Yield>
+		</Row>
+		<Row>
+			<GreatWorkClass>GREAT_WORK_MUSIC</GreatWorkClass>
+			<YieldType>YIELD_CULTURE</YieldType>
+			<Yield>2</Yield>
+		</Row>
+	</GreatWorkClass_Yields>
+	<Trait_YieldFromFeatures>
+		<Row>
+			<TraitType>TRAIT_FAITH_FROM_NATURE</TraitType>
+			<Type>TRAIT_FAITH_FROM_NATURE_YIELDFROMFEATURES</Type>
+			<bRequiresNoImprovement>true</bRequiresNoImprovement>
+		</Row>
+	</Trait_YieldFromFeatures>
+	<Trait_YieldFromFeature_Features>
+		<Row>
+			<Trait_YieldFromFeaturesType>TRAIT_FAITH_FROM_NATURE_YIELDFROMFEATURES</Trait_YieldFromFeaturesType>
+			<FeatureType>FEATURE_FOREST</FeatureType>
+		</Row>
+	</Trait_YieldFromFeature_Features>
+	<Trait_YieldFromFeature_Yields>
+		<Row>
+			<Trait_YieldFromFeaturesType>TRAIT_FAITH_FROM_NATURE_YIELDFROMFEATURES</Trait_YieldFromFeaturesType>
+			<YieldType>YIELD_FAITH</YieldType>
+			<Yield>1</Yield>
+			<NumFeaturesRequired>3</NumFeaturesRequired>
+		</Row>
+		<Row>
+			<Trait_YieldFromFeaturesType>TRAIT_FAITH_FROM_NATURE_YIELDFROMFEATURES</Trait_YieldFromFeaturesType>
+			<YieldType>YIELD_FAITH</YieldType>
+			<Yield>1</Yield>
+			<NumFeaturesRequired>1</NumFeaturesRequired>
+		</Row>
+	</Trait_YieldFromFeature_Yields>
+</GameData>

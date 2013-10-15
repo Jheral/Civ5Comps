@@ -583,6 +583,9 @@ void CvGameTrade::CopyPathIntoTradeConnection (CvAStarNode* pNode, TradeConnecti
 //	--------------------------------------------------------------------------------
 int CvGameTrade::GetDomainModifierTimes100 (DomainTypes eDomain)
 {
+	// Softcoding - v0.1, Snarko
+	// Made into a define
+	/* Original code
 	if (eDomain == DOMAIN_SEA)
 	{
 		return 100;
@@ -591,6 +594,16 @@ int CvGameTrade::GetDomainModifierTimes100 (DomainTypes eDomain)
 	{
 		return 0;
 	}
+	*/
+	if (eDomain == DOMAIN_SEA)
+	{
+		return GC.getSEA_TRADEROUTE_MODIFIER();
+	}
+	else
+	{
+		return GC.getLAND_TRADEROUTE_MODIFIER();
+	}
+	// END Softcoding
 }
 
 //	--------------------------------------------------------------------------------
@@ -3134,7 +3147,7 @@ int CvPlayerTrade::GetTradeRouteRange (DomainTypes eDomain, CvCity* pOriginCity)
 		/* Original code
 		iBaseRange = 20;
 		*/
-		iBaseRange = GC.getDefineINT("BASE_TRADE_RANGE_SEA");
+		iBaseRange = GC.getBASE_TRADE_RANGE_SEA();
 		// END Softcoding
 		break;
 	case DOMAIN_LAND:
@@ -3142,7 +3155,7 @@ int CvPlayerTrade::GetTradeRouteRange (DomainTypes eDomain, CvCity* pOriginCity)
 		/* Original code
 		iBaseRange = 10;
 		*/
-		iBaseRange = GC.getDefineINT("BASE_TRADE_RANGE_LAND");
+		iBaseRange = GC.getBASE_TRADE_RANGE_LAND();
 		// END Softcoding
 		break;
 	default:

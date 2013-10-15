@@ -157,6 +157,12 @@ public:
 
 	int  GetFlavorValue(int i) const;
 
+	// EventEngine - v0.1, Snarko
+	int getNumFlagPrereqs() const;
+	std::string getFlagPrereq(int i) const;
+	int getFlagPrereqValue(int i) const;
+	// END EventEngine
+
 	//---------------------------------------PROTECTED MEMBER VARIABLES---------------------------------
 protected:
 	void InitImprovementResourceList(CvImprovementResourceInfo** ppImprovementResource, int iListLen);
@@ -240,6 +246,10 @@ protected:
 	int** m_ppiRouteYieldChanges;
 
 	CvImprovementResourceInfo* m_paImprovementResource;
+
+	// EventEngine - v0.1, Snarko
+	std::vector<std::pair<std::string, int > > m_asziFlagPrereqs;
+	// END EventEngine
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

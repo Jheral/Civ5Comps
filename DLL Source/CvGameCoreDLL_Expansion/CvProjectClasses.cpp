@@ -18,6 +18,9 @@ CvProjectEntry::CvProjectEntry(void):
 	m_piVictoryMinThreshold(NULL),
 	m_piProjectsNeeded(NULL),
 	m_piFlavorValue(NULL)
+	// EventEngine - v0.1, Snarko
+	, m_asziFlagPrereqs(NULL)
+	// END EventEngine
 {
 }
 //------------------------------------------------------------------------------
@@ -95,6 +98,27 @@ bool CvProjectEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility
 
 	kUtility.SetFlavors(m_piFlavorValue, "Project_Flavors", "ProjectType", szProjectType);
 	kUtility.PopulateArrayByValue(m_piProjectsNeeded, "Projects", "Project_Prereqs", "PrereqProjectType", "ProjectType", szProjectType, "AmountNeeded");
+
+	// EventEngine - v0.1, Snarko
+	{
+		m_asziFlagPrereqs.clear();
+		std::string strKey("Project_PrereqFlags");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from Project_PrereqFlags where ProjectType = ?");
+		}
+
+		pResults->Bind(1, szProjectType);
+
+		while(pResults->Step())
+		{
+			std::string szFlag = pResults->GetText("Flag");
+			int iMinimumValue = pResults->GetInt("MinimumValue");
+			m_asziFlagPrereqs.push_back(std::make_pair(szFlag, iMinimumValue));
+		}
+	}
+	// END EventEngine
 
 	return true;
 }
@@ -277,6 +301,29 @@ int CvProjectEntry::GetProjectsNeeded(int i) const
 
 	return 0;
 }
+
+// EventEngine - v0.1, Snarko
+//------------------------------------------------------------------------------
+int CvProjectEntry::getNumFlagPrereqs() const
+{
+	return m_asziFlagPrereqs.size();
+}
+//------------------------------------------------------------------------------
+std::string CvProjectEntry::getFlagPrereq(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].first;
+}
+//------------------------------------------------------------------------------
+int CvProjectEntry::getFlagPrereqValue(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].second;
+}
+// END EventEngine
+
 
 //=====================================
 // CvProjectXMLEntries

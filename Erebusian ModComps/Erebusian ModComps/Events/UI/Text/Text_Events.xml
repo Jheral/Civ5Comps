@@ -17,14 +17,128 @@
 		<Row Tag="TXT_KEY_TP_HAPPINESS_EVENTS">
 			<Text>{1_Num} from events.</Text>
 		</Row>
-		<Row Tag="TXT_KEY_TP_SCIENCE_FROM_EVENTS">
-			<Text>{1_Num} from events.</Text>
+		<Row Tag="TXT_KEY_TP_YIELD_FROM_EVENTS">
+			<Text>[ICON_BULLET]{1_ColoredNum} from Events.</Text>
 		</Row>
-		<Row Tag="TXT_KEY_TP_GOLD_FROM_EVENTS">
-			<Text>{1_Num} from events.</Text>
+		<Row Tag="TXT_KEY_YIELD_FROM_EVENTS">
+			<Text>{1_Num} {2_IconString} from Events</Text>
 		</Row>
-		<Row Tag="TXT_KEY_TP_CULTURE_FROM_EVENTS">
-			<Text>{1_Num} from events.</Text>
+		<Row Tag="TXT_KEY_EVENT_NOTIFICATION_TEXT">
+			<Text>An event has occured</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENT_ACTION_CHANCE">
+			<Text>{1_Num}% chance for</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENT_ACTION_TURNS">
+			<Text>[SPACE]for {1_Num} turns</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_YIELD">
+			<Text>{1_Num} {2_IconString} per turn</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_YIELDMOD">
+			<Text>{1_Num}% {2_IconString} per turn</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_HAPPY">
+			<Text>{1_Num} happiness</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_TECH">
+			<Text>Get the {1_TechDesc} tech for free</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_NO_TECH">
+			<Text>Lose the {1_TechDesc} tech</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_POLICY">
+			<Text>Get the {1_PolicyDesc} policy for free</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_NO_POLICY">
+			<Text>Lose the {1_PolicyDesc} policy</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_BELIEF">
+			<Text>You would get a belief, but that is not yet supported. Sorry.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_REVEAL_TILE">
+			<Text>Reveals the tile at {1_Xcoord}:{2_Ycoord}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_CHANCE_FLAG">
+			<Text>Changes the {1_String} flag by {2_Num}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_SET_FLAG">
+			<Text>Set the {1_String} flag to {2_Num}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_SPECIALIST_YIELD">
+			<Text>Changes {1_IconString} produced by {2_SpecialistDesc} specialists by {3_Num}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_EVENT_FOR_CAPITAL">
+			<Text>Triggers the {1_EventDesc} event for {2_CityName}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_EVENT_FOR_ALL_CITIES">
+			<Text>Triggers the {1_EventDesc} event for all your cities</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_EVENT_FOR_ALL_UNITS">
+			<Text>Triggers the {1_EventDesc} event for all your units</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_EVENT">
+			<Text>Triggers the {1_EventDesc} event</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_CITY_ADD_BUILDING">
+			<Text>Gives {3_CityName} {1_Num: plural 1?a; other?{1};} {2_BuildingDesc}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_CITY_ADD_FREE_BUILDING">
+			<Text>Gives {3_CityName} {1_Num: plural 1?a; other?{1};} free {2_BuildingDesc}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_CITY_REM_BUILDING">
+			<Text>Removes {1_Num: plural 1?the; other?{1};} {2_BuildingDesc} from {3_CityName}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_CITY_YIELD">
+			<Text>Changes {1_IconString} yield by {2_Num} for {3_CityName}</Text>
+		</Row>
+		<Row Tag="EVENTACTION_CITY_YIELDMOD">
+			<Text>Changes {1_IconString} yield modifier by {2_Num} for {3_CityName}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_CITY_POPULATION">
+			<Text>Changes population by {1_Num} in {2_CityName}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_CITY_LOCAL_HAPPY">
+			<Text>Changes local happiness by {1_Num} in {2_CityName}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_CITY_FREE_SPECIALIST">
+			<Text>Gives {3_CityName} {1_Num: plural 1?a; other?{1};} free {2_SpecialistDesc}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_CITY_LOSE_FREE_SPECIALIST">
+			<Text>Removes {1_Num: plural 1?a; other?{1};} free {2_SpecialistDesc} from {3_CityName}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_CITY_SPECIALIST_YIELD">
+			<Text>Changes {1_IconString} produced by {2_SpecialistDesc} specialists by {3_Num} for {4_CityName}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_CITY_SET_FLAG">
+			<Text>Set the {1_String} flag to {2_Num} for {3_CityName}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_UNIT_EXPERIENCE">
+			<Text>Changes the experience for your {1_UnitName} by {2_Num}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_UNIT_PROMOTION">
+			<Text>Gives your {1_UnitName} a {2_PromotionDesc} promotion</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_UNIT_REM_PROMOTION">
+			<Text>Removes the {2_PromotionDesc} promotion from your {1_UnitName}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_UNIT_CLASS">
+			<Text>Converts your {1_UnitName} to a {2_UnitTypeDesc}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_UNIT_DAMAGE">
+			<Text>Damages your {1_UnitName} by {2_Num}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_UNIT_DAMAGE_KILL">
+			<Text>Kills your {1_UnitName}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_UNIT_DAMAGE_HEAL">
+			<Text>Heals your {1_UnitName} by {2_Num}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_UNIT_SPAWN_UNIT">
+			<Text>Gives you a {2_UnitTypeDesc} near your {1_UnitName}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_UNIT_SET_FLAG">
+			<Text>Set the {3_String} flag to {2_Num} for {1_UnitName}</Text>
 		</Row>
 	</Language_en_US>
 </GameData>

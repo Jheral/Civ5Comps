@@ -4624,7 +4624,12 @@ bool CvCityCulture::IsThemingBonusPossible(BuildingClassTypes eBuildingClass) co
 	return false;
 }
 
+// Revamped yields - v0.1, Snarko
+/* Original code
 int CvCityCulture::GetThemingBonus(BuildingClassTypes eBuildingClass) const
+*/
+int CvCityCulture::GetThemingBonus(BuildingClassTypes eBuildingClass, YieldTypes eYield) const
+// END Revamped yields
 {
 	CvPlayer &kPlayer = GET_PLAYER(m_pCity->getOwner());
 	int iRtnValue = 0;
@@ -4636,7 +4641,12 @@ int CvCityCulture::GetThemingBonus(BuildingClassTypes eBuildingClass) const
 		{
 			BuildingTypes eBuilding = (BuildingTypes)kPlayer.getCivilizationInfo().getCivilizationBuildings(eBuildingClass);
 			CvBuildingEntry *pkBuilding = GC.GetGameBuildings()->GetEntry(eBuilding);
+			// Revamped yields - v0.1, Snarko
+			/* Original code
 			if (pkBuilding)
+			*/
+			if (pkBuilding && (eYield == NO_YIELD || pkBuilding->GetThemingBonusInfo(iIndex)->GetYieldType() == eYield))
+			// END Revamped yields
 			{
 				int iBonus = pkBuilding->GetThemingBonusInfo(iIndex)->GetBonus();
 				int iModifier = kPlayer.GetPlayerPolicies()->GetNumericModifier(POLICYMOD_THEMING_BONUS);
@@ -5310,3 +5320,34 @@ void CultureHelpers::SendArtSwapNotification(GreatWorkSlotType eType, bool bArt,
 		GET_PLAYER(eReceipient).GetNotifications()->Add(NOTIFICATION_GREAT_WORK_COMPLETED_ACTIVE_PLAYER, strBuffer, strSummary, -1, -1, iWorkFromOriginator, kOriginator.GetID());
 	}
 }
+
+// Revamped yields - v0.1, Snarko
+//======================================================================================================
+//					CvGreatWorkClassInfo
+//======================================================================================================
+CvGreatWorkClassInfo::CvGreatWorkClassInfo() :
+	m_piYields(NULL)
+{
+}
+
+CvGreatWorkClassInfo::~CvGreatWorkClassInfo()
+{
+	SAFE_DELETE_ARRAY(m_piYields);
+}
+
+bool CvGreatWorkClassInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& kUtility)
+{
+	if(!CvBaseInfo::CacheResults(kResults, kUtility))
+		return false;
+
+	kUtility.SetYields(m_piYields, "GreatWorkClass_Yields", "GreatWorkClass", GetType());
+	return true;
+}
+
+int CvGreatWorkClassInfo::GetYield(int i) const
+{
+	CvAssertMsg(i < NUM_YIELD_TYPES, "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_piYields ? m_piYields[i] : 0;
+}
+// END Revamped yields

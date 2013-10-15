@@ -415,6 +415,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CvModEnumSerialization.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CvNotificationClasses.cpp"
 				>
 			</File>
@@ -862,6 +866,10 @@
 			</File>
 			<File
 				RelativePath=".\CvMinorCivAI.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CvModEnumSerialization.h"
 				>
 			</File>
 			<File

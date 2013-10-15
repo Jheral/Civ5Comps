@@ -115,8 +115,14 @@ public:
 	void ChangeMaxNumBuilders(int iChange);
 
 	int GetNumUnitsWithUnitAI(UnitAITypes eUnitAIType, bool bIncludeBeingTrained = false, bool bIncludeWater = true);
+	// EventEngine - v0.1, Snarko
+	/* Original code
 	int GetNumUnitsWithDomain(DomainTypes eDomain, bool bMilitaryOnly);
 	int GetNumUnitsWithUnitCombat(UnitCombatTypes eDomain);
+	*/
+	int GetNumUnitsWithDomain(DomainTypes eDomain, bool bMilitaryOnly) const;
+	int GetNumUnitsWithUnitCombat(UnitCombatTypes eDomain) const;
+	// END EventEngine
 
 	void InitDangerPlots();
 	void UpdateDangerPlots();
@@ -156,10 +162,20 @@ public:
 
 	// EventEngine - v0.1, Snarko
 	void doEvents();
-	void doEventChance(CvEventInfo& kEvent, std::map<std::string, std::vector<int> > &asziScopes, CvCity* pCity = NULL, CvUnit* pUnit = NULL);
-	bool checkEventModifier(CvEventModifierInfo& kModifier, std::map<std::string, std::vector<int> > &asziScopes, bool bRequirement = true);
+	void doEventChance(CvEventInfo& kEvent, CvCity* pCity = NULL, CvUnit* pUnit = NULL);
+	void triggerEvent(EventTypes eEvent, bool bCheckRequirements, std::map<std::string, int > Sets, CvCity* pCity = NULL, CvUnit* pUnit = NULL);
+	virtual void AI_chooseEventOption(int iEvent) = 0;
+
+	bool checkEventModifier(CvEventModifierInfo& kModifier, bool bRequirement = true);
+	bool testSetItems(CvEventModifierInfo& kModifier, int iMaximumItems, bool bRequirement, CvCity* pCity = NULL, CvUnit* pUnit = NULL);
+	int getSelfItemTest(CvEventModifierInfo& kModifier, CvCity* pCity = NULL) const;
+	bool isEventSetTest(CvEventModifierInfo& kModifier, int iItem, CvCity* pCity = NULL, CvUnit* pUnit = NULL) const;
+
+	void getSet(std::string szSet, std::vector< std::pair<int, int> >& aValues);
+	void setSet(std::string szSet, std::vector<std::pair<int, int> > aValues);
+
 	void processEventOption(int iID, int iOption);
-	bool processEventOptionByID(int iID, int iOptionID);
+	void processEventOptionByID(int iID, int iOptionID);
 	
 	const CvEvent* firstEvent(int* pIterIdx, bool bRev) const;
 	const CvEvent* nextEvent(int* pIterIdx, bool bRev) const;
@@ -170,11 +186,11 @@ public:
 	CvEvent* addEvent();
 	void deleteEvent(int iID);
 
-	void addTempEventEffect(EventTypes eEvent, EventOptionTypes eOption, EventActionTypeTypes eEventAction = NO_EVENTACTION, int iNumTurns = 1, int iType = -1, int iValue = 0); //Returns the EventEffect just added.
+	void addTempEventEffect(CvEventEffect& kEventEffect);
 	int getNumTempEventEffects() const;
-	CvEventEffects& getTempEventEffect(int index);
+	CvEventEffect& getTempEventEffect(int index);
 	void doTempEventEffects();
-	void unprocessTempEventEffect(int i);
+	void unprocessTempEventEffect(std::vector<CvEventEffect>::iterator& it);
 
 	int getYieldFromEvents(YieldTypes eYield) const;
 	void changeYieldFromEvents(YieldTypes eYield, int iChange);
@@ -184,7 +200,8 @@ public:
 	void changeHappyFromEvents(int iChange);
 	
 	void setFlag(std::string szFlag, int iValue);
-	int getFlag(std::string szFlag);
+	void changeFlag(std::string szFlag, int iValue);
+	int getFlag(std::string szFlag) const;
 	// END EventEngine
 
 	void updateYield();
@@ -359,17 +376,39 @@ public:
 	int GetHappinessFromTradeRoutes() const;
 	void DoUpdateCityConnectionHappiness();
 
+	// Revamped yields - v0.1, Snarko
+	int GetCityConnectionTradeRouteYieldModifier(YieldTypes eIndex) const;
+	void ChangeCityConnectionTradeRouteYieldModifier(YieldTypes eIndex, int iChange);
+	int GetCityConnectionTradeRouteYieldChange(YieldTypes eIndex) const;
+	void ChangeCityConnectionTradeRouteYieldChange(YieldTypes eIndex, int iChange);
+
+	int GetCityConnectionYield(YieldTypes eYield) const;
+	int GetCityConnectionYieldTimes100(YieldTypes eIndex) const;
+	void DoUpdateCityConnectionYield(YieldTypes eIndex);
+	void DoUpdateAllCityConnectionYields();
+	int GetCityConnectionRouteYieldTimes100(YieldTypes eYield, CvCity* pNonCapitalCity) const;
+	// END Revamped yields
+
 	// Culture
 
 	int GetTotalJONSCulturePerTurn() const;
 
 	int GetJONSCulturePerTurnFromCities() const;
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int GetJONSCulturePerTurnFromExcessHappiness() const;
 	int GetJONSCulturePerTurnFromTraits() const;
 
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	int GetJONSCulturePerTurnForFree() const;
 	void ChangeJONSCulturePerTurnForFree(int iChange);
+	*/
+	// END Revamped yields
 
 	int GetJONSCulturePerTurnFromMinorCivs() const; // DEPRECATED, use GetCulturePerTurnFromMinorCivs() instead
 	void ChangeJONSCulturePerTurnFromMinorCivs(int iChange); // DEPRECATED, does nothing
@@ -378,10 +417,15 @@ public:
 
 	int GetCulturePerTurnFromReligion() const;
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int GetCulturePerTurnFromBonusTurns() const;
 
 	int GetJONSCultureCityModifier() const;
 	void ChangeJONSCultureCityModifier(int iChange);
+	*/
+	// END Revamped yields
 
 	int getJONSCulture() const;
 	void setJONSCulture(int iNewValue);
@@ -393,17 +437,48 @@ public:
 
 	int GetJONSCulturePerCityPerTurn() const;
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int GetCulturePerWonder() const;
 	void ChangeCulturePerWonder(int iChange);
 
 	int GetCultureWonderMultiplier() const;
 	void ChangeCultureWonderMultiplier(int iChange);
+	*/
+	int GetYieldPerWonder(YieldTypes eYield) const;
+	void ChangeYieldPerWonder(YieldTypes eYield, int iChange);
+
+	int GetYieldWonderMultiplier(YieldTypes eYield) const;
+	void ChangeYieldWonderMultiplier(YieldTypes eYield, int iChange);
+
+	int GetReligionYieldModifier(YieldTypes eYield) const;
+
+	int GetYieldPerTurnFromTraits(YieldTypes eYield) const;
+
+	int GetYieldPerTurnFromReligion(YieldTypes eYield) const;
+
+	int GetYieldFromCities(YieldTypes eYield, bool bExcludeTradeRoutes = false) const;
+	int GetYieldFromCitiesTimes100(YieldTypes eYield, bool bExcludeTradeRoutes = false) const;
+
+	int GetGenericYieldsPerTurn(YieldTypes eYield) const;
+	int GetGenericYieldsPerTurnTimes100(YieldTypes eYield) const;
+	int GetGenericYieldModifiers(YieldTypes eYield) const;
+
+	void ChangeImmediateYield(YieldTypes eYield, int iChange, bool bDisplay = false, int iX = INVALID_PLOT_COORD, int iY = INVALID_PLOT_COORD);
+	// END Revamped yields
 
 	int GetCulturePerTechResearched() const;
 	void ChangeCulturePerTechResearched(int iChange);
 
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	int GetSpecialistCultureChange() const;
 	void ChangeSpecialistCultureChange(int iChange);
+	*/
+	// END Revamped yields
 
 	int GetCultureYieldFromPreviousTurns(int iGameTurn, int iNumPreviousTurnsToCount);
 
@@ -589,8 +664,21 @@ public:
 	// Temporary Bonuses
 	int GetAttackBonusTurns() const;
 	void ChangeAttackBonusTurns(int iChange);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int GetCultureBonusTurns() const;
 	void ChangeCultureBonusTurns(int iChange);
+	*/
+	int GetYieldFromLeagueReward(YieldTypes eYield) const;
+	std::vector<LeagueRewardYieldModifier> GetYieldBonusTurns(YieldTypes eYield) const;
+	std::vector<LeagueRewardYieldModifier> GetYieldBonusTurns() const;
+	void ChangeYieldBonusTurns(std::vector<LeagueRewardYieldModifier> pYieldBonusTurns);
+	void ChangeYieldBonusTurns(int iChange);
+
+	int GetYieldFromResolutions(YieldTypes eYield) const;
+	void ChangeYieldFromResolutions(int iYield, int iChange);
+	// END Revamped yields
 	int GetTourismBonusTurns() const;
 	void ChangeTourismBonusTurns(int iChange);
 
@@ -699,8 +787,15 @@ public:
 
 	// Great People Expenditure
 	void DoGreatPersonExpended(UnitTypes eGreatPersonUnit);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int GetGreatPersonExpendGold() const;
 	void ChangeGreatPersonExpendGold(int iChange);
+	*/
+	int GetGreatPersonExpendYield(YieldTypes eYield) const;
+	void ChangeGreatPersonExpendYield(YieldTypes eYield, int iChange);
+	// END Revamped yields
 
 	// Great People Spawning
 	void DoSeedGreatPeopleSpawnCounter();
@@ -823,11 +918,21 @@ public:
 	int getHappyPerMilitaryUnit() const;
 	void changeHappyPerMilitaryUnit(int iChange);
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int getHappinessToCulture() const;
 	void changeHappinessToCulture(int iChange);
 
 	int getHappinessToScience() const;
 	void changeHappinessToScience(int iChange);
+	*/
+	int getHappinessToYield(YieldTypes eYield) const;
+	void changeHappinessToYield(YieldTypes eYield, int iChange);
+
+	int getHappyYieldMultiplier(YieldTypes eYield) const;
+	void changeHappyYieldMultiplier(YieldTypes eYield, int iChange);
+	// END Revamped yields
 
 	int getHalfSpecialistUnhappinessCount() const;
 	bool isHalfSpecialistUnhappiness() const;
@@ -1068,6 +1173,14 @@ public:
 	int getExtraYieldThreshold(YieldTypes eIndex) const;
 	void updateExtraYieldThreshold(YieldTypes eIndex);
 
+	// Revamped yields - v0.1, Snarko
+	int getYieldFromGarrison(YieldTypes eIndex) const;
+	void changeYieldFromGarrison(YieldTypes eIndex, int iChange);
+
+	int GetYieldPerTurnFromExcessHappiness(YieldTypes eYield) const;
+	int GetYieldFromHappinessTimes100(YieldTypes eYield) const;
+	// END Revamped yields
+
 	// Science
 
 	int GetScience() const;
@@ -1075,7 +1188,12 @@ public:
 
 	int GetScienceFromCitiesTimes100(bool bIgnoreTrade) const;
 	int GetScienceFromOtherPlayersTimes100() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int GetScienceFromHappinessTimes100() const;
+	*/
+	// END Revamped yields
 	int GetScienceFromResearchAgreementsTimes100() const;
 	int GetScienceFromBudgetDeficitTimes100() const;
 
@@ -1601,13 +1719,25 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iTotalPopulation;
 	FAutoVariable<int, CvPlayer> m_iTotalLand;
 	FAutoVariable<int, CvPlayer> m_iTotalLandScored;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	FAutoVariable<int, CvPlayer> m_iJONSCulturePerTurnForFree;
 	FAutoVariable<int, CvPlayer> m_iJONSCulturePerTurnFromMinorCivs;
 	FAutoVariable<int, CvPlayer> m_iJONSCultureCityModifier;
+	*/
+	// END Revamped yields
 	FAutoVariable<int, CvPlayer> m_iJONSCulture;
 	FAutoVariable<int, CvPlayer> m_iJONSCultureEverGenerated;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	FAutoVariable<int, CvPlayer> m_iCulturePerWonder;
 	FAutoVariable<int, CvPlayer> m_iCultureWonderMultiplier;
+	*/
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiYieldPerWonder;
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiYieldWonderMultiplier;
+	// END Revamped yields
 	FAutoVariable<int, CvPlayer> m_iCulturePerTechResearched;
 	int m_iFaith;
 	int m_iFaithEverGenerated;
@@ -1638,7 +1768,12 @@ protected:
 	int m_iExtraLeagueVotes;
 	FAutoVariable<int, CvPlayer> m_iAdvancedStartPoints;
 	FAutoVariable<int, CvPlayer> m_iAttackBonusTurns;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int m_iCultureBonusTurns;
+	*/
+	// END Revamped yields
 	int m_iTourismBonusTurns;
 	FAutoVariable<int, CvPlayer> m_iGoldenAgeProgressMeter;
 	FAutoVariable<int, CvPlayer> m_iGoldenAgeMeterMod;
@@ -1681,7 +1816,13 @@ protected:
 	int m_iGreatScientistRateModifier;
 	int m_iGreatScientistBeakerModifier;
 	int m_iGreatEngineerRateModifier;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int m_iGreatPersonExpendGold;
+	*/
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiGreatPersonExpendYield;
+	// END Revamped yields
 	FAutoVariable<int, CvPlayer> m_iMaxGlobalBuildingProductionModifier;
 	FAutoVariable<int, CvPlayer> m_iMaxTeamBuildingProductionModifier;
 	FAutoVariable<int, CvPlayer> m_iMaxPlayerBuildingProductionModifier;
@@ -1721,8 +1862,15 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iExtraUnitCost;
 	FAutoVariable<int, CvPlayer> m_iNumMilitaryUnits;
 	FAutoVariable<int, CvPlayer> m_iHappyPerMilitaryUnit;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	FAutoVariable<int, CvPlayer> m_iHappinessToCulture;
 	FAutoVariable<int, CvPlayer> m_iHappinessToScience;
+	*/
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiHappinessToYield;
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiHappyYieldMultiplier;
+	// END Revamped yields
 	FAutoVariable<int, CvPlayer> m_iHalfSpecialistUnhappinessCount;
 	FAutoVariable<int, CvPlayer> m_iHalfSpecialistFoodCount;
 	FAutoVariable<int, CvPlayer> m_iMilitaryFoodProductionCount;
@@ -1794,7 +1942,13 @@ protected:
 	FAutoVariable<int, CvPlayer> m_iTurnsSinceSettledLastCity;
 	FAutoVariable<int, CvPlayer> m_iNumNaturalWondersDiscoveredInArea;
 	FAutoVariable<int, CvPlayer> m_iStrategicResourceMod;
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	FAutoVariable<int, CvPlayer> m_iSpecialistCultureChange;
+	*/
+	// END Revamped yields
 	FAutoVariable<int, CvPlayer> m_iGreatPeopleSpawnCounter;
 
 	FAutoVariable<int, CvPlayer> m_iFreeTechCount;
@@ -1842,6 +1996,12 @@ protected:
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiIncomingUnitTypes;
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiIncomingUnitCountdowns;
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiMinorFriendshipAnchors; // DEPRECATED
+	// Revamped yields - v0.1, Snarko
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiYieldFromGarrison;
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiCityConnectionTradeRouteYieldModifier;
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiCityConnectionTradeRouteYieldChange;
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiCityConnectionYieldTimes100;
+	// END Revamped yields
 	std::vector<int> m_aiSiphonLuxuryCount;
 	std::vector<int> m_aiGreatWorkYieldChange;
 
@@ -1912,6 +2072,11 @@ protected:
 
 	std::vector<CvString> m_ReplayDataSets;
 	std::vector< TurnData > m_ReplayDataSetValues;
+
+	// Revamped yields - v0.1, Snarko
+	std::vector<LeagueRewardYieldModifier> m_aYieldBonusTurns;
+	FAutoVariable<std::vector<int>, CvPlayer> m_aiResolutionYieldEffects;
+	// END Revamped yields
 
 	void doResearch();
 	void doWarnings();
@@ -2013,9 +2178,12 @@ protected:
 	CvPlayerAchievements m_kPlayerAchievements;
 
 	// EventEngine - v0.1, Snarko
-	//Probably not the best way to store events, but I couldn't find a better one.
+	// Used to (temporarily) store sets, across multiple functions.
+	// The second int is to store the modifier for this particular item.
+	std::map<std::string, std::vector< std::pair<int, int> > > m_asziSets;
+	// Probably not the best way to store events, but I couldn't find a better one.
 	FFreeListTrashArray<CvEvent> m_events;
-	std::vector<CvEventEffects> m_aEventEffects;
+	std::vector<CvEventEffect> m_aEventEffects;
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiYieldFromEvents;
 	FAutoVariable<std::vector<int>, CvPlayer> m_aiYieldModFromEvents;
 	int m_iHappyFromEvents;

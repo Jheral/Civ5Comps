@@ -569,7 +569,13 @@ void CvWorldBuilderMapLoader::SetInitialItems(bool bFirstCall)
 
 			// Update player data
 			kPlayer.GetCityConnections()->Update();
+			// Revamped yields - v0.1, Snarko
+			// No longer used
+			/*
 			kPlayer.GetTreasury()->DoUpdateCityConnectionGold();
+			*/
+			kPlayer.DoUpdateAllCityConnectionYields();
+			// END Revamped yields
 			kPlayer.GetTreasury()->DoGold();
 			kPlayer.DoUpdateHappiness();
 		}

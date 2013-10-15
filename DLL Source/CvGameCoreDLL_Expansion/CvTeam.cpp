@@ -4595,11 +4595,13 @@ void CvTeam::enhanceBuilding(BuildingTypes eIndex, int iChange)
 						{
 							for(int k = 0; k < NUM_YIELD_TYPES; k++)
 							{
+								// Revamped yields - v0.1, Snarko
+								/* Original code
 								if((YieldTypes)k == YIELD_CULTURE)
 								{
 									pLoopCity->ChangeJONSCulturePerTurnFromBuildings(thisBuildingEntry->GetTechEnhancedYieldChange(k) * iChange);
 								}
-								else if((YieldTypes)k == YIELD_FAITH)
+								if((YieldTypes)k == YIELD_FAITH)
 								{
 									pLoopCity->ChangeFaithPerTurnFromBuildings(thisBuildingEntry->GetTechEnhancedYieldChange(k) * iChange);
 								}
@@ -4607,6 +4609,9 @@ void CvTeam::enhanceBuilding(BuildingTypes eIndex, int iChange)
 								{
 									pLoopCity->ChangeBaseYieldRateFromBuildings(((YieldTypes)k), thisBuildingEntry->GetTechEnhancedYieldChange(k) * iChange);
 								}
+								*/
+								pLoopCity->ChangeBaseYieldRateFromBuildings(((YieldTypes)k), thisBuildingEntry->GetTechEnhancedYieldChange(k) * iChange);
+								// END Revamped yields
 							}
 						}
 					}

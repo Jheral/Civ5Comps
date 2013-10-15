@@ -383,6 +383,9 @@ bool CvDllDatabaseUtility::PrefetchGameData()
 	PrefetchCollection(GC.getEventModifierInfo(), "Event_Modifiers");
 	PrefetchCollection(GC.getEventInfo(), "Events");
 	// END EventEngine
+	// Revamped yields - v0.1, Snarko
+	PrefetchCollection(GC.getGreatWorkClassInfo(), "GreatWorkClasses");
+	// END Revamped yields
 
 
 	//Copy flavors into string array
@@ -739,7 +742,6 @@ bool CvDllDatabaseUtility::loadEventTypes(std::map<std::string, int>& loadVariab
 			loadVariable[kResults.GetText("Name")] = i;
 			std::string str(kResults.GetText("Name"));
 			std::string table(tableName);
-			gDLL->netMessageDebugLog("Loading " + table + ". Node "  + str + " int is " + FSerialization::toString(i) + "\n");
 			i++;
 		}
 		return true;

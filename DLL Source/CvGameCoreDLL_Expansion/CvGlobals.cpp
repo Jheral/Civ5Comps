@@ -1700,6 +1700,16 @@ CvGlobals::CvGlobals() :
 	m_iLEAGUE_MEMBER_VOTES_PER_CITY_STATE_ALLY(1),
 	m_fLEAGUE_PROJECT_REWARD_TIER_1_THRESHOLD(0.5f),
 	m_fLEAGUE_PROJECT_REWARD_TIER_2_THRESHOLD(1.0f),
+	// Softcoding - v0.1, Snarko
+	m_iCITY_CAPTURE_WARMONGER_OFFSET(1000),
+	m_iSEA_TRADEROUTE_MODIFIER(100),
+	m_iLAND_TRADEROUTE_MODIFIER(0),
+	m_iBASE_TRADE_RANGE_SEA(20),
+	m_iBASE_TRADE_RANGE_LAND(10),
+	// END Softcoding
+	// AIMOD - v0.1, Snarko
+	m_bUSE_AIMOD(false),
+	// END AIMOD
 
 // -- post defines --
 
@@ -3832,7 +3842,7 @@ EventActionTypeTypes CvGlobals::getEventActionType(std::string szEventActionType
 	return NO_EVENTACTION;
 }
 
-bool CvGlobals::EventBoolEval(bool bBool, CvEventModifierInfo& kModifier)
+bool CvGlobals::EventBoolEval(bool bBool, CvEventModifierInfo& kModifier) const
 {
 	bool bPass = false;
 	switch(kModifier.getCompareType())
@@ -3852,10 +3862,10 @@ bool CvGlobals::EventBoolEval(bool bBool, CvEventModifierInfo& kModifier)
 	}
 	return bPass;
 }
-bool CvGlobals::EventIntEval(int iInt, CvEventModifierInfo& kModifier)
+bool CvGlobals::EventIntEval(int iInt, CvEventModifierInfo& kModifier) const
 {
 	bool bPass = false;
-		switch(kModifier.getCompareType())
+	switch(kModifier.getCompareType())
 	{
 	case COMPARE_EQUAL:
 		bPass = (iInt == kModifier.getNumberToCompare());
@@ -3881,6 +3891,27 @@ bool CvGlobals::EventIntEval(int iInt, CvEventModifierInfo& kModifier)
 	return bPass;
 }
 // END EventEngine
+// Revamped yields - v0.1, Snarko
+std::vector<CvGreatWorkClassInfo*>& CvGlobals::getGreatWorkClassInfo()
+{
+	return m_paGreatWorkClassInfo;
+}
+
+CvGreatWorkClassInfo* CvGlobals::getGreatWorkClassInfo(GreatWorkClass eGreatWorkClass)
+{
+	CvAssert(eGreatWorkClass > -1);
+	CvAssert(eGreatWorkClass < GC.getNumGreatWorkClassInfos());
+	if(eGreatWorkClass > -1 && eGreatWorkClass < (int)m_paGreatWorkClassInfo.size())
+		return m_paGreatWorkClassInfo[eGreatWorkClass];
+	else
+		return NULL;
+}
+
+int CvGlobals::getNumGreatWorkClassInfos()
+{
+	return (int)m_paGreatWorkClassInfo.size();
+}
+// END Revamped yields
 
 //////////////////////////////////////////////////////////////////////////
 void CvGlobals::LogMessage(const char* szMessage)
@@ -5604,6 +5635,16 @@ void CvGlobals::cacheGlobals()
 	m_iWITHDRAW_MOD_BLOCKED_TILE = getDefineINT("WITHDRAW_MOD_BLOCKED_TILE");
 	m_iAI_OPERATIONAL_MAX_RECRUIT_TURNS_DEFAULT = getDefineINT("AI_OPERATIONAL_MAX_RECRUIT_TURNS_DEFAULT");
 	m_iAI_OPERATIONAL_MAX_RECRUIT_TURNS_ENEMY_TERRITORY = getDefineINT("AI_OPERATIONAL_MAX_RECRUIT_TURNS_ENEMY_TERRITORY");
+	// Softcoding - v0.1, Snarko
+	m_iCITY_CAPTURE_WARMONGER_OFFSET = GC.getDefineINT("CITY_CAPTURE_WARMONGER_OFFSET");
+	m_iSEA_TRADEROUTE_MODIFIER = getDefineINT("SEA_TRADEROUTE_MODIFIER");
+	m_iLAND_TRADEROUTE_MODIFIER = getDefineINT("LAND_TRADEROUTE_MODIFIER");
+	m_iBASE_TRADE_RANGE_SEA = getDefineINT("BASE_TRADE_RANGE_SEA");
+	m_iBASE_TRADE_RANGE_LAND = getDefineINT("BASE_TRADE_RANGE_LAND");
+	// END Softcoding
+	// AIMOD - v0.1, Snarko
+	m_bUSE_AIMOD = getDefineINT("USE_AIMOD") != 0;
+	// END AIMOD
 
 	// -- floats --
 
@@ -5941,6 +5982,9 @@ void CvGlobals::deleteInfoArrays()
 	// EventEngine - v0.1, Snarko
 	deleteInfoArray(m_paEventInfo);
 	// END EventEngine
+	// Revamped yields - v0.1, Snarko
+	deleteInfoArray(m_paGreatWorkClassInfo);
+	// END Revamped yields
 
 	SAFE_DELETE_ARRAY(GC.getFootstepAudioTags());
 

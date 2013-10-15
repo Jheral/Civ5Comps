@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created by ModBuddy on 8/25/2013 1:41:58 PM -->
+<GameData>
+	<Language_en_US>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_FPT">
+			<Text>[ICON_FOOD] Food per turn: {1_FoodPerTurn}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_PPT">
+			<Text>[ICON_PRODUCTION] Production per turn: {1_ProductionPerTurn}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_SPT">
+			<Text>[ICON_RESEARCH] Science per turn: {1_SciencePerTurn}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_CPT">
+			<Text>[ICON_CULTURE] Culture per turn: {1_CulturePerTurn}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_FAITHPT">
+			<Text>[ICON_PEACE] Faith per turn: {1_FaithPerTurn}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_FOOD_FROM_WONDERS">
+			<Text>+{1_FoodPerWorldWonder} [ICON_FOOD] Food from World Wonders</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_PRODUCTION_FROM_WONDERS">
+			<Text>+{1_ProductionPerWorldWonder} [ICON_PRODUCTION] Production from World Wonders</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GOLD_FROM_WONDERS">
+			<Text>+{1_GoldPerWorldWonder} [ICON_GOLD] Gold from World Wonders</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_SCIENCE_FROM_WONDERS">
+			<Text>+{1_SciencePerWorldWonder} [ICON_RESEARCH] Science from World Wonders</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_FAITH_FROM_WONDERS">
+			<Text>+{1_FaithPerWorldWonder} [ICON_PEACE] Faith from World Wonders</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_FOOD_FROM_NATURAL_WONDERS">
+			<Text>+{1_FoodPerWorldWonder} [ICON_FOOD] Food from Natural Wonders</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_PRODUCTION_FROM_NATURAL_WONDERS">
+			<Text>+{1_ProductionPerWorldWonder} [ICON_PRODUCTION] Production from Natural Wonders</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GOLD_FROM_NATURAL_WONDERS">
+			<Text>+{1_GoldPerWorldWonder} [ICON_GOLD] Gold from Natural Wonders</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_SCIENCE_FROM_NATURAL_WONDERS">
+			<Text>+{1_SciencePerWorldWonder} [ICON_RESEARCH] Science from Natural Wonders</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_FAITH_FROM_NATURAL_WONDERS">
+			<Text>+{1_FaithPerWorldWonder} [ICON_PEACE] Faith from Natural Wonders</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GREAT_PERSON_TILE_IMPROVEMENT_FOOD">
+			<Text>+{1_NumCulture} [ICON_FOOD] Culture from every Great Person tile improvement</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GREAT_PERSON_TILE_IMPROVEMENT_PRODUCTION">
+			<Text>+{1_NumCulture} [ICON_PRODUCTION] Culture from every Great Person tile improvement</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GREAT_PERSON_TILE_IMPROVEMENT_GOLD">
+			<Text>+{1_NumCulture} [ICON_GOLD] Culture from every Great Person tile improvement</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GREAT_PERSON_TILE_IMPROVEMENT_SCIENCE">
+			<Text>+{1_NumCulture} [ICON_RESEARCH] Culture from every Great Person tile improvement</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_GREAT_PERSON_TILE_IMPROVEMENT_FAITH">
+			<Text>+{1_NumCulture} [ICON_PEACE] Culture from every Great Person tile improvement</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_LANDMARK_FOOD">
+			<Text>+{1_NumFood} [ICON_FOOD] Food from every archaeological Landmark</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_LANDMARK_PRODUCTION">
+			<Text>+{1_NumProduction} [ICON_PRODUCTION] Production from every archaeological Landmark</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_LANDMARK_GOLD">
+			<Text>+{1_NumGold} [ICON_GOLD] Gold from every archaeological Landmark</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_LANDMARK_SCIENCE">
+			<Text>+{1_NumScience} [ICON_RESEARCH] Science from every archaeological Landmark</Text>
+		</Row>
+		<Row Tag="TXT_KEY_LEAGUE_OVERVIEW_EFFECT_SUMMARY_LANDMARK_FAITH">
+			<Text>+{1_NumFaith} [ICON_PEACE] Faith from every archaeological Landmark</Text>
+		</Row>
+		<Row Tag="TXT_KEY_PRODMOD_YIELD_WONDER">
+			<Text>[NEWLINE][ICON_BULLET]Modifier for Wonder: {1_Num}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_PRODUCTION_BUILDING_CULTURE_MOD">
+			<Text>[ICON_CULTURE] Culture: +{1_Num}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_PRODUCTION_BUILDING_FAITH_MOD">
+			<Text>[ICON_PEACE] Faith: +{1_Num}%</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_FROM_WONDERS">
+			<Text>{1_Num} {2_IconString} extra from wonders</Text>
+		</Row>
+		<Row Tag="TXT_KEY_YIELD_FROM_TRAITS">
+			<Text>{1_Num} {2_IconString} from Traits</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TP_YIELD_FROM_CITIES">
+			<Text>[ICON_BULLET]{1_ColoredNum} from Cities.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TP_YIELD_FROM_HAPPINESS">
+			<Text>[ICON_BULLET]{1_ColoredNum} from [ICON_HAPPINESS_1] Happiness.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TP_YIELD_FROM_TRAITS">
+			<Text>[ICON_BULLET]{1_ColoredNum} from Traits.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TP_YIELD_FROM_CITY_CONNECTIONS">
+			<Text>[ICON_BULLET]{1_ColoredNum} from City connections.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TP_YIELD_FROM_RESOLUTIONS">
+			<Text>[ICON_BULLET]{1_ColoredNum} from Resolutions.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TP_YIELD_FROM_RELIGION">
+			<Text>[ICON_BULLET]{1_ColoredNum} from Religion.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TP_YIELD_FROM_LEAGUE">
+			<Text>[ICON_BULLET]{1_ColoredNum} from Leagues.</Text>
+		</Row>
+		<Row Tag="TXT_KEY_TP_YIELD_FROM_GOLDEN_AGE">
+			<Text>[ICON_BULLET]{1_ColoredNum} from Golden Age.</Text>
+		</Row>
+	</Language_en_US>
+</GameData>

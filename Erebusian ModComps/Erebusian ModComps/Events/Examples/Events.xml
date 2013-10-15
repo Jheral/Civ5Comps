@@ -13,10 +13,11 @@
 		<Column name="EventType" type="text" default="EVENT_PLAYER"/>
 		<Column name="MeanTimeToHappen" type="integer" default="-1"/>
 		<Column name="Image" type="text" default="NULL"/>
+		<Column name="NotificationText" type="text" reference="Language_en_US(Tag)" default="TXT_KEY_EVENT_NOTIFICATION_TEXT"/>
 	</Table>
 	<Table name="Event_Requirements">
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
-		<Column name="ID_Scope" type="integer" default="9999"/>
+		<Column name="ID_Set" type="integer" default="9999"/>
 		<Column name="Type" type="text" notnull="true" unique="true"/>
 		<Column name="EventType" type="text" reference="Events(Type)"/>
 		<Column name="EventModifierType" type="text" notnull="true"/>
@@ -24,11 +25,11 @@
 		<Column name="CompareItem" type="text" default="NULL"/>
 		<Column name="iNumberToCompare" type="integer" default="-1"/>
 		<!-- <Column name="fFactor" type="float" default="0"/> -->
-		<Column name="sScope" type="text" default="default"/>
+		<Column name="SetName" type="text" default="default"/>
 	</Table>
 	<Table name="Event_Modifiers">
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
-		<Column name="ID_Scope" type="integer" default="9999"/>
+		<Column name="ID_Set" type="integer" default="9999"/>
 		<Column name="Type" type="text" notnull="true" unique="true"/>
 		<Column name="EventType" type="text" reference="Events(Type)"/>
 		<Column name="EventModifierType" type="text" notnull="true"/>
@@ -36,11 +37,11 @@
 		<Column name="CompareItem" type="text"/>
 		<Column name="iNumberToCompare" type="integer" default="-1"/>
 		<Column name="fFactor" type="float" default="0"/>
-		<Column name="sScope" type="text" default="default"/>
+		<Column name="SetName" type="text" default="default"/>
 	</Table>
 	<Table name="Event_Options">
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
-		<Column name="ID_Scope" type="integer" default="9999"/>
+		<Column name="ID_Set" type="integer" default="9999"/>
 		<Column name="Type" type="text" notnull="true" unique="true"/>
 		<Column name="EventType" type="text" reference="Events(Type)"/>
 		<Column name="Description" type="text" reference="Language_en_US(Tag)"/>
@@ -49,7 +50,7 @@
 	</Table>
 	<Table name="Event_Actions">
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
-		<Column name="ID_Scope" type="integer" default="9999"/>
+		<Column name="ID_Set" type="integer" default="9999"/>
 		<Column name="Type" type="text" notnull="true" unique="true"/>
 		<Column name="EventOptionType" type="text" reference="Event_Options(Type)"/>
 		<Column name="EventActionType" type="integer" notnull="true"/>
@@ -61,7 +62,7 @@
 		<Column name="iValue2" type="integer" default="0"/>
 		<Column name="bBool" type="boolean" default="false"/>
 		<Column name="sString" type="text" default=" "/>
-		<Column name="sScope" type="text" default="default"/>
+		<Column name="SetName" type="text" default="default"/>
 	</Table>
 	<Events>
 		<Row>
@@ -69,6 +70,8 @@
 			<Type>Test_Event</Type>
 			<Description>TXT_KEY_TEST_EVENT_DESC</Description>
 			<Civilopedia>TXT_KEY_TEST_EVENT</Civilopedia>
+			<EventType>EVENT_CITY</EventType>
+			<NotificationText>TXT_KEY_TEST_EVENT_NOTIFICATION</NotificationText>
 		</Row>
 		<Row>
 			<Type>EventTest</Type>
@@ -98,17 +101,17 @@
 			<EventModifierType>EVENTMOD_RESOURCE_AVAILABLE</EventModifierType>
 			<EventCompareType>COMPARE_LESSTHAN</EventCompareType>
 			<iNumberToCompare>3</iNumberToCompare>
-			<sScope>Scope_EventTest_1</sScope>
+			<SetName>Set_EventTest_1</SetName>
 		</Row>
 		<Row>
-			<ID_Scope>0</ID_Scope>
+			<ID_Set>0</ID_Set>
 			<Type>EventTestReq2</Type>
 			<EventType>EventTest</EventType>
 			<EventModifierType>EVENTMOD_RESOURCE_CLASS</EventModifierType>
 			<EventCompareType>COMPARE_MORETHAN</EventCompareType>
 			<iNumberToCompare>3</iNumberToCompare>
 			<CompareItem>RESOURCECLASS_RUSH</CompareItem>
-			<sScope>Scope_EventTest_1</sScope>
+			<SetName>Set_EventTest_1</SetName>
 		</Row>
 	</Event_Requirements>
 	<Event_Modifiers>
@@ -120,7 +123,7 @@
 			<EventCompareType>COMPARE_LESSTHAN</EventCompareType>
 			<iNumberToCompare>1</iNumberToCompare>
 			<fFactor>0.1</fFactor>
-			<sScope>Scope_EventTest_1</sScope>
+			<SetName>Set_EventTest_1</SetName>
 		</Row>
 	</Event_Modifiers>
 	<Event_Options>
@@ -190,7 +193,7 @@
 			<EventOptionType>Test_Event_Option1</EventOptionType>
 			<EventActionType>EVENTACTION_YIELD</EventActionType>
 			<ActionItem>YIELD_CULTURE</ActionItem>
-			<iValue>20</iValue>
+			<iValue>-1</iValue>
 			<iTurns>2</iTurns>
 		</Row>
 		<Row>
@@ -200,7 +203,14 @@
 			<ActionItem>YIELD_PRODUCTION</ActionItem>
 			<iValue>100</iValue>
 			<iTurns>2</iTurns>
-	</Row>
+		</Row>
+		<Row>
+			<Type>Test_Event_Action6</Type>
+			<EventOptionType>Test_Event_Option1</EventOptionType>
+			<EventActionType>EVENTACTION_CITY_ADD_BUILDING</EventActionType>
+			<ActionItem>BUILDING_LIBRARY</ActionItem>
+			<iValue>3</iValue>
+		</Row>
 		<Row>
 			<Type>EventTestAction1</Type>
 			<EventOptionType>EventTestOption1</EventOptionType>

@@ -158,6 +158,9 @@ CvPromotionEntry::CvPromotionEntry():
 	m_pbUnitCombat(NULL),
 	m_pbCivilianUnitType(NULL),
 	m_pbPostCombatRandomPromotion(NULL)
+	// EventEngine - v0.1, Snarko
+	, m_asziFlagPrereqs(NULL)
+	// END EventEngine
 {
 }
 
@@ -602,6 +605,27 @@ bool CvPromotionEntry::CacheResults(Database::Results& kResults, CvDatabaseUtili
 		"NewPromotion",
 		"PromotionType",
 		szPromotionType);
+
+	// EventEngine - v0.1, Snarko
+	{
+		m_asziFlagPrereqs.clear();
+		std::string strKey("UnitPromotion_PrereqFlags");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from UnitPromotion_PrereqFlags where PromotionType = ?");
+		}
+
+		pResults->Bind(1, szPromotionType);
+
+		while(pResults->Step())
+		{
+			std::string szFlag = pResults->GetText("Flag");
+			int iMinimumValue = pResults->GetInt("MinimumValue");
+			m_asziFlagPrereqs.push_back(std::make_pair(szFlag, iMinimumValue));
+		}
+	}
+	// END EventEngine
 
 	return true;
 }
@@ -1682,6 +1706,28 @@ bool CvPromotionEntry::IsPostCombatRandomPromotion(int i) const
 	return m_pbPostCombatRandomPromotion ? m_pbPostCombatRandomPromotion[i] : false;
 }
 
+
+// EventEngine - v0.1, Snarko
+//------------------------------------------------------------------------------
+int CvPromotionEntry::getNumFlagPrereqs() const
+{
+	return m_asziFlagPrereqs.size();
+}
+//------------------------------------------------------------------------------
+std::string CvPromotionEntry::getFlagPrereq(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].first;
+}
+//------------------------------------------------------------------------------
+int CvPromotionEntry::getFlagPrereqValue(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].second;
+}
+// END EventEngine
 //=====================================
 // CvPromotionEntryXMLEntries
 //=====================================

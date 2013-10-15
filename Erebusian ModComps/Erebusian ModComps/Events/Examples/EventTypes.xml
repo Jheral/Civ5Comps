@@ -2,6 +2,7 @@
 <!-- Created by ModBuddy on 8/4/2013 9:56:13 AM -->
 <!-- Changes to these must be reflected in CvEnums.h -->
 <!-- They are defined here to simplify string<->enum conversion and to have an easily available list of them -->
+<!-- THESE MUST BE IN ORDER -->
 <GameData>
 	<Table name="EventTypeTypes">
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
@@ -119,6 +120,9 @@
 			<Name>EVENTMOD_NUMDOMAINUNITS</Name>
 		</Row>
 		<Row>
+			<Name>EVENTMOD_NUMUNITCOMBATUNITS</Name>
+		</Row>
+		<Row>
 			<Name>EVENTMOD_HIGHESTUNITLEVEL</Name>
 		</Row>
 		<Row>
@@ -221,7 +225,7 @@
 			<Name>EVENTMOD_CITY_STRENGTH</Name>
 		</Row>
 		<Row>
-			<Name>EVENTMOD_CITY_YIELD</Name>
+			<Name>EVENTMOD_CITY_BASE_YIELD</Name>
 		</Row>
 		<Row>
 			<Name>EVENTMOD_CITY_MODIFIEDYIELD</Name>
@@ -233,7 +237,19 @@
 			<Name>EVENTMOD_CITY_POPULATION</Name>
 		</Row>
 		<Row>
-			<Name>EVENTMOD_CITY_SPY_PRESENT</Name>
+			<Name>EVENTMOD_CITY_OWN_SPY_PRESENT</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_CITY_SPY_RANK</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_CITY_NUM_SPY</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_CITY_NUM_DIPLOMAT</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_CITY_NUM_SPY_TOTAL</Name>
 		</Row>
 		<Row>
 			<Name>EVENTMOD_CITY_IS_CAPITAL</Name>
@@ -246,6 +262,9 @@
 		</Row>
 		<Row>
 			<Name>EVENTMOD_CITY_BUILDING</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_CITY_BUILDINGCLASS</Name>
 		</Row>
 		<Row>
 			<Name>EVENTMOD_CITY_NATIONAL_WONDERS</Name>
@@ -263,13 +282,19 @@
 			<Name>EVENTMOD_CITY_HAS_RESOURCE</Name>
 		</Row>
 		<Row>
-			<Name>EVENTMOD_CITY_HAS_RELIGION</Name>
+			<Name>EVENTMOD_CITY_RELIGION_PRESSURE</Name>
 		</Row>
 		<Row>
 			<Name>EVENTMOD_CITY_FOLLOWERS_RELIGION</Name>
 		</Row>
 		<Row>
-			<Name>EVENTMOD_CITY_CONQUERED</Name>
+			<Name>EVENTMOD_CITY_RELIGION_HOLY</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_CITY_EVER_OWNED</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_CITY_EVER_CONQUERED</Name>
 		</Row>
 		<Row>
 			<Name>EVENTMOD_CITY_ORIGINAL_OWNER</Name>
@@ -278,22 +303,106 @@
 			<Name>EVENTMOD_CITY_EVENT</Name>
 		</Row>
 		<Row>
-			<Name>EVENTMOD_CITY_FEATURE_IN_RANGE</Name>
+			<Name>EVENTMOD_CITY_NUM_FEATURE_IN_RANGE</Name>
 		</Row>
 		<Row>
-			<Name>EVENTMOD_CITY_IMPROVEMENT_IN_RANGE</Name>
+			<Name>EVENTMOD_CITY_NUM_IMPROVEMENT_IN_RANGE</Name>
 		</Row>
 		<Row>
-			<Name>EVENTMOD_CITY_RESOURCE_IN_RANGE</Name>
+			<Name>EVENTMOD_CITY_NUM_RESOURCE_IN_RANGE</Name>
 		</Row>
 		<Row>
-			<Name>EVENTMOD_CITY_TERRAIN_IN_RANGE</Name>
+			<Name>EVENTMOD_CITY_NUM_TERRAIN_IN_RANGE</Name>
 		</Row>
 		<Row>
 			<Name>EVENTMOD_CITY_END</Name>
 		</Row>
 		<Row>
 			<Name>EVENTMOD_UNIT_START</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_TYPE</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_CLASS</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_COMBAT</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_DOMAIN</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_CIVILIAN</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_GARRISONED</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_REQ_RESOURCE</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_FORTIFIED</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_LEVEL</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_EXPERIENCE</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_MOVES</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_DAMAGE</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_BASE_STRENGTH</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_ATTACK_STRENGTH</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_DEFENSE_STRENGTH</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_COMBAT_LIMIT</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_RANGED_BASE_STRENGTH</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_RANGED_ATTACK_STRENGTH</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_RANGED_DEFENSE_STRENGTH</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_RANGE</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_RANGED_COMBAT_LIMIT</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_INTERCEPT_CHANCE</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_INTERCEPT_RANGE</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_PROMOTION</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_NUM_FEATURE_IN_RANGE</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_NUM_IMPROVEMENT_IN_RANGE</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_NUM_RESOURCE_IN_RANGE</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_NUM_TERRAIN_IN_RANGE</Name>
 		</Row>
 		<Row>
 			<Name>EVENTMOD_UNIT_END</Name>
@@ -332,6 +441,9 @@
 			<Name>EVENTACTION_SET_FLAG</Name>
 		</Row>
 		<Row>
+			<Name>EVENTACTION_SPECIALIST_YIELD</Name>
+		</Row>
+		<Row>
 			<Name>EVENTACTION_EVENT_FOR_CAPITAL</Name>
 		</Row>
 		<Row>
@@ -347,10 +459,7 @@
 			<Name>EVENTACTION_CITY_START</Name>
 		</Row>
 		<Row>
-			<Name>EVENTACTION_ADD_BUILDING</Name>
-		</Row>
-		<Row>
-			<Name>EVENTACTION_REM_BUILDING</Name>
+			<Name>EVENTACTION_CITY_ADD_BUILDING</Name>
 		</Row>
 		<Row>
 			<Name>EVENTACTION_CITY_YIELD</Name>
@@ -359,13 +468,19 @@
 			<Name>EVENTACTION_CITY_YIELDMOD</Name>
 		</Row>
 		<Row>
-			<Name>EVENTACTION_POPULATION</Name>
+			<Name>EVENTACTION_CITY_POPULATION</Name>
 		</Row>
 		<Row>
-			<Name>EVENTACTION_LOCAL_HAPPY</Name>
+			<Name>EVENTACTION_CITY_LOCAL_HAPPY</Name>
 		</Row>
 		<Row>
-			<Name>EVENTACTION_SPECIALIST</Name>
+			<Name>EVENTACTION_CITY_FREE_SPECIALIST</Name>
+		</Row>
+		<Row>
+			<Name>EVENTACTION_CITY_SPECIALIST_YIELD</Name>
+		</Row>
+		<Row>
+			<Name>EVENTACTION_CITY_SET_FLAG</Name>
 		</Row>
 		<Row>
 			<Name>EVENTACTION_CITY_END</Name>
@@ -374,25 +489,22 @@
 			<Name>EVENTACTION_UNIT_START</Name>
 		</Row>
 		<Row>
-			<Name>EVENTACTION_EXPERIENCE</Name>
+			<Name>EVENTACTION_UNIT_EXPERIENCE</Name>
 		</Row>
 		<Row>
-			<Name>EVENTACTION_ADD_PROMOTION</Name>
+			<Name>EVENTACTION_UNIT_PROMOTION</Name>
 		</Row>
 		<Row>
-			<Name>EVENTACTION_REM_PROMOTION</Name>
+			<Name>EVENTACTION_UNIT_CLASS</Name>
 		</Row>
 		<Row>
-			<Name>EVENTACTION_CLASS</Name>
+			<Name>EVENTACTION_UNIT_DAMAGE</Name>
 		</Row>
 		<Row>
-			<Name>EVENTACTION_DAMAGE</Name>
+			<Name>EVENTACTION_UNIT_SPAWN_UNIT</Name>
 		</Row>
 		<Row>
-			<Name>EVENTACTION_SPAWN_UNIT</Name>
-		</Row>
-		<Row>
-			<Name>EVENTACTION_JUMP_TO_NEAREST_PLOT</Name>
+			<Name>EVENTACTION_UNIT_SET_FLAG</Name>
 		</Row>
 		<Row>
 			<Name>EVENTACTION_UNIT_END</Name>

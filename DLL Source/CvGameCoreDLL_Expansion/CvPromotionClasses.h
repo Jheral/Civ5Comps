@@ -195,6 +195,12 @@ public:
 	bool GetCivilianUnitType(int i) const;
 	bool IsPostCombatRandomPromotion(int i) const;
 
+	// EventEngine - v0.1, Snarko
+	int getNumFlagPrereqs() const;
+	std::string getFlagPrereq(int i) const;
+	int getFlagPrereqValue(int i) const;
+	// END EventEngine
+
 protected:
 	int m_iLayerAnimationPath;
 	int m_iPrereqPromotion;
@@ -348,6 +354,10 @@ protected:
 	bool* m_pbUnitCombat;
 	bool* m_pbCivilianUnitType;
 	bool* m_pbPostCombatRandomPromotion;
+
+	// EventEngine - v0.1, Snarko
+	std::vector<std::pair<std::string, int > > m_asziFlagPrereqs;
+	// END EventEngine
 };
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

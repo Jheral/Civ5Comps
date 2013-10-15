@@ -227,20 +227,31 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 
 	Method(GetJONSCulturePerTurn);
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	Method(GetBaseJONSCulturePerTurn);
+
 	Method(GetJONSCulturePerTurnFromBuildings);
 	Method(ChangeJONSCulturePerTurnFromBuildings);
+
 	Method(GetJONSCulturePerTurnFromPolicies);
 	Method(ChangeJONSCulturePerTurnFromPolicies);
+
 	Method(GetJONSCulturePerTurnFromSpecialists);
 	Method(ChangeJONSCulturePerTurnFromSpecialists);
+
 	Method(GetJONSCulturePerTurnFromGreatWorks);
+
 	Method(GetJONSCulturePerTurnFromTraits);
 	Method(GetJONSCulturePerTurnFromReligion);
+	
 	Method(GetJONSCulturePerTurnFromLeagues);
-
+	
 	Method(GetCultureRateModifier);
 	Method(ChangeCultureRateModifier);
+	*/
+	// END Revamped yields
 
 	Method(GetNumGreatWorks);
 	Method(GetNumGreatWorkSlots);
@@ -257,10 +268,17 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetThemingTooltip);
 
 	Method(GetFaithPerTurn);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	Method(GetFaithPerTurnFromBuildings);
 	Method(GetFaithPerTurnFromPolicies);
 	Method(GetFaithPerTurnFromTraits);
 	Method(GetFaithPerTurnFromReligion);
+	*/
+	Method(GetYieldPerTurnFromTraits);
+	Method(GetYieldPerReligionTimes100);
+	// END Revamped yields
 
 	Method(IsReligionInCity);
 	Method(IsHolyCityForReligion);
@@ -327,6 +345,10 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetHappinessFromBuildings);
 	Method(GetHappiness);
 	Method(GetLocalHappiness);
+	// EventEngine - v0.1, Snarko
+	Method(GetHappinessFromEvents);
+	Method(ChangeHappinessFromEvents);
+	// END EventEngine
 
 	Method(IsNeverLost);
 	Method(SetNeverLost);
@@ -352,6 +374,10 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetRiverPlotYield);
 	Method(GetLakePlotYield);
 
+	// Revamped yields - v0.1, Snarko
+	Method(GetWonderExtraYield);
+	// END Revamped yields
+
 	Method(GetBaseYieldRate);
 
 	Method(GetBaseYieldRateFromTerrain);
@@ -369,6 +395,14 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetBaseYieldRateFromReligion);
 	Method(ChangeBaseYieldRateFromReligion);
 
+	// EventEngine - v0.1, Snarko
+	Method(GetBaseYieldRateFromEvents);
+	Method(ChangeBaseYieldRateFromEvents);
+
+	Method(GetEventYieldRateModifier);
+	Method(ChangeEventYieldRateModifier);
+	// END EventEngine
+
 	Method(GetYieldPerPopTimes100);
 
 	Method(GetBaseYieldRateModifier);
@@ -378,6 +412,10 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 
 	Method(GetExtraSpecialistYield);
 	Method(GetExtraSpecialistYieldOfType);
+	// EventEngine - v0.1, Snarko
+	Method(GetCitySpecialistExtraYield);
+	Method(ChangeCitySpecialistExtraYield);
+	// END EventEngine
 
 	Method(GetDomainFreeExperience);
 	Method(GetDomainProductionModifier);
@@ -2030,12 +2068,16 @@ int CvLuaCity::lGetJONSCulturePerTurn(lua_State* L)
 	return BasicLuaMethod(L, &CvCity::getJONSCulturePerTurn);
 }
 //------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 //int GetBaseJONSCulturePerTurn() const;
 int CvLuaCity::lGetBaseJONSCulturePerTurn(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::GetBaseJONSCulturePerTurn);
 }
 //------------------------------------------------------------------------------
+
 //int GetJONSCulturePerTurnFromBuildings() const;
 int CvLuaCity::lGetJONSCulturePerTurnFromBuildings(lua_State* L)
 {
@@ -2047,6 +2089,7 @@ int CvLuaCity::lChangeJONSCulturePerTurnFromBuildings(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::ChangeJONSCulturePerTurnFromBuildings);
 }
+
 //------------------------------------------------------------------------------
 //int GetJONSCulturePerTurnFromPolicies() const;
 int CvLuaCity::lGetJONSCulturePerTurnFromPolicies(lua_State* L)
@@ -2060,6 +2103,7 @@ int CvLuaCity::lChangeJONSCulturePerTurnFromPolicies(lua_State* L)
 	return BasicLuaMethod(L, &CvCity::ChangeJONSCulturePerTurnFromPolicies);
 }
 //------------------------------------------------------------------------------
+
 //int GetJONSCulturePerTurnFromSpecialists() const;
 int CvLuaCity::lGetJONSCulturePerTurnFromSpecialists(lua_State* L)
 {
@@ -2071,6 +2115,7 @@ int CvLuaCity::lChangeJONSCulturePerTurnFromSpecialists(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::ChangeJONSCulturePerTurnFromSpecialists);
 }
+
 //------------------------------------------------------------------------------
 //int GetJONSCulturePerTurnFromGreatWorks() const;
 int CvLuaCity::lGetJONSCulturePerTurnFromGreatWorks(lua_State* L)
@@ -2083,6 +2128,7 @@ int CvLuaCity::lGetJONSCulturePerTurnFromTraits(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::GetJONSCulturePerTurnFromTraits);
 }
+
 //------------------------------------------------------------------------------
 //int GetJONSCulturePerTurnFromReligion() const;
 int CvLuaCity::lGetJONSCulturePerTurnFromReligion(lua_State* L)
@@ -2095,12 +2141,14 @@ int CvLuaCity::lChangeJONSCulturePerTurnFromReligion(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::ChangeJONSCulturePerTurnFromReligion);
 }
+
 //------------------------------------------------------------------------------
 //int GetJONSCulturePerTurnFromLeagues() const;
 int CvLuaCity::lGetJONSCulturePerTurnFromLeagues(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::GetJONSCulturePerTurnFromLeagues);
 }
+
 //------------------------------------------------------------------------------
 //int getCultureRateModifier() const;
 int CvLuaCity::lGetCultureRateModifier(lua_State* L)
@@ -2113,6 +2161,8 @@ int CvLuaCity::lChangeCultureRateModifier(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::changeCultureRateModifier);
 }
+*/
+// END Revamped yields
 //------------------------------------------------------------------------------
 //int GetNumGreatWorks();
 int CvLuaCity::lGetNumGreatWorks(lua_State* L)
@@ -2239,6 +2289,9 @@ int CvLuaCity::lGetFaithPerTurn(lua_State* L)
 	return BasicLuaMethod(L, &CvCity::GetFaithPerTurn);
 }
 //------------------------------------------------------------------------------
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 //int GetFaithPerTurnFromBuildings() const;
 int CvLuaCity::lGetFaithPerTurnFromBuildings(lua_State* L)
 {
@@ -2268,6 +2321,17 @@ int CvLuaCity::lChangeFaithPerTurnFromReligion(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::ChangeFaithPerTurnFromReligion);
 }
+*/
+int CvLuaCity::lGetYieldPerTurnFromTraits(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvCity::GetYieldPerTurnFromTraits);
+}
+
+int CvLuaCity::lGetYieldPerReligionTimes100(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvCity::GetYieldPerReligionTimes100);
+}
+// END Revamped yields
 //------------------------------------------------------------------------------
 //int IsReligionInCity() const;
 int CvLuaCity::lIsReligionInCity(lua_State* L)
@@ -2748,6 +2812,18 @@ int CvLuaCity::lGetHappiness(lua_State* L)
 	lua_pushinteger(L, iHappiness);
 	return 1;
 }
+// EventEngine - v0.1, Snarko
+//------------------------------------------------------------------------------
+int CvLuaCity::lGetHappinessFromEvents(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvCity::GetHappinessFromEvents);
+}
+//------------------------------------------------------------------------------
+int CvLuaCity::lChangeHappinessFromEvents(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvCity::ChangeHappinessFromEvents);
+}
+// END EventEngine
 //------------------------------------------------------------------------------
 //bool isNeverLost();
 int CvLuaCity::lIsNeverLost(lua_State* L)
@@ -2891,6 +2967,13 @@ int CvLuaCity::lGetLakePlotYield(lua_State* L)
 	lua_pushinteger(L, iResult);
 	return 1;
 }
+// Revamped yields - v0.1, Snarko
+//------------------------------------------------------------------------------
+int CvLuaCity::lGetWonderExtraYield(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvCity::getWonderExtraYield);
+}
+// END Revamped yields
 //------------------------------------------------------------------------------
 //int getBaseYieldRate(YieldTypes eIndex);
 int CvLuaCity::lGetBaseYieldRate(lua_State* L)
@@ -2952,6 +3035,28 @@ int CvLuaCity::lChangeBaseYieldRateFromReligion(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::ChangeBaseYieldRateFromReligion);
 }
+// EventEngine - v0.1, Snarko
+//------------------------------------------------------------------------------
+int CvLuaCity::lGetBaseYieldRateFromEvents(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvCity::GetBaseYieldRateFromEvents);
+}
+//------------------------------------------------------------------------------
+int CvLuaCity::lChangeBaseYieldRateFromEvents(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvCity::ChangeBaseYieldRateFromEvents);
+}
+//------------------------------------------------------------------------------
+int CvLuaCity::lGetEventYieldRateModifier(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvCity::GetEventYieldRateModifier);
+}
+//------------------------------------------------------------------------------
+int CvLuaCity::lChangeEventYieldRateModifier(lua_State* L)
+{
+	return BasicLuaMethod(L, &CvCity::ChangeEventYieldRateModifier);
+}
+// END EventEngine
 //------------------------------------------------------------------------------
 int CvLuaCity::lGetYieldPerPopTimes100(lua_State* L)
 {
@@ -3023,6 +3128,23 @@ int CvLuaCity::lGetExtraSpecialistYieldOfType(lua_State* L)
 {
 	return BasicLuaMethod<int, YieldTypes, SpecialistTypes>(L, &CvCity::getExtraSpecialistYield);
 }
+
+// EventEngine - v0.1, Snarko
+int CvLuaCity::lGetCitySpecialistExtraYield(lua_State* L)
+{
+	return BasicLuaMethod<int, SpecialistTypes, YieldTypes>(L, &CvCity::getCitySpecialistExtraYield);
+}
+int CvLuaCity::lChangeCitySpecialistExtraYield(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const SpecialistTypes eIndex = (SpecialistTypes)lua_tointeger(L, 2);
+	const YieldTypes eIndex2 = (YieldTypes)lua_tointeger(L, 3);
+	const int iChange = lua_tointeger(L, 4);
+
+	pkCity->changeCitySpecialistExtraYield(eIndex, eIndex2, iChange);
+	return 1;
+}
+// END EventEngine
 
 //------------------------------------------------------------------------------
 //int getDomainFreeExperience(DomainTypes eIndex);
@@ -3901,7 +4023,16 @@ int CvLuaCity::lGetSpecialistYield(lua_State* L)
 //------------------------------------------------------------------------------
 int CvLuaCity::lGetCultureFromSpecialist(lua_State* L)
 {
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	// This is a bit of a hack but I don't want to replace an entire LUA screen just for this.
+	/* Original code
 	return BasicLuaMethod(L, &CvCity::GetCultureFromSpecialist);
+	*/
+	lua_pushinteger(L, 0);
+
+	return 1;
+	// END Revamped yields
 }
 //------------------------------------------------------------------------------
 int CvLuaCity::lGetReligionCityRangeStrikeModifier(lua_State* L)

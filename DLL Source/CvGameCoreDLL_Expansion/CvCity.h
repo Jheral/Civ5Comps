@@ -19,6 +19,9 @@
 #include "FStlContainerSerialization.h"
 #include "FAutoVariable.h"
 #include "FAutoVector.h"
+// EventEngine - v0.1, Snarko
+#include "CvEvent.h"
+// END EventEngine
 
 #include "CvPreGame.h"
 
@@ -120,6 +123,9 @@ public:
 
 	bool IsHasResourceLocal(ResourceTypes eResource, bool bTestVisible) const;
 	void ChangeNumResourceLocal(ResourceTypes eResource, int iChange);
+	// EventEngine - v0.1, Snarko
+	bool IsWorkingResource(ResourceTypes eResource) const;
+	// END EventEngine
 
 	bool IsBuildingLocalResourceValid(BuildingTypes eBuilding, bool bTestVisible, CvString* toolTipSink = NULL) const;
 
@@ -230,7 +236,12 @@ public:
 
 	void UpdateReligion(ReligionTypes eNewMajority);
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used, use getExtraSpecialistYield
+	/* Original code
 	int GetCultureFromSpecialist(SpecialistTypes eSpecialist) const;
+	*/
+	// END Revamped yields
 
 	CvHandicapInfo& getHandicapInfo() const;
 	HandicapTypes getHandicapType() const;
@@ -345,6 +356,9 @@ public:
 
 	int getJONSCulturePerTurn() const;
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int GetBaseJONSCulturePerTurn() const;
 
 	int GetJONSCulturePerTurnFromBuildings() const;
@@ -364,13 +378,18 @@ public:
 	void ChangeJONSCulturePerTurnFromReligion(int iChange);
 
 	int GetJONSCulturePerTurnFromLeagues() const;
-
+	
 	int getCultureRateModifier() const;
 	void changeCultureRateModifier(int iChange);
+	*/
+	// END Revamped yields
 
 	// END Culture
 
 	int GetFaithPerTurn() const;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	int GetFaithPerTurnFromBuildings() const;
 	void ChangeFaithPerTurnFromBuildings(int iChange);
 
@@ -378,9 +397,15 @@ public:
 	void ChangeFaithPerTurnFromPolicies(int iChange);
 
 	int GetFaithPerTurnFromTraits() const;
-
+	*/
+	int GetYieldPerTurnFromTraits(YieldTypes eYield) const;
+	
+	// No longer used
+	/* Original code
 	int GetFaithPerTurnFromReligion() const;
 	void ChangeFaithPerTurnFromReligion(int iChange);
+	*/
+	// END Revamped yields
 
 	int getNumWorldWonders() const;
 	void changeNumWorldWonders(int iChange);
@@ -489,6 +514,10 @@ public:
 	void ChangeBaseHappinessFromBuildings(int iChange);
 	int GetUnmoddedHappinessFromBuildings() const;
 	void ChangeUnmoddedHappinessFromBuildings(int iChange);
+	// EventEngine - v0.1, Snarko
+	int GetHappinessFromEvents() const;
+	void ChangeHappinessFromEvents(int iChange);
+	// END EventEngine
 
 	bool IsIgnoreCityForHappiness() const;
 	void SetIgnoreCityForHappiness(bool bValue);
@@ -556,8 +585,17 @@ public:
 	void changeSeaResourceYield(YieldTypes eIndex, int iChange);
 
 	int getBaseYieldRateModifier(YieldTypes eIndex, int iExtra = 0, CvString* toolTipSink = NULL) const;
+	// Revamped yields - v0.1, Snarko
+	// To include production
+	/* Original code
 	int getYieldRate(YieldTypes eIndex, bool bIgnoreTrade) const;
 	int getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade) const;
+	*/
+	int getYieldRate(YieldTypes eIndex, bool bIgnoreTrade, int iExtraModifier = 0) const;
+	int getYieldRateTimes100(YieldTypes eIndex, bool bIgnoreTrade, int iExtraModifier = 0) const;
+
+	int getWonderExtraYield(YieldTypes eIndex) const;
+	// END Revamped yields
 
 	// Base Yield
 	int getBaseYieldRate(YieldTypes eIndex) const;
@@ -576,6 +614,14 @@ public:
 
 	int GetBaseYieldRateFromReligion(YieldTypes eIndex) const;
 	void ChangeBaseYieldRateFromReligion(YieldTypes eIndex, int iChange);
+
+	// EventEngine - v0.1, Snarko
+	int GetBaseYieldRateFromEvents(YieldTypes eIndex) const;
+	void ChangeBaseYieldRateFromEvents(YieldTypes eIndex, int iChange);
+
+	int GetEventYieldRateModifier(YieldTypes eIndex) const;
+	void ChangeEventYieldRateModifier(YieldTypes eIndex, int iChange);
+	// END EventEngine
 	// END Base Yield
 
 	int GetYieldPerPopTimes100(YieldTypes eIndex) const;
@@ -595,6 +641,10 @@ public:
 
 	int getHappinessModifier(YieldTypes eIndex) const;
 
+	// EventEngine - v0.1, Snarko
+	int getCitySpecialistExtraYield(SpecialistTypes eIndex1, YieldTypes eIndex2) const;
+	void changeCitySpecialistExtraYield(SpecialistTypes eIndex1, YieldTypes eIndex2, int iChange);
+	// END EventEngine
 	int getExtraSpecialistYield(YieldTypes eIndex) const;
 	int getExtraSpecialistYield(YieldTypes eIndex, SpecialistTypes eSpecialist) const;
 	void updateExtraSpecialistYield(YieldTypes eYield);
@@ -617,6 +667,11 @@ public:
 
 	bool isEverOwned(PlayerTypes eIndex) const;
 	void setEverOwned(PlayerTypes eIndex, bool bNewValue);
+
+	// EventEngine - v0.1, Snarko
+	bool isEverConquered(PlayerTypes eIndex) const;
+	void setEverConquered(PlayerTypes eIndex, bool bNewValue);
+	// END EventEngine
 
 	bool isRevealed(TeamTypes eIndex, bool bDebug) const;
 	bool setRevealed(TeamTypes eIndex, bool bNewValue);
@@ -802,8 +857,18 @@ public:
 
 	int iScratch; // know the scope of your validity
 	// EventEngine - v0.1, Snarko
-	bool checkEventModifier(CvEventModifierInfo& kModifier);
+	bool checkEventModifier(CvEventModifierInfo& kModifier, bool bRequirement = true);
 	void doEvents();
+
+	void setFlag(std::string szFlag, int iValue);
+	void changeFlag(std::string szFlag, int iValue);
+	int getFlag(std::string szFlag) const;
+
+	void addTempEventEffect(CvEventEffect& kEventEffect);
+	int getNumTempEventEffects() const;
+	CvEventEffect& getTempEventEffect(int index);
+	void doTempEventEffects();
+	void unprocessTempEventEffect(std::vector<CvEventEffect>::iterator& kEventEffects);
 	// END EventEngine
 
 protected:
@@ -829,6 +894,9 @@ protected:
 	FAutoVariable<int, CvCity> m_iGreatPeopleRateModifier;
 	FAutoVariable<int, CvCity> m_iJONSCultureStored;
 	FAutoVariable<int, CvCity> m_iJONSCultureLevel;
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	FAutoVariable<int, CvCity> m_iJONSCulturePerTurnFromBuildings;
 	FAutoVariable<int, CvCity> m_iJONSCulturePerTurnFromPolicies;
 	FAutoVariable<int, CvCity> m_iJONSCulturePerTurnFromSpecialists;
@@ -837,6 +905,8 @@ protected:
 	int m_iFaithPerTurnFromPolicies;
 	int m_iFaithPerTurnFromReligion;
 	FAutoVariable<int, CvCity> m_iCultureRateModifier;
+	*/
+	// END Revamped yields
 	FAutoVariable<int, CvCity> m_iNumWorldWonders;
 	FAutoVariable<int, CvCity> m_iNumTeamWonders;
 	FAutoVariable<int, CvCity> m_iNumNationalWonders;
@@ -907,17 +977,27 @@ protected:
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromSpecialists;
 	FAutoVariable<std::vector<int>, CvCity> m_aiBaseYieldRateFromMisc;
 	std::vector<int> m_aiBaseYieldRateFromReligion;
+	// EventEngine - v0.1, Snarko
+	std::vector<int> m_aiBaseYieldRateFromEvents;
+	std::vector<int> m_aiEventYieldRateModifier;
+	// END EventEngine
 	FAutoVariable<std::vector<int>, CvCity> m_aiYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiYieldPerPop;
 	std::vector<int> m_aiYieldPerReligion;
 	FAutoVariable<std::vector<int>, CvCity> m_aiPowerYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiResourceYieldRateModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiExtraSpecialistYield;
+	// EventEngine - v0.1, Snarko
+	FAutoVariable< std::vector< Firaxis::Array<int, NUM_YIELD_TYPES > >, CvCity> m_ppaaiSpecialistExtraYield;
+	// END EventEngine
 	FAutoVariable<std::vector<int>, CvCity> m_aiProductionToYieldModifier;
 	FAutoVariable<std::vector<int>, CvCity> m_aiDomainFreeExperience;
 	FAutoVariable<std::vector<int>, CvCity> m_aiDomainProductionModifier;
 
 	FAutoVariable<std::vector<bool>, CvCity> m_abEverOwned;
+	// EventEngine - v0.1, Snarko
+	FAutoVariable<std::vector<bool>, CvCity> m_abEverConquered;
+	// END EventEngine
 	FAutoVariable<std::vector<bool>, CvCity> m_abRevealed;
 
 	FAutoVariable<CvString, CvCity> m_strScriptData;
@@ -940,6 +1020,13 @@ protected:
 
 	int m_iBaseHappinessFromBuildings;
 	int m_iUnmoddedHappinessFromBuildings;
+	// EventEngine - v0.1, Snarko
+	int m_iHappinessFromEvents;
+
+	std::vector<CvEventEffect> m_aEventEffects;
+
+	std::map<std::string, int> m_asziFlags;
+	// END EventEngine
 
 	bool m_bRouteToCapitalConnectedLastTurn;
 	bool m_bRouteToCapitalConnectedThisTurn;

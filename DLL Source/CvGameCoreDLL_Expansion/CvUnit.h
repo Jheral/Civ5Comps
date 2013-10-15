@@ -20,6 +20,9 @@
 #include "CvInfos.h"
 #include "CvPromotionClasses.h"
 #include "CvAStarNode.h"
+// EventEngine - v0.1, Snarko
+#include "CvEvent.h"
+// END EventEngine
 
 #define DEFAULT_UNIT_MAP_LAYER 0
 
@@ -1226,8 +1229,18 @@ public:
 	static bool dispatchingNetMessage();
 
 	// EventEngine - v0.1, Snarko
-	bool checkEventModifier(CvEventModifierInfo& kModifier);
+	bool checkEventModifier(CvEventModifierInfo& kModifier, bool bRequirement = true);
 	void doEvents();
+
+	void setFlag(std::string szFlag, int iValue);
+	void changeFlag(std::string szFlag, int iValue);
+	int getFlag(std::string szFlag) const;
+
+	void addTempEventEffect(CvEventEffect& kEventEffect);
+	int getNumTempEventEffects() const;
+	CvEventEffect& getTempEventEffect(int index);
+	void doTempEventEffects();
+	void unprocessTempEventEffect(std::vector<CvEventEffect>::iterator& kEventEffects);
 	// END EventEngine
 
 	std::string debugDump(const FAutoVariableBase&) const;
@@ -1468,6 +1481,12 @@ protected:
 	CvString m_strName;
 	GreatWorkType m_eGreatWork;
 	int m_iTourismBlastStrength;
+
+	// EventEngine - v0.1, Snarko
+	std::vector<CvEventEffect> m_aEventEffects;
+
+	std::map<std::string, int> m_asziFlags;
+	// END EventEngine
 
 	mutable CvPathNodeArray m_kLastPath;
 	mutable uint m_uiLastPathCacheDest;

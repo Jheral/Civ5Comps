@@ -183,28 +183,87 @@ protected:
 	static int lChangeGold(lua_State* L);
 	static int lCalculateGrossGold(lua_State* L);
 	static int lGetLifetimeGrossGold(lua_State* L);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/*
 	static int lGetGoldFromCitiesTimes100(lua_State* L);
 	static int lGetGoldFromCitiesMinusTradeRoutesTimes100(lua_State* L);
+	*/
+	// END Revamped yields
 	static int lGetGoldPerTurnFromDiplomacy(lua_State* L);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	static int lGetCityConnectionRouteGoldTimes100(lua_State* L);
 	static int lGetCityConnectionGold(lua_State* L);
 	static int lGetCityConnectionGoldTimes100(lua_State* L);
 	static int lGetGoldPerTurnFromReligion(lua_State* L);
+	*/
+	static int lGetCityConnectionTradeRouteYieldModifier(lua_State* L);
+	static int lChangeCityConnectionTradeRouteYieldModifier(lua_State* L);
+	static int lGetCityConnectionTradeRouteYieldChange(lua_State* L);
+	static int lChangeCityConnectionTradeRouteYieldChange(lua_State* L);
+	static int lGetCityConnectionYield(lua_State* L);
+	static int lGetCityConnectionYieldTimes100(lua_State* L);
+	static int lDoUpdateCityConnectionYield(lua_State* L);
+	static int lGetCityConnectionRouteYieldTimes100(lua_State* L);
+	// END Revamped yields
 	static int lGetGoldPerTurnFromTradeRoutes(lua_State* L);
 	static int lGetGoldPerTurnFromTradeRoutesTimes100(lua_State* L);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	static int lGetGoldPerTurnFromTraits(lua_State* L);
+	*/
+	// END Revamped yields
 
 	static int lGetTotalJONSCulturePerTurn(lua_State* L);
 
 	static int lGetJONSCulturePerTurnFromCities(lua_State* L);
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	static int lGetJONSCulturePerTurnFromExcessHappiness(lua_State* L);
 	static int lGetJONSCulturePerTurnFromTraits(lua_State* L);
-
 	static int lGetCultureWonderMultiplier(lua_State* L);
+	*/
+	static int lGetYieldPerWonder(lua_State* L);
+	static int lChangeYieldPerWonder(lua_State* L);
+	static int lGetYieldWonderMultiplier(lua_State* L);
+	static int lChangeYieldWonderMultiplier(lua_State* L);
+	static int lGetYieldFromGarrison(lua_State* L);
+	static int lChangeYieldFromGarrison(lua_State* L);
+	static int lGetGreatPersonExpendYield(lua_State* L);
+	static int lChangeGreatPersonExpendYield(lua_State* L);
 
+	static int lChangeImmediateYield(lua_State* L);
+
+	static int lGetReligionYieldModifier(lua_State* L);
+	static int lGetYieldFromReligion(lua_State* L);
+	static int lGetYieldFromTraits(lua_State* L);
+	static int lGetYieldFromCities(lua_State* L);
+	static int lGetYieldFromCitiesTimes100(lua_State* L);
+	static int lGetGenericYieldModifiers(lua_State* L);
+	static int lGetGenericYieldsPerTurn(lua_State* L);
+	static int lGetGenericYieldsPerTurnTimes100(lua_State* L);
+	static int lGetYieldPerTurnFromExcessHappiness(lua_State* L);
+	static int lGetYieldFromHappinessTimes100(lua_State* L);
+
+	static int lGetHappinessToYield(lua_State* L);
+	static int lChangeHappinessToYield(lua_State* L);
+	static int lGetHappyYieldMultiplier(lua_State* L);
+	static int lChangeHappyYieldMultiplier(lua_State* L);	
+	// END Revamped yields
+
+	// Revamped yields - v0.1, Snarko
+	// REMOVED
+	// This tag is not used in base civ 5 and there's little reason to keep it.
+	/* Original code
 	static int lGetJONSCulturePerTurnForFree(lua_State* L);
 	static int lChangeJONSCulturePerTurnForFree(lua_State* L);
+	*/
+	// END Revamped yields
 
 	static int lGetJONSCulturePerTurnFromMinorCivs(lua_State* L); // DEPRECATED, use lGetCulturePerTurnFromMinorCivs instead
 	static int lChangeJONSCulturePerTurnFromMinorCivs(lua_State* L); // DEPRECATED, does nothing
@@ -212,8 +271,14 @@ protected:
 	static int lGetCulturePerTurnFromMinor(lua_State* L);
 
 	static int lGetCulturePerTurnFromReligion(lua_State* L);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	static int lGetCulturePerTurnFromBonusTurns(lua_State* L);
+	
 	static int lGetCultureCityModifier(lua_State* L);
+	*/
+	// END Revamped yields
 
 	static int lGetJONSCulture(lua_State* L);
 	static int lSetJONSCulture(lua_State* L);
@@ -319,7 +384,12 @@ protected:
 	static int lSetHappinessPerTradeRoute(lua_State* L);
 	static int lChangeHappinessPerTradeRoute(lua_State* L);
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/*
 	static int lGetCityConnectionTradeRouteGoldModifier(lua_State* L);
+	*/
+	// END Revamped yields
 
 	static int lGetHappinessFromMinorCivs(lua_State* L);
 	static int lGetHappinessFromMinor(lua_State* L);
@@ -384,7 +454,15 @@ protected:
 	static int lGetAdvancedStartVisibilityCost(lua_State* L);
 
 	static int lGetAttackBonusTurns(lua_State* L);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	static int lGetCultureBonusTurns(lua_State* L);
+	*/
+	static int lGetYieldFromLeagueReward(lua_State* L);
+	static int lGetYieldBonusTurns(lua_State* L);
+	static int lGetYieldFromResolutions(lua_State* L);
+	// END Revamped yields
 	static int lGetTourismBonusTurns(lua_State* L);
 
 	static int lGetGoldenAgeProgressThreshold(lua_State* L);
@@ -629,7 +707,12 @@ protected:
 
 	static int lGetScienceFromCitiesTimes100(lua_State* L);
 	static int lGetScienceFromOtherPlayersTimes100(lua_State* L);
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	static int lGetScienceFromHappinessTimes100(lua_State* L);
+	*/
+	// END Revamped yields
 	static int lGetScienceFromResearchAgreementsTimes100(lua_State* L);
 	static int lGetScienceFromBudgetDeficitTimes100(lua_State* L);
 

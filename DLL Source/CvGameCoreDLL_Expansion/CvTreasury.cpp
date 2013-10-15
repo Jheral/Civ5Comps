@@ -107,7 +107,13 @@ void CvTreasury::DoGold()
 
 	if (m_pPlayer->isHuman() && !GC.getGame().isGameMultiPlayer())
 	{
+		// Revamped yields - v0.1, Snarko
+		// No longer used
+		/*
 		int iGoldDelta = (GetGoldFromCitiesTimes100(false) - GetGoldFromCitiesTimes100(true)) / 100;
+		*/
+		int iGoldDelta = (m_pPlayer->GetYieldFromCitiesTimes100(YIELD_GOLD, false) - m_pPlayer->GetYieldFromCitiesTimes100(YIELD_GOLD, true)) / 100;
+		// END Revamped yields
 		if (iGoldDelta >= 200)
 		{
 			gDLL->UnlockAchievement(ACHIEVEMENT_XP2_32);
@@ -179,6 +185,9 @@ void CvTreasury::ChangeGoldTimes100(int iChange)
 	SetGoldTimes100(GetGoldTimes100() + iChange);
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+/*
 // Gold from Cities
 int CvTreasury::GetGoldFromCities() const
 {
@@ -200,6 +209,8 @@ int CvTreasury::GetGoldFromCitiesTimes100(bool bExcludeTradeRoutes) const
 
 	return iGold;
 }
+*/
+// END Revamped yields
 
 /// Gold Per Turn from Diplomatic Deals
 int CvTreasury::GetGoldPerTurnFromDiplomacy() const
@@ -219,6 +230,9 @@ void CvTreasury::ChangeGoldPerTurnFromDiplomacy(int iChange)
 	SetGoldPerTurnFromDiplomacy(GetGoldPerTurnFromDiplomacy() + iChange);
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+/*
 /// Get the amount of gold granted by connecting the city
 int CvTreasury::GetCityConnectionRouteGoldTimes100(CvCity* pNonCapitalCity) const
 {
@@ -230,9 +244,9 @@ int CvTreasury::GetCityConnectionRouteGoldTimes100(CvCity* pNonCapitalCity) cons
 
 	int iGold = 0;
 
-	int iTradeRouteBaseGold = /*100*/ GC.getTRADE_ROUTE_BASE_GOLD();
-	int iTradeRouteCapitalGoldMultiplier = /*0*/ GC.getTRADE_ROUTE_CAPITAL_POP_GOLD_MULTIPLIER();
-	int iTradeRouteCityGoldMultiplier = /*125*/ GC.getTRADE_ROUTE_CITY_POP_GOLD_MULTIPLIER();
+	int iTradeRouteBaseGold = /*100*//* GC.getTRADE_ROUTE_BASE_GOLD();
+	int iTradeRouteCapitalGoldMultiplier = /*0*//* GC.getTRADE_ROUTE_CAPITAL_POP_GOLD_MULTIPLIER();
+	int iTradeRouteCityGoldMultiplier = /*125*//* GC.getTRADE_ROUTE_CITY_POP_GOLD_MULTIPLIER();
 
 	iGold += iTradeRouteBaseGold;	// Base Gold: 0
 	iGold += (pCapitalCity->getPopulation() * iTradeRouteCapitalGoldMultiplier);	// Capital Multiplier
@@ -323,6 +337,8 @@ void CvTreasury::ChangeCityConnectionTradeRouteGoldChange(int iChange)
 		DoUpdateCityConnectionGold();
 	}
 }
+*/
+// END Revamped yields
 
 /// Returns the route-type between two cities
 bool CvTreasury::HasCityConnectionRouteBetweenCities(CvCity* pFirstCity, CvCity* pSecondCity, bool bBestRoute) const
@@ -407,6 +423,9 @@ int CvTreasury::GetGoldPerTurnFromTradeRoutesTimes100() const
 	//return m_pPlayer->GetTrade()->GetAllTradeValueTimes100(YIELD_GOLD);
 }
 
+// Revamped yields - v0.1, Snarko
+// No longer used
+/* Original code
 /// Gold per turn from traits
 int CvTreasury::GetGoldPerTurnFromTraits() const
 {
@@ -440,6 +459,8 @@ int CvTreasury::GetGoldPerTurnFromReligion() const
 
 	return iGoldFromReligion;
 }
+*/
+// END Revamped yields
 
 /// Gross income for turn times 100
 int CvTreasury::CalculateGrossGold()
@@ -452,12 +473,21 @@ int CvTreasury::CalculateGrossGoldTimes100()
 {
 	int iNetGold;
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	// Gold from Cities
 	iNetGold = GetGoldFromCitiesTimes100();
+	*/
+	iNetGold = m_pPlayer->GetGenericYieldsPerTurnTimes100(YIELD_GOLD);
+	// END Revamped yields
 
 	// Gold per Turn from Diplomacy
 	iNetGold += GetGoldPerTurnFromDiplomacy() * 100;
 
+	// Revamped yields - v0.1, Snarko
+	// No longer used
+	/* Original code
 	// City connection bonuses
 	iNetGold += GetCityConnectionGoldTimes100();
 
@@ -466,13 +496,15 @@ int CvTreasury::CalculateGrossGoldTimes100()
 
 	// International trade
 	iNetGold += GetGoldPerTurnFromTraits() * 100;
+	*/
+	// Modifiers
+	int iModifier = 100;
 
-	// EventEngine - v0.1, Snarko
-	if (m_pPlayer->getYieldFromEvents(YIELD_GOLD) > 0)
-	{
-		iNetGold += m_pPlayer->getYieldFromEvents(YIELD_GOLD) * 100;
-	}
-	// END EventEngine
+	iModifier += m_pPlayer->GetGenericYieldModifiers(YIELD_GOLD);
+
+	iNetGold *= iModifier;
+	iNetGold /= 100;
+	// END Revamped yields
 
 	return iNetGold;
 }

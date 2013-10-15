@@ -132,6 +132,9 @@ CvImprovementEntry::CvImprovementEntry(void):
 	m_ppiTechFreshWaterYieldChanges(NULL),
 	m_ppiRouteYieldChanges(NULL),
 	m_paImprovementResource(NULL)
+	// EventEngine - v0.1, Snarko
+	, m_asziFlagPrereqs(NULL)
+	// END EventEngine
 {
 }
 
@@ -469,6 +472,27 @@ bool CvImprovementEntry::CacheResults(Database::Results& kResults, CvDatabaseUti
 		pResults->Reset();
 
 	}
+
+	// EventEngine - v0.1, Snarko
+	{
+		m_asziFlagPrereqs.clear();
+		std::string strKey("Improvement_PrereqFlags");
+		Database::Results* pResults = kUtility.GetResults(strKey);
+		if(pResults == NULL)
+		{
+			pResults = kUtility.PrepareResults(strKey, "select * from Improvement_PrereqFlags where ImprovementType = ?");
+		}
+
+		pResults->Bind(1, szImprovementType);
+
+		while(pResults->Step())
+		{
+			std::string szFlag = pResults->GetText("Flag");
+			int iMinimumValue = pResults->GetInt("MinimumValue");
+			m_asziFlagPrereqs.push_back(std::make_pair(szFlag, iMinimumValue));
+		}
+	}
+	// END EventEngine
 
 	return true;
 }
@@ -1038,6 +1062,28 @@ int CvImprovementEntry::GetFlavorValue(int i) const
 	CvAssertMsg(i > -1, "Indes out of bounds");
 	return m_piFlavorValue[i];
 }
+
+// EventEngine - v0.1, Snarko
+//------------------------------------------------------------------------------
+int CvImprovementEntry::getNumFlagPrereqs() const
+{
+	return m_asziFlagPrereqs.size();
+}
+//------------------------------------------------------------------------------
+std::string CvImprovementEntry::getFlagPrereq(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].first;
+}
+//------------------------------------------------------------------------------
+int CvImprovementEntry::getFlagPrereqValue(int i) const
+{
+	CvAssertMsg(i < m_asziFlagPrereqs.size(), "Index out of bounds");
+	CvAssertMsg(i > -1, "Index out of bounds");
+	return m_asziFlagPrereqs[i].second;
+}
+// END EventEngine
 
 
 //=====================================
