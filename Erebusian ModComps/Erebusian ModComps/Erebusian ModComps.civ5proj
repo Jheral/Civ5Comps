@@ -87,6 +87,11 @@
         <Type>UpdateDatabase</Type>
         <FileName>Shared Assets/XML/SoftcodedYieldChanges.sql</FileName>
       </Action>
+      <Action>
+        <Set>OnModActivated</Set>
+        <Type>UpdateDatabase</Type>
+        <FileName>AIMod/XML/AIMod_Defines.xml</FileName>
+      </Action>
     </ModActions>
     <ModContent>
       <Content xmlns="">
@@ -114,6 +119,7 @@
     <Folder Include="AdvancementsScreen\UI" />
     <Folder Include="AdvancementsScreen\SQL" />
     <Folder Include="AdvancementsScreen\UI\Text" />
+    <Folder Include="CityView Local Happiness\" />
     <Folder Include="CityView Local Happiness\UI\" />
     <Folder Include="CityView Local Happiness\XML" />
     <Folder Include="AIMod\XML" />
