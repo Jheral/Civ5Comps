@@ -4,15 +4,6 @@
 		<Row Tag="TXT_KEY_ADVANCEMENTS_SCREEN">
 			<Text>Advancements</Text>
 		</Row>
-		<Row Tag="TXT_KEY_BRANCHCLASS_SOCIAL_POLICY">
-			<Text>Social Policies</Text>
-		</Row>
-		<Row Tag="TXT_KEY_BRANCHCLASS_SOCIAL_POLICY_2">
-			<Text>Test Policies</Text>
-		</Row>
-		<Row Tag="TXT_KEY_BRANCHCLASS_IDEOLOGY">
-			<Text>Ideological Tenets</Text>
-		</Row>
 		<Row Tag="TXT_KEY_PLACEHOLDER">
 			<Text>Placeholder - Sod off!</Text>
 		</Row>
@@ -54,6 +45,57 @@
 		</Row>
 		<Row Tag="TXT_KEY_TENET_ADOPT">
 			<Text>Adopt</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_PROGRESS_PER_TURN">
+			<Text>Progress Per Turn: {1_YieldPerTurn}[ICON_RESEARCH]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_CURRENT_TECH">
+			<Text>Currently Researching: {1_CurrentTech} ({2_Progress}/{3_TechCost}[ICON_RESEARCH])</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_CURRENT_TECH_NOTHING">
+			<Text>Currently Researching: Nothing</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_TURNS_LEFT">
+			<Text>Next Discovery: {1_TurnsLeft}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_TURNS">
+			<Text>{1_TurnsLeft} Turns</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_NEVER">
+			<Text>Never</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_NOW">
+			<Text>Now</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_FREE_TECHS">
+			<Text># of Free Choices: {1_NumFreeTechs}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_FREE_LABEL">
+			<Text>Free</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_LOCKED">
+			<Text>Locked</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_TT_REQUIRED">
+			<Text>Required Techs:</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_TT_REQUIRED_TECH">
+			<Text>[ICON_BULLET]{1_TechName} ({2_TreeName})</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_TT_UNLOCK_UNIT_LABEL">
+			<Text>Allows Units:[NEWLINE]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_TT_UNLOCK_BUILDING_LABEL">
+			<Text>Allows Buildings:[NEWLINE]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_TT_PROJECT">
+			<Text>'{1_TurnsLeft}' Project</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_TT_UNLOCK_BUILD_LABEL">
+			<Text>Allows Actions:[NEWLINE]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_ADV_TECH_TT_FREE_PROMOTION">
+			<Text>Grants the [COLOR_POSITIVE_TEXT]{@1_PromotionName}[ENDCOLOR] Promotion to allowed Units</Text>
 		</Row>
 	</Language_en_US>
 </GameData>

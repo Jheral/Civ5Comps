@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GameData>
+	<Table name="TechTreeClassTypes">
+		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
+		<Column name="Type" type="text" notnull="true" unique="true"/>
+		<Column name="Description" type="text" reference="Language_en_US(Tag)"/>
+		<Column name="Civilopedia" type="text" default="NULL" reference="Language_en_US(Tag)"/>
+		<Column name="Strategy" type="text" default="NULL" reference="Language_en_US(Tag)"/>
+		<Column name="Help" type="text" default="NULL" reference="Language_en_US(Tag)"/>
+		<Column name="Style" type="text" />
+	</Table>
+	<TechTreeClassTypes>
+		<Row>
+			<ID>0</ID>
+			<Type>TECHTREE_CLASS_VANILLA</Type>
+			<Description>TXT_KEY_TECHTREE_CLASS_VANILLA</Description>
+			<Style>TECH_TREE</Style>
+		</Row>
+	</TechTreeClassTypes>
+	<Language_en_US>
+		<Row Tag="TXT_KEY_TECHTREE_CLASS_VANILLA">
+			<Text>Technologies</Text>
+		</Row>
+	</Language_en_US>
+</GameData>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GameData>
+	<Table name="PolicyBranchClassTypes">
+		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
+		<Column name="Type" type="text" notnull="true" unique="true"/>
+		<Column name="Description" type="text" reference="Language_en_US(Tag)"/>
+		<Column name="Civilopedia" type="text" default="NULL" reference="Language_en_US(Tag)"/>
+		<Column name="Strategy" type="text" default="NULL" reference="Language_en_US(Tag)"/>
+		<Column name="Help" type="text" default="NULL" reference="Language_en_US(Tag)"/>
+		<Column name="Style" type="text" />
+		<Column name="TenetMaxLevel" type="integer"/>
+	</Table>
+	<PolicyBranchClassTypes>
+		<Row>
+			<ID>0</ID>
+			<Type>BRANCHCLASS_SOCIAL_POLICY</Type>
+			<Description>TXT_KEY_BRANCHCLASS_SOCIAL_POLICY</Description>
+			<Style>SOCIAL_POLICY</Style>
+		</Row>
+		<Row>
+			<Type>BRANCHCLASS_IDEOLOGY</Type>
+			<Description>TXT_KEY_BRANCHCLASS_IDEOLOGY</Description>
+			<Style>IDEOLOGY</Style>
+		</Row>
+	</PolicyBranchClassTypes>
+	<Language_en_US>
+		<Row Tag="TXT_KEY_BRANCHCLASS_SOCIAL_POLICY">
+			<Text>Social Policies</Text>
+		</Row>
+		<Row Tag="TXT_KEY_BRANCHCLASS_IDEOLOGY">
+			<Text>Ideological Tenets</Text>
+		</Row>
+	</Language_en_US>
+</GameData>

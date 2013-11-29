@@ -3,6 +3,9 @@ include( "IconSupport" );
 include( "InstanceManager" );
 include( "CommonBehaviors" );
 include( "FLuaVector" );
+include( "TechButtonInclude" );
+
+include( "AdvScreenTechHelp" );
 
 local m_PopupInfo = nil;
 
@@ -12,6 +15,8 @@ local g_PolicyInstanceManager = InstanceManager:new( "PolicyButton", "PolicyIcon
 local g_BranchInstanceManager = InstanceManager:new( "BranchButtonInstance", "BranchButton", Controls.BranchStack );
 
 local g_TabInstanceManager = InstanceManager:new( "TabButtonInstance", "TabButton", Controls.TabPanel );
+
+local g_TechPipeManager = InstanceManager:new( "ConnectorPipe", "ConnectorImage", Controls.TreePanel );
 
 local fullColor		= {x = 1, y = 1, z = 1, w = 1	};
 local fadeColor		= {x = 1, y = 1, z = 1, w = 0	};
@@ -35,6 +40,12 @@ local g_PolicyYOffset = 68;
 local g_PolicyPipeXOffset = 28;
 local g_PolicyPipeYOffset = 68;
 
+local g_TechXOffset = 80;
+local g_TechYOffset = 70;
+
+local g_TechPipeXOffset = 70;
+local g_TechPipeYOffset = 80;
+
 local m_gPolicyID;
 local m_gAdoptingPolicy;
 
@@ -44,6 +55,7 @@ local currentView = {
 	["Class"] = nil,
 	["Style"] = nil,
 	["Branch"] = nil,
+	["Type"] = nil,
 };
 
 tableTabs = {};
@@ -150,13 +162,24 @@ Events.SerialEventGameMessagePopup.Add( OnPopupMessage );
 -------------------------------------------------
 -- Switch Tabs
 -------------------------------------------------
-function SwitchTabs(iBranchClass)
+function SwitchTabs(iBranchClass, iType)
 	for i, button in pairs(tableTabButtons) do
 		if button.TabButtonHL	~= nil then button.TabButtonHL:SetHide(true);	end
 	end
 	local eBranchClass = tableTabs[iBranchClass];
 
-	--print(string.format("%s - %s", eBranchClass.Type, eBranchClass.Style));
+	-- iType == 0 then TechTreeClass
+	-- iType == 1 then PolicyBranchClass
+
+	if iType == 0 then
+		currentView.Type = "TECH";
+		--print("Tech Type");
+	elseif iType == 1 then
+		currentView.Type = "POLICY";
+		--print("Policy Type");
+	end
+
+	--print(string.format("%s: %s - %s", iBranchClass, eBranchClass.Type, eBranchClass.Style));
 	
 	currentView.Class = eBranchClass;
 	tableTabButtons[eBranchClass.Type].TabButtonHL:SetHide(false);
@@ -169,8 +192,12 @@ function SwitchTabs(iBranchClass)
 		currentView.Style = "IDEOLOGY";
 		currentView.Branch = nil;
 		--print("Ideology Style");
+	elseif eBranchClass.Style == "TECH_TREE" then
+		currentView.Style = "TECH_TREE";
+		currentView.Branch = nil;
+		--print("Tech Tree Style");
 	else
-		currentView = {["Class"]=nil,["Style"]=nil,["Branch"]=nil};
+		currentView = {["Class"]=nil,["Style"]=nil,["Branch"]=nil,["Type"]=nil};
 		--print("Nothing Style");
 	end
 	UpdateDisplay();
@@ -179,46 +206,99 @@ end
 -------------------------------------------------
 -- Update Display
 -------------------------------------------------
-function UpdateDisplay() -- TODO: Make this work with ideologies
+function UpdateDisplay()
     local pPlayer = Players[Game.GetActivePlayer()];
     if pPlayer == nil then
 		return;
     end
+	PopulateTabList();
+	
+	Controls.InfoLabel11:SetText("");
+	Controls.InfoLabel12:SetText("");
+	Controls.InfoLabel21:SetText("");
+	Controls.InfoLabel22:SetText("");
+	Controls.InfoLabel31:SetText("");
+	Controls.InfoLabel32:SetText("");
+
     local pTeam = Teams[pPlayer:GetTeam()];
     local playerHas1City = pPlayer:GetNumCities() > 0;
     local bShowAll = OptionsManager.GetPolicyInfo();
-    local iTurns;
-    local iCultureNeeded = pPlayer:GetNextPolicyCost() - pPlayer:GetJONSCulture();
-    if (iCultureNeeded <= 0) then
-		iTurns = 0;
-    else
-		if (pPlayer:GetTotalJONSCulturePerTurn() == 0) then
-			iTurns = "?";
+	if currentView.Type == "TECH" then
+		local eCurrentTech = GameInfo.Technologies[pPlayer:GetCurrentResearch()];
+		if eCurrentTech ~= nil then
+			local iProgress = pPlayer:GetResearchProgress(eCurrentTech.ID);
+			local iTechCost = pPlayer:GetResearchCost(eCurrentTech.ID);
+			Controls.InfoLabel12:LocalizeAndSetText("TXT_KEY_ADV_TECH_CURRENT_TECH", Locale.ConvertTextKey(eCurrentTech.Description), iProgress, iTechCost);
 		else
-			iTurns = iCultureNeeded / pPlayer:GetTotalJONSCulturePerTurn();
-			iTurns = math.ceil(iTurns);
+			Controls.InfoLabel12:LocalizeAndSetText("TXT_KEY_ADV_TECH_CURRENT_TECH_NOTHING");
 		end
-    end
 
-	PopulateBranchClassList();
-    Controls.NextCost:LocalizeAndSetText("TXT_KEY_NEXT_POLICY_COST_LABEL", pPlayer:GetNextPolicyCost());
-    Controls.CurrentCultureLabel:LocalizeAndSetText("TXT_KEY_CURRENT_CULTURE_LABEL", pPlayer:GetJONSCulture());
-    Controls.CulturePerTurnLabel:LocalizeAndSetText("TXT_KEY_CULTURE_PER_TURN_LABEL", pPlayer:GetTotalJONSCulturePerTurn());
-    Controls.NextPolicyTurnLabel:LocalizeAndSetText("TXT_KEY_NEXT_POLICY_TURN_LABEL", iTurns);
-	
-    local iNumFreePolicies = pPlayer:GetNumFreePolicies();
-    if (iNumFreePolicies > 0) then
-	    Controls.FreePoliciesLabel:LocalizeAndSetText( "TXT_KEY_FREE_POLICIES_LABEL", iNumFreePolicies );
-	    Controls.FreePoliciesLabel:SetHide( false );
-	else
-	    Controls.FreePoliciesLabel:SetHide( true );
-    end
+		local iSciencePerTurn = pPlayer:GetScience();
+		Controls.InfoLabel11:LocalizeAndSetText("TXT_KEY_ADV_TECH_PROGRESS_PER_TURN", iSciencePerTurn);
+		if iSciencePerTurn > 0 and eCurrentTech ~= nil then
+ 			local iTurnsLeft = pPlayer:GetResearchTurnsLeft( eCurrentTech.ID, true );
+			Controls.InfoLabel21:LocalizeAndSetText("TXT_KEY_ADV_TECH_TURNS_LEFT", Locale.ConvertTextKey("TXT_KEY_ADV_TECH_TURNS", iTurnsLeft));
+		else
+			Controls.InfoLabel21:LocalizeAndSetText("TXT_KEY_ADV_TECH_TURNS_LEFT", Locale.ConvertTextKey("TXT_KEY_ADV_TECH_NEVER"));
+		end
+		
+		local iFreeTechs = pPlayer:GetNumFreeTechs();
+		if iFreeTechs > 0 then
+			Controls.InfoLabel31:SetText("[COLOR_POSITIVE_TEXT]" .. Locale.ConvertTextKey("TXT_KEY_ADV_TECH_FREE_TECHS", iFreeTechs) .. "[ENDCOLOR]");
+			Controls.InfoLabel21:LocalizeAndSetText("TXT_KEY_ADV_TECH_TURNS_LEFT", "[COLOR_POSITIVE_TEXT]" .. Locale.ConvertTextKey("TXT_KEY_ADV_TECH_NOW") .. "[ENDCOLOR]");
+		else
+			Controls.InfoLabel31:SetText();
+		end
+
+		Controls.InfoStack:ReprocessAnchoring();
+		Controls.InfoStack2:ReprocessAnchoring();
+		Controls.InfoStack3:ReprocessAnchoring();
+
+		Controls.InfoStack:SetHide(false);
+		Controls.InfoStack2:SetHide(false);
+		Controls.InfoStack3:SetHide(false);
+	elseif currentView.Type == "POLICY" then
+		local iTurns;
+		local iYieldNeeded = pPlayer:GetNextPolicyCost() - pPlayer:GetJONSCulture();
+		if (iYieldNeeded <= 0) then
+			iTurns = 0;
+		else
+			if (pPlayer:GetTotalJONSCulturePerTurn() == 0) then
+				iTurns = "?";
+			else
+				iTurns = iYieldNeeded / pPlayer:GetTotalJONSCulturePerTurn();
+				iTurns = iTurns + 1;
+				iTurns = math.floor(iTurns);
+			end
+		end
+		
+		Controls.InfoLabel11:LocalizeAndSetText("TXT_KEY_CULTURE_PER_TURN_LABEL", pPlayer:GetTotalJONSCulturePerTurn());
+		Controls.InfoLabel12:LocalizeAndSetText("TXT_KEY_CURRENT_CULTURE_LABEL", pPlayer:GetJONSCulture());
+		Controls.InfoLabel21:LocalizeAndSetText("TXT_KEY_NEXT_POLICY_COST_LABEL", pPlayer:GetNextPolicyCost());
+		Controls.InfoLabel22:LocalizeAndSetText("TXT_KEY_NEXT_POLICY_TURN_LABEL", iTurns);
+
+		local iNumFreePolicies = pPlayer:GetNumFreePolicies();
+		if (iNumFreePolicies > 0) then
+			Controls.InfoLabel31:SetText("[COLOR_POSITIVE_TEXT]" .. Locale.ConvertTextKey("TXT_KEY_ADV_TECH_FREE_TECHS", iNumFreePolicies) .. "[ENDCOLOR]");
+		else
+			Controls.InfoLabel31:SetText("");
+		end
     
-	Controls.InfoStack:ReprocessAnchoring();
-	Controls.InfoStack2:ReprocessAnchoring();
-	Controls.InfoStack3:ReprocessAnchoring();
+		Controls.InfoStack:ReprocessAnchoring();
+		Controls.InfoStack2:ReprocessAnchoring();
+		Controls.InfoStack3:ReprocessAnchoring();
+
+		Controls.InfoStack:SetHide(false);
+		Controls.InfoStack2:SetHide(false);
+		Controls.InfoStack3:SetHide(false);
+	else
+		Controls.InfoStack:SetHide(true);
+		Controls.InfoStack2:SetHide(true);
+		Controls.InfoStack3:SetHide(true);
+	end
 	
 	if currentView.Class ~= nil then
+		Controls.TechStyle:SetHide(true);
 		Controls.TenetStyle:SetHide(true);
 		Controls.PolicyStyle:SetHide(true);
 		--print(string.format("%s - %s", Locale.ConvertTextKey(currentView.Class.Description), currentView.Style));
@@ -230,13 +310,19 @@ function UpdateDisplay() -- TODO: Make this work with ideologies
 			Controls.PolicyStyle:SetHide(false);
 			PopulateBranchList(currentView.Class.Type);
 			ViewPolicyBranch(currentView.Branch);
+		elseif currentView.Style == "TECH_TREE" then
+			Controls.TechStyle:SetHide(false);
+			PopulateTechBranchList(currentView.Class.Type);
+			ViewTechTree(currentView.Branch);
 		end
 	else
+		Controls.TechStyle:SetHide(true);
 		Controls.TenetStyle:SetHide(true);
 		Controls.PolicyStyle:SetHide(true);
 	end
 end
 Events.EventPoliciesDirty.Add( UpdateDisplay );
+Events.SerialEventResearchDirty.Add( UpdateDisplay );
 
 -------------------------------------------------
 -- On Show All Tenets
@@ -280,6 +366,41 @@ function GetPolicies(eBranch)
 		policyInfo = GameInfo.Policies[i];
 	end
 	return policies;
+end
+
+-------------------------------------------------
+-- Find Tech By ID
+-------------------------------------------------
+function GetTechByID(iTechID)
+	local i = 0;
+	local techInfo = GameInfo.Technologies[i];
+	while techInfo ~= nil do
+		if techInfo.ID == iTechID then
+			return techInfo;
+		end
+		i = i + 1;
+		techInfo = GameInfo.Technologies[i];
+	end
+	return nil;
+end
+
+-------------------------------------------------
+-- Get Techs
+-------------------------------------------------
+function GetTechs(eBranch)
+	local techs = {};
+
+	local i = 0;
+	local techInfo = GameInfo.Technologies[i];
+	--print(techInfo ~= nil);
+	while techInfo ~= nil do
+		if (techInfo.TechTreeType == eBranch.Type) then
+			techs[techInfo.Type] = techInfo;
+		end
+		i = i + 1;
+		techInfo = GameInfo.Technologies[i];
+	end
+	return techs;
 end
 
 -------------------------------------------------
@@ -398,6 +519,70 @@ function BuildTenet(pPlayer, ePolicy, instance)
 end
 
 -------------------------------------------------
+-- Build Tech Button
+-- Builds the buttons for the Tech branch's tree
+-------------------------------------------------
+function BuildTechButton(pPlayer, eTech, instance)
+	local pTeam = Teams[pPlayer:GetTeam()];
+	local bIsResearched = pTeam:GetTeamTechs():HasTech(eTech.ID);
+	local bIsAvailable = pPlayer:CanResearch(eTech.ID);
+	local bIsLocked = not pPlayer:CanEverResearch(eTech.ID);
+	local bInProgress = pPlayer:GetCurrentResearch() == eTech.ID;
+	local iFreeTechs = pPlayer:GetNumFreeTechs();
+ 	local iTurnsLeft = pPlayer:GetResearchTurnsLeft( eTech.ID, true );
+	
+	local queuePosition = pPlayer:GetQueuePosition( eTech.ID );
+	if queuePosition == -1 then else
+		instance.TechQueueLabel:SetText( tostring( queuePosition-1 ) );
+		instance.TechQueue:SetHide( false );
+	end
+
+	if bIsLocked then
+		instance.LabelBox:SetHide(false);
+		instance.Label:LocalizeAndSetText("TXT_KEY_ADV_TECH_LOCKED");
+		instance.Locked:SetHide(false);
+	elseif bIsResearched then
+		instance.Researched:SetHide(false);
+	elseif not bIsAvailable then
+		instance.Unavailable:SetHide(false);
+	elseif bInProgress then
+		instance.TechQueue:SetHide( true );
+		if iFreeTechs > 0 then 
+			instance.FreeTech:SetHide(false);
+			instance.LabelBox:SetHide(false);
+			instance.Label:LocalizeAndSetText("TXT_KEY_ADV_TECH_FREE_LABEL");
+		else 
+			instance.CurrentlyResearching:SetHide(false);
+			instance.TurnsLeft:SetHide(false);
+ 			if pPlayer:GetScience() > 0 then
+				instance.TurnsLeftLabel:SetText( iTurnsLeft );
+  			else
+				instance.TurnsLeftLabel:SetText( "-" );
+  			end
+		end
+	elseif bIsAvailable then
+		if iFreeTechs > 0 then 
+			instance.FreeTech:SetHide(false);
+			instance.LabelBox:SetHide(false);
+			instance.Label:LocalizeAndSetText("TXT_KEY_ADV_TECH_FREE_LABEL");
+		else 
+			instance.Available:SetHide(false); 
+		end
+	else
+		instance.Unavailable:SetHide(false);
+	end
+	
+	IconHookup(eTech.PortraitIndex, 64, eTech.IconAtlas, instance.TechPortrait);
+	instance.TechButton:SetOffsetVal((eTech.GridY+1)*g_TechYOffset-36,(eTech.GridX)*g_TechXOffset);
+	instance.TechButton:SetToolTipString( AdvScreenTechHelp( eTech.ID ) );
+	instance.TechButton:SetVoid1( eTech.ID );
+	instance.TechButton:SetVoid2( iFreeTechs );
+	techPediaSearchStrings[tostring(instance.TechButton)] = eTech.Description;
+	instance.TechButton:RegisterCallback( Mouse.eLClick, TechSelected );
+	instance.TechButton:RegisterCallback( Mouse.eRClick, GetTechPedia );
+end
+
+-------------------------------------------------
 -- Build Pipe Paths
 -- Builds the Pipe Connectors of the current tree,
 -- indicating which policies require others
@@ -405,213 +590,349 @@ end
 function BuildPipePaths( iBranchIndex )
 	local eBranch = GetBranchByID(iBranchIndex);
 	if eBranch == nil then
-		print("Branch Index Nil Value Error - BuildPipePaths");
+		--print("Branch Index Nil Value Error - BuildPipePaths");
 		return;
 	end
-	local PolicyTable = GetPolicies(eBranch);
-	local PrereqsTable = {};
-	local policyPipes = {};
+	if currentView.Type == "POLICY" then
+		local PolicyTable = GetPolicies(eBranch);
+		local PrereqsTable = {};
+		local policyPipes = {};
 
-	local cnxCenter = 1; 
-	local cnxLeft = 2; 
-	local cnxRight = 4;
+		local cnxCenter = 1; 
+		local cnxLeft = 2; 
+		local cnxRight = 4;
 
-	for i, row in pairs(PolicyTable) do
-		policyPipes[row.Type] = 
-		{
-			upConnectionLeft = false;
-			upConnectionRight = false;
-			upConnectionCenter = false;
-			upConnectionType = 0;
-			downConnectionLeft = false;
-			downConnectionRight = false;
-			downConnectionCenter = false;
-			downConnectionType = 0;
-			yOffset = 0;
-			policyType = row.Type;
-		};
-	end
+		for i, row in pairs(PolicyTable) do
+			policyPipes[row.Type] = 
+			{
+				upConnectionLeft = false;
+				upConnectionRight = false;
+				upConnectionCenter = false;
+				upConnectionType = 0;
+				downConnectionLeft = false;
+				downConnectionRight = false;
+				downConnectionCenter = false;
+				downConnectionType = 0;
+				yOffset = 0;
+				policyType = row.Type;
+			};
+		end
 	
-	-- Get the prereqs that involve the policies in the active tree
-	for row in GameInfo.Policy_PrereqPolicies() do
-		local bValidType = false;
-		local bValidPrereq = false;
-		for _, policy in pairs(PolicyTable) do
-			if row.PolicyType == policy.Type then
-				bValidType = true;
-			elseif row.PrereqPolicy == policy.Type then
-				bValidPrereq = true;
-			end		
-		end
-		if bValidPrereq and bValidType then
-			table.insert(PrereqsTable, row);
-
-		end
-	end
-
-	-- Evaluate all the pipe "bends" to make sure the right ones are being used
-	for _, row in pairs(PrereqsTable) do
-		local prereq = GameInfo.Policies[row.PrereqPolicy];
-		local policy = GameInfo.Policies[row.PolicyType];
-		if policy and prereq then
-			if policy.GridX < prereq.GridX then
-				policyPipes[policy.Type].upConnectionRight = true;
-				policyPipes[prereq.Type].downConnectionLeft = true;
-			elseif policy.GridX > prereq.GridX then
-				policyPipes[policy.Type].upConnectionLeft = true;
-				policyPipes[prereq.Type].downConnectionRight = true;
-			else
-				policyPipes[policy.Type].upConnectionCenter = true;
-				policyPipes[prereq.Type].downConnectionCenter = true;
+		-- Get the prereqs that involve the policies in the active tree
+		for row in GameInfo.Policy_PrereqPolicies() do
+			local bValidType = false;
+			local bValidPrereq = false;
+			for _, policy in pairs(PolicyTable) do
+				if row.PolicyType == policy.Type then
+					bValidType = true;
+				elseif row.PrereqPolicy == policy.Type then
+					bValidPrereq = true;
+				end		
 			end
-			local yOffset = (policy.GridY - prereq.GridY) - 1;
-			if yOffset > policyPipes[prereq.Type].yOffset then
-				policyPipes[prereq.Type].yOffset = yOffset;
+			if bValidPrereq and bValidType then
+				table.insert(PrereqsTable, row);
+
 			end
 		end
-	end
-	
-	for pipeIndex, thisPipe in pairs(policyPipes) do
-		if thisPipe.upConnectionLeft then thisPipe.upConnectionType = thisPipe.upConnectionType + cnxLeft; end 
-		if thisPipe.upConnectionRight then thisPipe.upConnectionType = thisPipe.upConnectionType + cnxRight; end 
-		if thisPipe.upConnectionCenter then thisPipe.upConnectionType = thisPipe.upConnectionType + cnxCenter; end 
-		if thisPipe.downConnectionLeft then thisPipe.downConnectionType = thisPipe.downConnectionType + cnxLeft; end 
-		if thisPipe.downConnectionRight then thisPipe.downConnectionType = thisPipe.downConnectionType + cnxRight; end 
-		if thisPipe.downConnectionCenter then thisPipe.downConnectionType = thisPipe.downConnectionType + cnxCenter; end 
-	end
-	
-	-- Draw the straight connecting pipes
-	for _, prereq in pairs(PrereqsTable) do
-		local currentPipe = policyPipes[prereq.PrereqPolicy];
-		local currentPolicy = PolicyTable[prereq.PolicyType];
-		local currentPrereq = PolicyTable[prereq.PrereqPolicy];
 
-		if currentPolicy.GridY - currentPrereq.GridY > 1 or currentPolicy.GridY - currentPrereq.GridY < -1 then
-			local xOffset = (currentPrereq.GridX-1)*g_PolicyPipeXOffset + 30;
+		-- Evaluate all the pipe "bends" to make sure the right ones are being used
+		for _, row in pairs(PrereqsTable) do
+			local prereq = GameInfo.Policies[row.PrereqPolicy];
+			local policy = GameInfo.Policies[row.PolicyType];
+			if policy and prereq then
+				if policy.GridX < prereq.GridX then
+					policyPipes[policy.Type].upConnectionRight = true;
+					policyPipes[prereq.Type].downConnectionLeft = true;
+				elseif policy.GridX > prereq.GridX then
+					policyPipes[policy.Type].upConnectionLeft = true;
+					policyPipes[prereq.Type].downConnectionRight = true;
+				else
+					policyPipes[policy.Type].upConnectionCenter = true;
+					policyPipes[prereq.Type].downConnectionCenter = true;
+				end
+				local yOffset = (policy.GridY - prereq.GridY) - 1;
+				if yOffset > policyPipes[prereq.Type].yOffset then
+					policyPipes[prereq.Type].yOffset = yOffset;
+				end
+			end
+		end
+	
+		for pipeIndex, thisPipe in pairs(policyPipes) do
+			if thisPipe.upConnectionLeft then thisPipe.upConnectionType = thisPipe.upConnectionType + cnxLeft; end 
+			if thisPipe.upConnectionRight then thisPipe.upConnectionType = thisPipe.upConnectionType + cnxRight; end 
+			if thisPipe.upConnectionCenter then thisPipe.upConnectionType = thisPipe.upConnectionType + cnxCenter; end 
+			if thisPipe.downConnectionLeft then thisPipe.downConnectionType = thisPipe.downConnectionType + cnxLeft; end 
+			if thisPipe.downConnectionRight then thisPipe.downConnectionType = thisPipe.downConnectionType + cnxRight; end 
+			if thisPipe.downConnectionCenter then thisPipe.downConnectionType = thisPipe.downConnectionType + cnxCenter; end 
+		end
+	
+		-- Draw the straight connecting pipes
+		for _, prereq in pairs(PrereqsTable) do
+			local currentPipe = policyPipes[prereq.PrereqPolicy];
+			local currentPolicy = PolicyTable[prereq.PolicyType];
+			local currentPrereq = PolicyTable[prereq.PrereqPolicy];
+
+			if currentPolicy.GridY - currentPrereq.GridY > 1 or currentPolicy.GridY - currentPrereq.GridY < -1 then
+				local xOffset = (currentPrereq.GridX-1)*g_PolicyPipeXOffset + 30;
+				local pipe = g_PolicyPipeManager:GetInstance();
+				local size = { x = 19; y = g_PolicyPipeYOffset*(currentPolicy.GridY - currentPrereq.GridY - 1); };
+				pipe.ConnectorImage:SetOffsetVal(xOffset, (currentPrereq.GridY-1)*g_PolicyPipeYOffset + 58);
+				pipe.ConnectorImage:SetTexture(vTexture);
+				pipe.ConnectorImage:SetSize(size);
+			end
+
+			--Generalize this like so?
+			local distance = math.abs(currentPolicy.GridX - currentPrereq.GridX);
+			local xOffset = 0;
+			if currentPolicy.GridX - currentPrereq.GridX > 0 then
+				xOffset = (currentPrereq.GridX-1)*g_PolicyPipeXOffset + 30;
+			elseif currentPolicy.GridX - currentPrereq.GridX < 0 then
+				xOffset = (currentPolicy.GridX-1)*g_PolicyPipeXOffset + 30;
+			end
 			local pipe = g_PolicyPipeManager:GetInstance();
-			local size = { x = 19; y = g_PolicyPipeYOffset*(currentPolicy.GridY - currentPrereq.GridY - 1); };
-			pipe.ConnectorImage:SetOffsetVal(xOffset, (currentPrereq.GridY-1)*g_PolicyPipeYOffset + 58);
-			pipe.ConnectorImage:SetTexture(vTexture);
+			local sizeX = distance*20*(1 + (distance/20));
+			local size = { x = sizeX; y = 19; };
+			pipe.ConnectorImage:SetOffsetVal(xOffset + 16, (currentPrereq.GridY-1 + currentPipe.yOffset)*g_PolicyPipeYOffset + 58);
+			pipe.ConnectorImage:SetTexture(hTexture);
+			pipe.ConnectorImage:SetSize(size);
+		end
+	
+		-- Draw the downward bend connecting pipes
+		for pipeIndex, thisPipe in pairs(policyPipes) do
+			local policy = GameInfo.Policies[thisPipe.policyType];
+			local xOffset = (policy.GridX-1)*g_PolicyPipeXOffset + 30;
+			if thisPipe.downConnectionType >= 1 then
+			
+				local startPipe = g_PolicyPipeManager:GetInstance();
+				startPipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset + 48 );
+				startPipe.ConnectorImage:SetTexture(vTexture);
+			
+				local pipe = g_PolicyPipeManager:GetInstance();			
+				if thisPipe.downConnectionType == 1 then
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset + 58 );
+					pipe.ConnectorImage:SetTexture(vTexture);
+				elseif thisPipe.downConnectionType == 2 then
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1 + thisPipe.yOffset)*g_PolicyPipeYOffset + 58 );
+					pipe.ConnectorImage:SetTexture(bottomRightTexture);
+				elseif thisPipe.downConnectionType == 3 then
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset + 58 );
+					pipe.ConnectorImage:SetTexture(vTexture);
+					pipe = g_PolicyPipeManager:GetInstance();			
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1 + thisPipe.yOffset)*g_PolicyPipeYOffset + 58 );
+					pipe.ConnectorImage:SetTexture(bottomRightTexture);
+				elseif thisPipe.downConnectionType == 4 then
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset + 58 );
+					pipe.ConnectorImage:SetTexture(bottomLeftTexture);
+				elseif thisPipe.downConnectionType == 5 then
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset + 58 );
+					pipe.ConnectorImage:SetTexture(vTexture);
+					pipe = g_PolicyPipeManager:GetInstance();			
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1 + thisPipe.yOffset)*g_PolicyPipeYOffset + 58 );
+					pipe.ConnectorImage:SetTexture(bottomLeftTexture);
+				elseif thisPipe.downConnectionType == 6 then
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1 + thisPipe.yOffset)*g_PolicyPipeYOffset + 58 );
+					pipe.ConnectorImage:SetTexture(bottomRightTexture);
+					pipe = g_PolicyPipeManager:GetInstance();		
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1 + thisPipe.yOffset)*g_PolicyPipeYOffset + 58 );
+					pipe.ConnectorImage:SetTexture(bottomLeftTexture);
+				else
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset + 58 );
+					pipe.ConnectorImage:SetTexture(vTexture);
+					pipe = g_PolicyPipeManager:GetInstance();		
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1 + thisPipe.yOffset)*g_PolicyPipeYOffset + 58 );
+					pipe.ConnectorImage:SetTexture(bottomRightTexture);
+					pipe = g_PolicyPipeManager:GetInstance();
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1 + thisPipe.yOffset)*g_PolicyPipeYOffset + 58 );
+					pipe.ConnectorImage:SetTexture(bottomLeftTexture);
+				end
+			end
+		end
+
+		-- Draw the upward bend connecting pipes
+		for pipeIndex, thisPipe in pairs(policyPipes) do
+			local policy = GameInfo.Policies[thisPipe.policyType];
+			local xOffset = (policy.GridX-1)*g_PolicyPipeXOffset + 30;
+		
+			if thisPipe.upConnectionType >= 1 then
+			
+				local startPipe = g_PolicyPipeManager:GetInstance();
+				startPipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset + 0 );
+				startPipe.ConnectorImage:SetTexture(vTexture);
+			
+				local pipe = g_PolicyPipeManager:GetInstance();			
+				if thisPipe.upConnectionType == 1 then
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
+					pipe.ConnectorImage:SetTexture(vTexture);
+				elseif thisPipe.upConnectionType == 2 then
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
+					pipe.ConnectorImage:SetTexture(topRightTexture);
+				elseif thisPipe.upConnectionType == 3 then
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
+					pipe.ConnectorImage:SetTexture(vTexture);
+					pipe = g_PolicyPipeManager:GetInstance();			
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
+					pipe.ConnectorImage:SetTexture(topRightTexture);
+				elseif thisPipe.upConnectionType == 4 then
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
+					pipe.ConnectorImage:SetTexture(topLeftTexture);
+				elseif thisPipe.upConnectionType == 5 then
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
+					pipe.ConnectorImage:SetTexture(vTexture);
+					pipe = g_PolicyPipeManager:GetInstance();			
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
+					pipe.ConnectorImage:SetTexture(topLeftTexture);
+				elseif thisPipe.upConnectionType == 6 then
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
+					pipe.ConnectorImage:SetTexture(topRightTexture);
+					pipe = g_PolicyPipeManager:GetInstance();		
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
+					pipe.ConnectorImage:SetTexture(topLeftTexture);
+				else
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
+					pipe.ConnectorImage:SetTexture(vTexture);
+					pipe = g_PolicyPipeManager:GetInstance();		
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
+					pipe.ConnectorImage:SetTexture(topRightTexture);
+					pipe = g_PolicyPipeManager:GetInstance();
+					pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
+					pipe.ConnectorImage:SetTexture(topLeftTexture);
+				end
+			end
+		end
+	elseif currentView.Type == "TECH" then
+		local TechTable = GetTechs(eBranch);
+		local PrereqsTable = {};
+		local pipes = {};
+
+		local cnxCenter = 1; 
+		local cnxLeft = 2; 
+		local cnxRight = 4;
+		
+		-- Get the prereqs that involve the techs in the active tree
+		for row in GameInfo.Technology_PrereqTechs() do
+			local bValidType = false;
+			local bValidPrereq = false;
+			for _, tech in pairs(TechTable) do
+				if row.TechType == tech.Type then
+					bValidType = true;
+				elseif row.PrereqTech == tech.Type then
+					bValidPrereq = true;
+				end
+			end
+			if bValidPrereq and bValidType then
+				table.insert(PrereqsTable, row);
+			end
+		end
+		
+		for i, row in pairs(PrereqsTable) do
+			pipes[row.PrereqTech.."->"..row.TechType] = 
+			{
+				BendConnectionType = 0;
+				EndConnectionType = 0;
+				yMidOffset = 0;
+				TechType = row.TechType;
+				PrereqTech = row.PrereqTech;
+			};
+		end
+		
+		-- Evaluate all the pipe "bends" to make sure the right ones are being used
+		for _, row in pairs(pipes) do
+			local prereq = GameInfo.Technologies[row.PrereqTech];
+			local tech = GameInfo.Technologies[row.TechType];
+			if tech and prereq then
+				row.yMidOffset = (tech.GridX - prereq.GridX) ;
+				if tech.GridY < prereq.GridY then
+					row.BendConnectionType = cnxLeft;
+					row.EndConnectionType = cnxRight;
+				elseif tech.GridY > prereq.GridY then
+					row.BendConnectionType = cnxRight;
+					row.EndConnectionType = cnxLeft;
+				else
+					row.BendConnectionType = cnxCenter;
+					row.EndConnectionType = cnxCenter;
+				end
+			end
+		end
+		
+		-- Draw the straight connecting pipes
+		for _, currentPipe in pairs(pipes) do
+			local currentTech = TechTable[currentPipe.TechType];
+			local currentPrereq = TechTable[currentPipe.PrereqTech];
+			
+			-- Vertical Pipes
+			if currentTech.GridX - currentPrereq.GridX > 1 or currentTech.GridX - currentPrereq.GridX < -1 then
+				local xOffset = (currentPrereq.GridY+1)*g_TechPipeXOffset - 10;
+				local pipe = g_TechPipeManager:GetInstance();
+				local size = { x = 19; y = g_TechPipeYOffset*(currentPipe.yMidOffset); };
+				pipe.ConnectorImage:SetOffsetVal(xOffset, (currentPrereq.GridX)*g_TechPipeYOffset + 64);
+				pipe.ConnectorImage:SetTexture(vTexture);
+				pipe.ConnectorImage:SetSize(size);
+			end
+			
+			-- Horizontal Pipes
+			local distance = math.abs(currentTech.GridY - currentPrereq.GridY);
+			local xOffset = 0;
+			if currentTech.GridY - currentPrereq.GridY > 0 then
+				xOffset = (currentPrereq.GridY+1)*g_TechPipeXOffset - 10;
+			elseif currentTech.GridY - currentPrereq.GridY < 0 then
+				xOffset = (currentTech.GridY+1)*g_TechPipeXOffset - 10;
+			end
+			local pipe = g_TechPipeManager:GetInstance();
+			local sizeXMult = (g_TechPipeXOffset-8);
+			local sizeX = distance*sizeXMult*(1 + (distance/sizeXMult));
+			local size = { x = sizeX; y = 19; };
+			pipe.ConnectorImage:SetOffsetVal(xOffset + 16, (currentPrereq.GridX + currentPipe.yMidOffset - 1)*g_TechPipeYOffset + 64);
+			pipe.ConnectorImage:SetTexture(hTexture);
 			pipe.ConnectorImage:SetSize(size);
 		end
 
-		--Generalize this like so?
-		local distance = math.abs(currentPolicy.GridX - currentPrereq.GridX);
-		local xOffset = 0;
-		if currentPolicy.GridX - currentPrereq.GridX > 0 then
-			xOffset = (currentPrereq.GridX-1)*g_PolicyPipeXOffset + 30;
-		elseif currentPolicy.GridX - currentPrereq.GridX < 0 then
-			xOffset = (currentPolicy.GridX-1)*g_PolicyPipeXOffset + 30;
-		end
-		local pipe = g_PolicyPipeManager:GetInstance();
-		local sizeX = distance*20*(1 + (distance/20));
-		local size = { x = sizeX; y = 19; };
-		pipe.ConnectorImage:SetOffsetVal(xOffset + 16, (currentPrereq.GridY-1 + currentPipe.yOffset)*g_PolicyPipeYOffset + 58);
-		pipe.ConnectorImage:SetTexture(hTexture);
-		pipe.ConnectorImage:SetSize(size);
-	end
+		-- Draw the bends of the pipes
+		for pipeIndex, thisPipe in pairs(pipes) do
+			local tech = GameInfo.Technologies[thisPipe.TechType];
+			local prereq = GameInfo.Technologies[thisPipe.PrereqTech];
+			local xOffset = (prereq.GridY+1)*g_TechPipeXOffset-10;
+			local yMult = g_TechPipeYOffset;
+			local yMod = 64;
+			local yOffset = prereq.GridX * yMult + yMod;
+			local yOffsetBend = (prereq.GridX + thisPipe.yMidOffset - 1) * yMult + yMod;
+			local manager = g_TechPipeManager;
+			if thisPipe.BendConnectionType ~= 0 then
+				local pipe = manager:GetInstance();			
+				pipe.ConnectorImage:SetOffsetVal( xOffset, yOffsetBend);
 	
-	-- Draw the downward bend connecting pipes
-	for pipeIndex, thisPipe in pairs(policyPipes) do
-		local policy = GameInfo.Policies[thisPipe.policyType];
-		local xOffset = (policy.GridX-1)*g_PolicyPipeXOffset + 30;
-		if thisPipe.downConnectionType >= 1 then
-			
-			local startPipe = g_PolicyPipeManager:GetInstance();
-			startPipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset + 48 );
-			startPipe.ConnectorImage:SetTexture(vTexture);
-			
-			local pipe = g_PolicyPipeManager:GetInstance();			
-			if thisPipe.downConnectionType == 1 then
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset + 58 );
-				pipe.ConnectorImage:SetTexture(vTexture);
-			elseif thisPipe.downConnectionType == 2 then
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1 + thisPipe.yOffset)*g_PolicyPipeYOffset + 58 );
-				pipe.ConnectorImage:SetTexture(bottomRightTexture);
-			elseif thisPipe.downConnectionType == 3 then
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset + 58 );
-				pipe.ConnectorImage:SetTexture(vTexture);
-				pipe = g_PolicyPipeManager:GetInstance();			
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1 + thisPipe.yOffset)*g_PolicyPipeYOffset + 58 );
-				pipe.ConnectorImage:SetTexture(bottomRightTexture);
-			elseif thisPipe.downConnectionType == 4 then
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset + 58 );
-				pipe.ConnectorImage:SetTexture(bottomLeftTexture);
-			elseif thisPipe.downConnectionType == 5 then
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset + 58 );
-				pipe.ConnectorImage:SetTexture(vTexture);
-				pipe = g_PolicyPipeManager:GetInstance();			
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1 + thisPipe.yOffset)*g_PolicyPipeYOffset + 58 );
-				pipe.ConnectorImage:SetTexture(bottomLeftTexture);
-			elseif thisPipe.downConnectionType == 6 then
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1 + thisPipe.yOffset)*g_PolicyPipeYOffset + 58 );
-				pipe.ConnectorImage:SetTexture(bottomRightTexture);
-				pipe = g_PolicyPipeManager:GetInstance();		
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1 + thisPipe.yOffset)*g_PolicyPipeYOffset + 58 );
-				pipe.ConnectorImage:SetTexture(bottomLeftTexture);
-			else
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset + 58 );
-				pipe.ConnectorImage:SetTexture(vTexture);
-				pipe = g_PolicyPipeManager:GetInstance();		
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1 + thisPipe.yOffset)*g_PolicyPipeYOffset + 58 );
-				pipe.ConnectorImage:SetTexture(bottomRightTexture);
-				pipe = g_PolicyPipeManager:GetInstance();
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1 + thisPipe.yOffset)*g_PolicyPipeYOffset + 58 );
-				pipe.ConnectorImage:SetTexture(bottomLeftTexture);
+				if thisPipe.BendConnectionType == cnxCenter then
+					pipe.ConnectorImage:SetTexture(vTexture);
+				elseif thisPipe.BendConnectionType == cnxLeft then
+					pipe.ConnectorImage:SetTexture(bottomRightTexture);
+				elseif thisPipe.BendConnectionType == cnxRight then
+					pipe.ConnectorImage:SetTexture(bottomLeftTexture);
+				end
 			end
 		end
-	end
-
-	-- Draw the upward bend connecting pipes
-	for pipeIndex, thisPipe in pairs(policyPipes) do
-		local policy = GameInfo.Policies[thisPipe.policyType];
-		local xOffset = (policy.GridX-1)*g_PolicyPipeXOffset + 30;
 		
-		if thisPipe.upConnectionType >= 1 then
+		-- Draw the endpoints of the pipes
+		for pipeIndex, thisPipe in pairs(pipes) do
+			local tech = GameInfo.Technologies[thisPipe.TechType];
+			local xOffset = (tech.GridY+1)*g_TechPipeXOffset-10;
+			local yMult = g_TechPipeYOffset;
+			local yMod = -16;
+			local yOffset = tech.GridX * yMult + yMod;
+			local manager = g_TechPipeManager;
+			if thisPipe.EndConnectionType ~= 0 then
 			
-			local startPipe = g_PolicyPipeManager:GetInstance();
-			startPipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset + 0 );
-			startPipe.ConnectorImage:SetTexture(vTexture);
-			
-			local pipe = g_PolicyPipeManager:GetInstance();			
-			if thisPipe.upConnectionType == 1 then
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
-				pipe.ConnectorImage:SetTexture(vTexture);
-			elseif thisPipe.upConnectionType == 2 then
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
-				pipe.ConnectorImage:SetTexture(topRightTexture);
-			elseif thisPipe.upConnectionType == 3 then
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
-				pipe.ConnectorImage:SetTexture(vTexture);
-				pipe = g_PolicyPipeManager:GetInstance();			
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
-				pipe.ConnectorImage:SetTexture(topRightTexture);
-			elseif thisPipe.upConnectionType == 4 then
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
-				pipe.ConnectorImage:SetTexture(topLeftTexture);
-			elseif thisPipe.upConnectionType == 5 then
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
-				pipe.ConnectorImage:SetTexture(vTexture);
-				pipe = g_PolicyPipeManager:GetInstance();			
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
-				pipe.ConnectorImage:SetTexture(topLeftTexture);
-			elseif thisPipe.upConnectionType == 6 then
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
-				pipe.ConnectorImage:SetTexture(topRightTexture);
-				pipe = g_PolicyPipeManager:GetInstance();		
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
-				pipe.ConnectorImage:SetTexture(topLeftTexture);
-			else
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
-				pipe.ConnectorImage:SetTexture(vTexture);
-				pipe = g_PolicyPipeManager:GetInstance();		
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
-				pipe.ConnectorImage:SetTexture(topRightTexture);
-				pipe = g_PolicyPipeManager:GetInstance();
-				pipe.ConnectorImage:SetOffsetVal( xOffset, (policy.GridY-1)*g_PolicyPipeYOffset - 10 );
-				pipe.ConnectorImage:SetTexture(topLeftTexture);
+				local pipe = manager:GetInstance();			
+				pipe.ConnectorImage:SetOffsetVal( xOffset, yOffset);
+
+				if thisPipe.EndConnectionType == cnxCenter then
+					pipe.ConnectorImage:SetTexture(vTexture);
+				elseif thisPipe.EndConnectionType == cnxLeft then
+					pipe.ConnectorImage:SetTexture(topRightTexture);
+				elseif thisPipe.EndConnectionType == cnxRight then
+					pipe.ConnectorImage:SetTexture(topLeftTexture);
+				end
 			end
 		end
+
 	end
 end
 
@@ -655,13 +976,27 @@ function PolicySelected( iPolicyIndex )
 end
 
 -------------------------------------------------
+-- Tech Selected
+-- When a policy is elected in the tree, this is run.
+-------------------------------------------------
+function TechSelected( iTechID )
+	local pPlayer = Players[Game.GetActivePlayer()];
+	if pPlayer == nil then
+		return;
+	end
+	if iTechID > -1 then
+   		Network.SendResearch(iTechID, pPlayer:GetNumFreeTechs(), -1, UIManager:GetShift());
+   	end
+end
+
+-------------------------------------------------
 -- Policy Branch Selected
 -- When a policy branch's Adopt button is clicked, this is run.
 -------------------------------------------------
 function PolicyBranchSelected( iBranchIndex )
 	local eBranch = GetBranchByID(iBranchIndex);
 	if eBranch ~= nil then
-		print(string.format("Branch Selected : %s", Locale.ConvertTextKey(eBranch.Description)));
+		--print(string.format("Branch Selected : %s", Locale.ConvertTextKey(eBranch.Description)));
 		local pPlayer = Players[Game.GetActivePlayer()];
 		if pPlayer == nil then
 			return;
@@ -695,13 +1030,24 @@ end
 -------------------------------------------------
 function GetBranchByID(iBranchID)
 	local i = 0;
-	local policyBranchInfo = GameInfo.PolicyBranchTypes[i];
-	while policyBranchInfo ~= nil do
-		if policyBranchInfo.ID == iBranchID then
-			return policyBranchInfo;
+	if currentView.Type == "TECH" then
+		local branchInfo = GameInfo.TechTreeTypes[i];
+		while branchInfo ~= nil do
+			if branchInfo.ID == iBranchID then
+				return branchInfo;
+			end
+			i = i + 1;
+			branchInfo = GameInfo.TechTreeTypes[i];
 		end
-		i = i + 1;
-		policyBranchInfo = GameInfo.PolicyBranchTypes[i];
+	elseif currentView.Type == "POLICY" then
+		local branchInfo = GameInfo.PolicyBranchTypes[i];
+		while branchInfo ~= nil do
+			if branchInfo.ID == iBranchID then
+				return branchInfo;
+			end
+			i = i + 1;
+			branchInfo = GameInfo.PolicyBranchTypes[i];
+		end
 	end
 	return nil;
 end
@@ -711,19 +1057,34 @@ end
 -------------------------------------------------
 function GetBranches(sBranchType)
 	local branches = {};
-
 	local i = 0;
-	local policyBranchInfo = GameInfo.PolicyBranchTypes[i];
-	while policyBranchInfo ~= nil do
-		if policyBranchInfo.PolicyBranchClass == sBranchType then
-			local policyCount = tableLength(GetPolicies(policyBranchInfo));
-			--print(policyCount);
-			if (policyCount > 0) then
-				table.insert(branches, policyBranchInfo);
+
+	if currentView.Type == "TECH" then
+		local branchInfo = GameInfo.TechTreeTypes[i];
+		--print(branchInfo ~= nil);
+		while branchInfo ~= nil do
+			if branchInfo.BranchClass == sBranchType then
+				--print(branchInfo.Type);
+				local count = tableLength(GetTechs(branchInfo));
+				if (count > 0) then
+					table.insert(branches, branchInfo);
+				end
 			end
+			i = i + 1;
+			branchInfo = GameInfo.TechTreeTypes[i];
 		end
-		i = i + 1;
-		policyBranchInfo = GameInfo.PolicyBranchTypes[i];
+	elseif currentView.Type == "POLICY" then
+		local branchInfo = GameInfo.PolicyBranchTypes[i];
+		while branchInfo ~= nil do
+			if branchInfo.PolicyBranchClass == sBranchType then
+				local count = tableLength(GetPolicies(branchInfo));
+				if (count > 0) then
+					table.insert(branches, branchInfo);
+				end
+			end
+			i = i + 1;
+			branchInfo = GameInfo.PolicyBranchTypes[i];
+		end
 	end
 	return branches;
 end
@@ -764,6 +1125,17 @@ function BuildBranchButton(pPlayer, eBranch, instance)
 	instance.BranchButton:RegisterCallback( Mouse.eLClick, UpdateBranchView );
 	--print("test:%s", instance.BranchLabel:GetText());
 end
+
+-------------------------------------------------
+-- Build Tech Branch Button
+-- Builds the buttons for the branch list
+-------------------------------------------------
+function BuildTechBranchButton(pPlayer, eBranch, instance)
+	instance.BranchLabel:LocalizeAndSetText(eBranch.Description);
+    instance.BranchButton:SetVoid1( eBranch.ID );
+	instance.BranchButton:RegisterCallback( Mouse.eLClick, UpdateBranchView );
+end
+
 -------------------------------------------------
 -- Build Ideology Button
 -- Builds the buttons for the ideology list
@@ -780,6 +1152,7 @@ function BuildIdeologyButton(pPlayer, eBranch, instance)
 	end
 	--print("test:%s", instance.BranchLabel:GetText());
 end
+
 -------------------------------------------------
 -- UpdateBranchView
 -- Sets the branch/ideology to be show, and calls the update routine
@@ -787,13 +1160,20 @@ end
 function UpdateBranchView( iBranchIndex )
 	local eBranch = GetBranchByID(iBranchIndex);
 	if eBranch ~= nil then
-		local eClass = GameInfo.PolicyBranchClassTypes[GameInfoTypes[eBranch.PolicyBranchClass]];
+		local eClass;
+		if currentView.Type == "TECH" then
+			eClass = GameInfo.TechTreeClassTypes[GameInfoTypes[eBranch.BranchClass]];
+		elseif currentView.Type == "POLICY" then
+			eClass = GameInfo.PolicyBranchClassTypes[GameInfoTypes[eBranch.PolicyBranchClass]];
+		end
 		sStyle = eClass.Style;
-		currentView = {["Class"] = eClass,["Style"] = sStyle,["Branch"] = eBranch,};
+		sType = currentView.Type;
+		currentView = {["Class"] = eClass,["Style"] = sStyle,["Branch"] = eBranch,["Type"] = sType,};
 		--print(string.format("Next View - %s - %s - %s",currentView.Class.Description,currentView.Style,currentView.Branch.Description));
 	end
 	UpdateDisplay();
 end
+
 -------------------------------------------------
 -- View Policy Branch
 -- When a policy branch is selected in the left sidebar, this is run.
@@ -801,11 +1181,6 @@ end
 -- the tree for that branch can be built.
 -------------------------------------------------
 function ViewPolicyBranch( eBranch )
-	--if eBranch ~= nil then
-	--	print(string.format("ViewPolicyBranch - %s", Locale.ConvertTextKey(eBranch.Description)));
-	--else
-	--	print(string.format("ViewPolicyBranch - %s", "Nil Branch"));
-	--end
 	Controls.PolicyPanel:DestroyAllChildren();
 	if eBranch ~= nil then
 		currentView.Branch = eBranch;
@@ -878,11 +1253,6 @@ end
 -- Shows the Ideology's tenets in the right-hand area of the popup
 -------------------------------------------------
 function ViewIdeology( eBranch )
-	--if eBranch ~= nil then
-	--	print(string.format("ViewIdeology - %s", Locale.ConvertTextKey(eBranch.Description)));
-	--else
-	--	print(string.format("ViewIdeology - %s", "Nil Branch"));
-	--end
 	Controls.TenetWrapper:DestroyAllChildren();
 	if eBranch ~= nil then
 		tableBranchButtons = {};
@@ -977,13 +1347,89 @@ function ViewIdeology( eBranch )
 		Controls.TenetTreePanel:SetHide(true);
 	end
 end
+
 -------------------------------------------------
--- Build Tab Button
+-- View Tech Tree
+-- Shows the Tech Tree's techs in the right-hand area of the popup
 -------------------------------------------------
-function BuildTabButton(pPlayer, eBranchClass, instance)
-	instance.TabButton:LocalizeAndSetText( eBranchClass.Description );
-    instance.TabButton:SetVoid1( eBranchClass.ID );
+function ViewTechTree( eBranch )
+	Controls.TreePanel:DestroyAllChildren();
+	if eBranch ~= nil then
+		currentView.Branch = eBranch;
+		
+		local pPlayer = Players[Game.GetActivePlayer()];
+		local pTeam = Teams[pPlayer:GetTeam()];
+		local techs = GetTechs( eBranch );
+		
+		GatherInfoAboutUniqueStuff(GameInfo.Civilizations[pPlayer:GetCivilizationType()].Type);
+
+		Controls.TreePanelLabel:LocalizeAndSetText(eBranch.Description);
+		tableBranchButtons[eBranch.Type].BranchButtonHL:SetHide(false);
+		
+		if eBranch.BranchImage ~= nil then
+   			CivIconHookup( pPlayer:GetID(), 64, Controls.TenetCivIcon, Controls.TenetCivIconBG, Controls.TenetCivIconShadow, false, true );
+			Controls.TechBranchImage:SetTexture( eBranch.BranchImage );
+			Controls.TechBranchImage:SetHide(false);
+			Controls.BranchImageFade:SetHide(false);
+		else
+			Controls.BranchImageFade:SetHide(true);
+			Controls.TechBranchImage:SetHide(true);
+		end
+		local SizeX = 0;
+		BuildPipePaths( eBranch.ID );
+		for i, eTech in pairs(techs) do
+			local instance = {};
+			ContextPtr:BuildInstanceForControl("TechButtonInstance", instance, Controls.TreePanel);
+			BuildTechButton(pPlayer, eTech, instance);
+			if eTech.GridX > SizeX then SizeX = eTech.GridX; end
+		end
+		Controls.TreePanel:SetSizeY((SizeX+2)*80);
+		Controls.TreePanel:ReprocessAnchoring();
+		Controls.TreeWrapper:CalculateSize();
+		Controls.TreeWrapper:ReprocessAnchoring();
+		Controls.TreeScrollPanel:CalculateInternalSize();
+		Controls.TreeScrollPanel:ReprocessAnchoring();
+		Controls.TechTreePanel:SetHide(false);
+	else
+		Controls.TechTreePanel:SetHide(true);
+	end
+end
+
+-------------------------------------------------
+-- Build Policy Class Tab Button
+-------------------------------------------------
+function BuildTabButton(pPlayer, eTabClass, instance, type, tabID)
+	local typeInt;
+	if type == "TECH" then typeInt = 0;
+	elseif type == "POLICY" then typeInt = 1;
+	end
+	instance.TabButton:LocalizeAndSetText( eTabClass.Description );
+    instance.TabButton:SetVoids( tabID, typeInt );
 	instance.TabButton:RegisterCallback( Mouse.eLClick, SwitchTabs );
+end
+
+-------------------------------------------------
+-- Populate Tech Branch List
+-------------------------------------------------
+function PopulateTechBranchList(sBranchClass)
+	Controls.TechBranchStack:DestroyAllChildren();
+	local pPlayer = Players[Game.GetActivePlayer()];
+	if pPlayer == nil then return;
+	else
+		local branchList = GetBranches(sBranchClass);
+		--print("Tech Branches for " .. sBranchClass .. ": " .. tableLength(branchList));
+		for i, eBranch in pairs(branchList) do
+			local instance = {};
+			--print("Tech Branch Button - eBranch.Type");
+			ContextPtr:BuildInstanceForControl("TechBranchButtonInstance", instance, Controls.TechBranchStack);
+			BuildTechBranchButton(pPlayer, eBranch, instance);
+			tableBranchButtons[eBranch.Type] = instance;
+		end
+	end
+	Controls.BranchStack:SetHide(false);
+	Controls.BranchStack:CalculateSize();
+    Controls.BranchStack:ReprocessAnchoring();
+    Controls.BranchListScrollPanel:CalculateInternalSize();
 end
 
 -------------------------------------------------
@@ -1031,21 +1477,35 @@ function PopulateIdeologyList(sBranchClass)
 end
 
 -------------------------------------------------
--- Populate Branch Class List
+-- Populate Tab List
 -------------------------------------------------
-function PopulateBranchClassList()
+function PopulateTabList()
 	Controls.TabStack:DestroyAllChildren();
 	local pPlayer = Players[Game.GetActivePlayer()];
 	if pPlayer == nil then return;
 	else
-		local tabList = DB.Query("SELECT * FROM PolicyBranchClassTypes");
+		local tabID = 0;
+		-- Add the Tech Tree Classes as tabs
+		local tabList = DB.Query("SELECT * FROM TechTreeClassTypes");
+		for eTechClass in tabList do
+			local instance = {};
+			ContextPtr:BuildInstanceForControl("TabButtonInstance", instance, Controls.TabStack);
+			BuildTabButton(pPlayer, eTechClass, instance, "TECH", tabID);
+			tableTabs[tabID] = eTechClass;
+			tableTabButtons[eTechClass.Type] = instance;
+			tabID = tabID + 1;
+		end
+
+		-- Add the Policy Branche Classes as tabs
+		tabList = DB.Query("SELECT * FROM PolicyBranchClassTypes");
 		for eBranchClass in tabList do
 			--print(string.format("%s - %s", eBranchClass.Type, eBranchClass.Style));
 			local instance = {};
 			ContextPtr:BuildInstanceForControl("TabButtonInstance", instance, Controls.TabStack);
-			BuildTabButton(pPlayer, eBranchClass, instance);
-			tableTabs[eBranchClass.ID] = eBranchClass;
+			BuildTabButton(pPlayer, eBranchClass, instance, "POLICY", tabID);
+			tableTabs[tabID] = eBranchClass;
 			tableTabButtons[eBranchClass.Type] = instance;
+			tabID = tabID + 1;
 		end
 	end
 	Controls.TabStack:SetHide(false);
@@ -1058,7 +1518,7 @@ end
 -- Init
 -------------------------------------------------
 function Init()
-	PopulateBranchClassList();
+	PopulateTabList();
 	tableBranches = GetBranches("BRANCHCLASS_SOCIAL_POLICY");
 	UpdateDisplay();
 	ContextPtr:SetHide(true);
