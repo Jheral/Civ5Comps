@@ -1,12 +1,4 @@
 
-INSERT INTO PolicyBranchClassTypes (Type) VALUES("BRANCHCLASS_SOCIAL_POLICY");
-INSERT INTO PolicyBranchClassTypes (Type) VALUES("BRANCHCLASS_IDEOLOGY");
-
-UPDATE PolicyBranchClassTypes SET Description	= "TXT_KEY_BRANCHCLASS_SOCIAL_POLICY"	WHERE Type = "BRANCHCLASS_SOCIAL_POLICY";
-UPDATE PolicyBranchClassTypes SET Description	= "TXT_KEY_BRANCHCLASS_IDEOLOGY"		WHERE Type = "BRANCHCLASS_IDEOLOGY";
-UPDATE PolicyBranchClassTypes SET Style			= "SOCIAL_POLICY"						WHERE Type = "BRANCHCLASS_SOCIAL_POLICY";
-UPDATE PolicyBranchClassTypes SET Style			= "IDEOLOGY"							WHERE Type = "BRANCHCLASS_IDEOLOGY";
-
 UPDATE PolicyBranchTypes SET PolicyBranchClass = "BRANCHCLASS_SOCIAL_POLICY"	WHERE PurchaseByLevel = 0;
 UPDATE PolicyBranchTypes SET PolicyBranchClass = "BRANCHCLASS_IDEOLOGY"			WHERE PurchaseByLevel = 1;
 
@@ -22,3 +14,5 @@ UPDATE PolicyBranchTypes SET PolicyBranchImage = "PolicyBranch_Aesthetics.dds"		
 UPDATE PolicyBranchTypes SET PolicyBranchImage = "SocialPoliciesAutocracy.dds"							WHERE Type = "POLICY_BRANCH_AUTOCRACY";
 UPDATE PolicyBranchTypes SET PolicyBranchImage = "SocialPoliciesFreedom.dds"							WHERE Type = "POLICY_BRANCH_FREEDOM";
 UPDATE PolicyBranchTypes SET PolicyBranchImage = "SocialPoliciesOrder.dds"								WHERE Type = "POLICY_BRANCH_ORDER";
+
+UPDATE Technologies SET TechTreeType = "TECHTREE_VANILLA";
