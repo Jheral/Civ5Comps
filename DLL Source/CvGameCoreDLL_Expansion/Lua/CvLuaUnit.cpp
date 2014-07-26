@@ -126,9 +126,16 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(CanPromote);
 	Method(Promote);
 
+	// Multiple Unit Upgrades - v0.1, Snarko
+	/* Original code
 	Method(GetUpgradeUnitType);
+	*/
+	// END Multiple Unit Upgrades
 	Method(UpgradePrice);
 	Method(CanUpgradeRightNow);
+	// Multiple Unit Upgrades - v0.1, Snarko
+	Method(CanUpgrade);
+	// END Multiple Unit Upgrades
 	Method(GetNumResourceNeededToUpgrade);
 
 	Method(GetHandicapType);
@@ -209,7 +216,9 @@ void CvLuaUnit::PushMethods(lua_State* L, int t)
 	Method(CanAirDefend);
 	Method(GetAirCombatDamage);
 	Method(GetRangeCombatDamage);
+	Method(GetAirStrikeDefenseDamage);
 	Method(GetBestInterceptor);
+	Method(GetInterceptorCount);
 	Method(GetBestSeaPillageInterceptor);
 	Method(GetCaptureChance);
 
@@ -1458,6 +1467,8 @@ int CvLuaUnit::lPromote(lua_State* L)
 }
 //------------------------------------------------------------------------------
 //int GetUpgradeUnitType();
+// Multiple Unit Upgrades - v0.1, Snarko
+/* Original code
 int CvLuaUnit::lGetUpgradeUnitType(lua_State* L)
 {
 	CvUnit* pkUnit = GetInstance(L);
@@ -1466,6 +1477,8 @@ int CvLuaUnit::lGetUpgradeUnitType(lua_State* L)
 	lua_pushinteger(L, iResult);
 	return 1;
 }
+*/
+// END Multiple Unit Upgrades
 //------------------------------------------------------------------------------
 //int upgradePrice(int /*UnitTypes*/ eUnit);
 int CvLuaUnit::lUpgradePrice(lua_State* L)
@@ -1487,13 +1500,30 @@ int CvLuaUnit::lCanUpgradeRightNow(lua_State* L)
 	lua_pushboolean(L, bResult);
 	return 1;
 }
+// Multiple Unit Upgrades - v0.1, Snarko
+int CvLuaUnit::lCanUpgrade(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	const UnitTypes eUpgradeUnitType = (UnitTypes) lua_tointeger(L, 2);
+	const bool bTestVisible = luaL_optint(L, 3, 0);
+	const bool bResult = pkUnit->CanUpgrade(eUpgradeUnitType, bTestVisible);
+
+	lua_pushboolean(L, bResult);
+	return 1;
+}
+// END Multiple Unit Upgrades
 //------------------------------------------------------------------------------
 int CvLuaUnit::lGetNumResourceNeededToUpgrade(lua_State* L)
 {
 	CvUnit* pkUnit = GetInstance(L);
 	const ResourceTypes eResource = (ResourceTypes) lua_tointeger(L, 2);
 
+	// Multiple Unit Upgrades - v0.1, Snarko
+	/* Original code
 	const UnitTypes eUpgradeUnitType = pkUnit->GetUpgradeUnitType();
+	*/
+	const UnitTypes eUpgradeUnitType = (UnitTypes) lua_tointeger(L, 3);
+	// END Multiple Unit Upgrades
 
 	CvUnitEntry* pkUnitInfo = GC.getUnitInfo(eUpgradeUnitType);
 	if(pkUnitInfo == NULL)
@@ -2173,19 +2203,53 @@ int CvLuaUnit::lGetRangeCombatDamage(lua_State* L)
 	return 1;
 }
 //------------------------------------------------------------------------------
-//CyUnit* bestInterceptor( CyPlot* pPlot);
+//int airCombatDamage( CyUnit* pDefender);
+int CvLuaUnit::lGetAirStrikeDefenseDamage(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	CvUnit* pkAttacker = GetInstance(L, 2);
+	const bool bIncludeRand = lua_toboolean(L, 3);
+
+	const int iResult = pkUnit->GetAirStrikeDefenseDamage(pkAttacker, bIncludeRand);
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+//------------------------------------------------------------------------------
+//CvUnit* GetBestInterceptor( CvPlot* pPlot, CvUnit *pDefender, bool bLandInterceptorsOnly, bool bVisibleInterceptorsOnly);
 int CvLuaUnit::lGetBestInterceptor(lua_State* L)
 {
 	CvUnit* pkUnit = GetInstance(L);
 	CvPlot* pkPlot = CvLuaPlot::GetInstance(L, 2);
+	CvUnit* pkDefender = GetInstance(L, 3, false);
+	const bool bLandInterceptorsOnly = lua_toboolean(L, 4);
+	const bool bVisibleInterceptorsOnly = lua_toboolean(L, 5);
 
 	CvUnit* pkBestUnit = 0;
 	if(pkPlot)
 	{
-		pkBestUnit = pkUnit->GetBestInterceptor(*pkPlot);
+		pkBestUnit = pkUnit->GetBestInterceptor(*pkPlot, pkDefender, bLandInterceptorsOnly, bVisibleInterceptorsOnly);
 	}
 
 	CvLuaUnit::Push(L, pkBestUnit);
+	return 1;
+}
+//------------------------------------------------------------------------------
+//CvUnit* GetInterceptor Count( CvPlot* pPlot, CvUnit *pDefender, bool bLandInterceptorsOnly, bool bVisibleInterceptorsOnly);
+int CvLuaUnit::lGetInterceptorCount(lua_State* L)
+{
+	CvUnit* pkUnit = GetInstance(L);
+	CvPlot* pkPlot = CvLuaPlot::GetInstance(L, 2);
+	CvUnit* pkDefender = GetInstance(L, 3, false);
+	const bool bLandInterceptorsOnly = lua_toboolean(L, 4);
+	const bool bVisibleInterceptorsOnly = lua_toboolean(L, 5);
+
+	int iCount  = 0;
+	if(pkPlot)
+	{
+		iCount = pkUnit->GetInterceptorCount(*pkPlot, pkDefender, bLandInterceptorsOnly, bVisibleInterceptorsOnly);
+	}
+
+	lua_pushinteger(L, iCount);
 	return 1;
 }
 //------------------------------------------------------------------------------

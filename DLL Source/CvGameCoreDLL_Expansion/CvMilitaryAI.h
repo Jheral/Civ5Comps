@@ -272,6 +272,11 @@ public:
 		m_iNumberOfTimesOpsBuildSkippedOver = 0;
 	}
 
+	// Multiple Unit Upgrades - v0.1, Snarko
+	// Evaluates which unit we want to upgrade pUnit to.
+	UnitTypes GetBestUpgradeUnit(CvUnit* pUnit) const;
+	// END Multiple Unit Upgrades
+
 	// Public logging functions
 	void LogDeclarationOfWar(PlayerTypes eOpponent);
 	void LogCivilizationDestroyed();
@@ -296,6 +301,7 @@ private:
 	void UpdateMilitaryStrategies();
 	void UpdateOperations();
 	void MakeEmergencyPurchases();
+	void MakeOffensivePurchases();
 	void RequestImprovements();
 	void DisbandObsoleteUnits();
 	bool IsAttackReady(MultiunitFormationTypes eFormation, AIOperationTypes eOperationType) const;

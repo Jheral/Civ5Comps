@@ -149,7 +149,12 @@ CvPolicyEntry::CvPolicyEntry(void):
 	m_iMilitaryUnitGiftExtraInfluence(0),
 	m_iProtectedMinorPerTurnInfluence(0),
 	m_iAfraidMinorPerTurnInfluence(0),
+	m_iMinorBullyScoreModifier(0),
 	m_iThemingBonusMultiplier(0),
+	m_iInternalTradeRouteYieldModifier(0),
+	m_iSharedReligionTourismModifier(0),
+	m_iTradeRouteTourismModifier(0),
+	m_iOpenBordersTourismModifier(0),
 	m_iCityStateTradeChange(0),
 	m_bMinorGreatPeopleAllies(false),
 	m_bMinorScienceAllies(false),
@@ -472,7 +477,12 @@ bool CvPolicyEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility&
 	m_iMilitaryUnitGiftExtraInfluence = kResults.GetInt("MilitaryUnitGiftExtraInfluence");
 	m_iProtectedMinorPerTurnInfluence = kResults.GetInt("ProtectedMinorPerTurnInfluence");
 	m_iAfraidMinorPerTurnInfluence = kResults.GetInt("AfraidMinorPerTurnInfluence");
+	m_iMinorBullyScoreModifier = kResults.GetInt("MinorBullyScoreModifier");
 	m_iThemingBonusMultiplier = kResults.GetInt("ThemingBonusMultiplier");
+	m_iInternalTradeRouteYieldModifier = kResults.GetInt("InternalTradeRouteYieldModifier");
+	m_iSharedReligionTourismModifier = kResults.GetInt("SharedReligionTourismModifier");
+	m_iTradeRouteTourismModifier = kResults.GetInt("TradeRouteTourismModifier");
+	m_iOpenBordersTourismModifier = kResults.GetInt("OpenBordersTourismModifier");
 	m_iCityStateTradeChange = kResults.GetInt("CityStateTradeChange");
 	m_bMinorGreatPeopleAllies = kResults.GetBool("MinorGreatPeopleAllies");
 	m_bMinorScienceAllies = kResults.GetBool("MinorScienceAllies");
@@ -1451,10 +1461,40 @@ int CvPolicyEntry::GetAfraidMinorPerTurnInfluence() const
 	return m_iAfraidMinorPerTurnInfluence;
 }
 
+/// Score modifier for ability to bully a minor
+int CvPolicyEntry::GetMinorBullyScoreModifier() const
+{
+	return m_iMinorBullyScoreModifier;
+}
+
 /// Boost to museum theming
 int CvPolicyEntry::GetThemingBonusMultiplier() const
 {
 	return m_iThemingBonusMultiplier;
+}
+
+/// Boost to internal trade routes
+int CvPolicyEntry::GetInternalTradeRouteYieldModifier() const
+{
+	return m_iInternalTradeRouteYieldModifier;
+}
+
+/// Boost to tourism bonus for shared religion
+int CvPolicyEntry::GetSharedReligionTourismModifier() const
+{
+	return m_iSharedReligionTourismModifier;
+}
+
+/// Boost to tourism bonus for trade routes
+int CvPolicyEntry::GetTradeRouteTourismModifier() const
+{
+	return m_iTradeRouteTourismModifier;
+}
+
+/// Boost to tourism bonus for open borders
+int CvPolicyEntry::GetOpenBordersTourismModifier() const
+{
+	return m_iOpenBordersTourismModifier;
 }
 
 /// Boost to museum theming
@@ -2967,12 +3007,26 @@ int CvPlayerPolicies::GetNumericModifier(PolicyModifierType eType)
 			case POLICYMOD_AFRAID_INFLUENCE:
 				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetAfraidMinorPerTurnInfluence();
 				break;
+			case POLICYMOD_MINOR_BULLY_SCORE_MODIFIER:
+				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetMinorBullyScoreModifier();
+				break;
 			case POLICYMOD_THEMING_BONUS:
 				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetThemingBonusMultiplier();
 				break;
 			case POLICYMOD_CITY_STATE_TRADE_CHANGE:
 				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetCityStateTradeChange();
 				break;
+			case POLICYMOD_INTERNAL_TRADE_MODIFIER:
+				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetInternalTradeRouteYieldModifier();
+				break;
+			case POLICYMOD_SHARED_RELIGION_TOURISM_MODIFIER:
+				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetSharedReligionTourismModifier();
+				break;
+			case POLICYMOD_TRADE_ROUTE_TOURISM_MODIFIER:
+				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetTradeRouteTourismModifier();
+				break;
+			case POLICYMOD_OPEN_BORDERS_TOURISM_MODIFIER:
+				rtnValue += m_pPolicies->GetPolicyEntry(i)->GetOpenBordersTourismModifier();
 			}
 		}
 	}
@@ -3643,41 +3697,43 @@ void CvPlayerPolicies::SetPolicyBranchUnlocked(PolicyBranchTypes eBranchType, bo
 				{
 					m_pPlayer->ChangeNumFreeTenets(iFreePolicies, !bRevolution);
 
-					PlayerTypes eActivePlayer = GC.getGame().getActivePlayer();
+					for(int iNotifyLoop = 0; iNotifyLoop < MAX_MAJOR_CIVS; ++iNotifyLoop){
+						PlayerTypes eNotifyPlayer = (PlayerTypes) iNotifyLoop;
+						CvPlayerAI& kCurNotifyPlayer = GET_PLAYER(eNotifyPlayer);
 
-					// Issue notification if OTHER than active player
-					if (m_pPlayer->GetID() != eActivePlayer)
-					{
-						CvPlayerAI& kActivePlayer = GET_PLAYER(eActivePlayer);
-						CvTeam& kActiveTeam = GET_TEAM(kActivePlayer.getTeam());
-						const bool bHasMet = kActiveTeam.isHasMet(m_pPlayer->getTeam());
-
-						CvNotifications* pNotifications = kActivePlayer.GetNotifications();
-						if(pNotifications)
+						// Issue notification if OTHER than target player
+						if (m_pPlayer->GetID() != eNotifyPlayer)
 						{
-							CvString strBuffer;
-							if(bHasMet)
-							{
-								if (bRevolution)
-									strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_IDEOLOGY_CHANGE", m_pPlayer->getCivilizationShortDescriptionKey(), pkPolicyBranchInfo->GetDescriptionKey());
-								else
-									strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_IDEOLOGY_CHOSEN", m_pPlayer->getCivilizationShortDescriptionKey(), pkPolicyBranchInfo->GetDescriptionKey());
-							}
-							else
-							{
-								if (bRevolution)
-									strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_IDEOLOGY_CHANGE_UNMET", pkPolicyBranchInfo->GetDescriptionKey());
-								else
-									strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_IDEOLOGY_CHOSEN_UNMET", pkPolicyBranchInfo->GetDescriptionKey());
-							}
+							CvTeam& kNotifyTeam = GET_TEAM(kCurNotifyPlayer.getTeam());
+							const bool bHasMet = kNotifyTeam.isHasMet(m_pPlayer->getTeam());
 
-							CvString strSummary;
-							if (bRevolution)
-								strSummary = GetLocalizedText("TXT_KEY_NOTIFICATION_SUMMARY_IDEOLOGY_CHANGE");
-							else
-								strSummary = GetLocalizedText("TXT_KEY_NOTIFICATION_SUMMARY_IDEOLOGY_CHOSEN");
+							CvNotifications* pNotifications = kCurNotifyPlayer.GetNotifications();
+							if(pNotifications)
+							{
+								CvString strBuffer;
+								if(bHasMet)
+								{
+									if (bRevolution)
+										strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_IDEOLOGY_CHANGE", m_pPlayer->getCivilizationShortDescriptionKey(), pkPolicyBranchInfo->GetDescriptionKey());
+									else
+										strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_IDEOLOGY_CHOSEN", m_pPlayer->getCivilizationShortDescriptionKey(), pkPolicyBranchInfo->GetDescriptionKey());
+								}
+								else
+								{
+									if (bRevolution)
+										strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_IDEOLOGY_CHANGE_UNMET", pkPolicyBranchInfo->GetDescriptionKey());
+									else
+										strBuffer = GetLocalizedText("TXT_KEY_NOTIFICATION_IDEOLOGY_CHOSEN_UNMET", pkPolicyBranchInfo->GetDescriptionKey());
+								}
 
-							pNotifications->Add(NOTIFICATION_IDEOLOGY_CHOSEN, strBuffer, strSummary, -1, -1, m_pPlayer->GetID());
+								CvString strSummary;
+								if (bRevolution)
+									strSummary = GetLocalizedText("TXT_KEY_NOTIFICATION_SUMMARY_IDEOLOGY_CHANGE");
+								else
+									strSummary = GetLocalizedText("TXT_KEY_NOTIFICATION_SUMMARY_IDEOLOGY_CHOSEN");
+
+								pNotifications->Add(NOTIFICATION_IDEOLOGY_CHOSEN, strBuffer, strSummary, -1, -1, m_pPlayer->GetID());
+							}
 						}
 					}
 				}
@@ -4349,8 +4405,6 @@ bool CvPlayerPolicies::IsTimeToChooseIdeology() const
 	{
 		return false;
 	}
-	*/
-	// END AdvancementScreen
 
 	if (m_pPlayer->GetCurrentEra() > GC.getInfoTypeForString("ERA_INDUSTRIAL"))
 	{
@@ -4390,6 +4444,70 @@ bool CvPlayerPolicies::IsTimeToChooseIdeology() const
 	}
 
 	return false;
+	*/
+	CvBuildingXMLEntries* pkGameBuildings = GC.GetGameBuildings();
+	CvCivilizationInfo* pkInfo = GC.getCivilizationInfo(m_pPlayer->getCivilizationType());
+	if(pkInfo)
+	{
+		// Find a building that triggers an ideology
+		// Loop through all building classes
+		for(int iI = 0; iI < GC.getNumBuildingClassInfos(); iI++)
+		{
+			const BuildingTypes eBuilding = static_cast<BuildingTypes>(pkInfo->getCivilizationBuildings(iI));
+			CvBuildingEntry* pkBuildingInfo = NULL;
+			if(eBuilding != -1)
+			{
+				pkBuildingInfo = pkGameBuildings->GetEntry(eBuilding);
+				if (pkBuildingInfo)
+				{
+					int iIdeologyTriggerCount = pkBuildingInfo->GetXBuiltTriggersIdeologyChoice();
+					if (iIdeologyTriggerCount > 0)
+					{
+						if (m_pPlayer->getBuildingClassCount((BuildingClassTypes)iI) >= iIdeologyTriggerCount)
+						{
+							return true;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	bool bAnyValid = false;
+	for (int iI = 0; iI < GC.getNumPolicyBranchInfos(); iI++)
+	{
+		CvPolicyBranchEntry* pkInfo = GC.getPolicyBranchInfo((PolicyBranchTypes)iI);
+		if (pkInfo && pkInfo->IsPurchaseByLevel())
+		{
+			bool bValid = true;
+			for (int iJ = 0; iJ < pkInfo->getNumFlagPrereqs(); iJ++)
+			{
+				if (m_pPlayer->getFlag(pkInfo->getFlagPrereq(iJ)) < pkInfo->getFlagPrereqValue(iJ))
+				{
+					bValid = false;
+				}
+			}
+			CvPolicyBranchClassEntry* pkClassInfo = GC.getPolicyBranchClassInfo(pkInfo->GetPolicyBranchClass());
+			if (pkClassInfo)
+			{
+				for (int iJ = 0; iJ < pkClassInfo->getNumFlagPrereqs(); iJ++)
+				{
+					if (m_pPlayer->getFlag(pkClassInfo->getFlagPrereq(iJ)) < pkClassInfo->getFlagPrereqValue(iJ))
+					{
+						bValid = false;
+					}
+				}
+			}
+			if (bValid)
+			{
+				bAnyValid = true;
+				break;
+			}
+		}
+	}
+
+	return bAnyValid;
+	// END AdvancementScreen
 }
 
 /// List of tenets that can be adopted for an Ideology

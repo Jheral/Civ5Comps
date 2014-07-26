@@ -125,7 +125,7 @@ function GetHelpTextForBuilding(iBuildingID, bExcludeName, bExcludeHeader, bNoMa
 			table.insert(lines, Locale.ConvertTextKey("TXT_KEY_PRODUCTION_COST", iCost));
 		end
 		
-		if(pBuildingInfo.UnlockedByLeague and Game.GetNumActiveLeagues() > 0) then
+		if(pBuildingInfo.UnlockedByLeague and Game.GetNumActiveLeagues() > 0 and not Game.IsOption("GAMEOPTION_NO_LEAGUES")) then
 			local pLeague = Game.GetActiveLeague();
 			if (pLeague ~= nil) then
 				local iCostPerPlayer = pLeague:GetProjectBuildingCostPerPlayer(iBuildingID);
@@ -424,19 +424,24 @@ function GetHelpTextForProcess(iProcessID, bIncludeRequirementsInfo)
 	end
 	
 	-- League Project text
-	local tProject = nil;
-	for t in GameInfo.LeagueProjects() do
-		if (iProcessID == GameInfo.Processes[t.Process].ID) then
-			tProject = t;
-			break;
+	if (not Game.IsOption("GAMEOPTION_NO_LEAGUES")) then
+		local tProject = nil;
+		
+		for t in GameInfo.LeagueProjects() do
+			if (iProcessID == GameInfo.Processes[t.Process].ID) then
+				tProject = t;
+				break;
+			end
+		end
+
+		local pLeague = Game.GetActiveLeague();
+
+		if (tProject ~= nil and pLeague ~= nil) then
+			strHelpText = strHelpText .. "[NEWLINE][NEWLINE]";
+			strHelpText = strHelpText .. pLeague:GetProjectDetails(GameInfo.LeagueProjects[tProject.Type].ID, Game.GetActivePlayer());
 		end
 	end
-	local pLeague = Game.GetActiveLeague();
-	if (tProject ~= nil and pLeague ~= nil) then
-		strHelpText = strHelpText .. "[NEWLINE][NEWLINE]";
-		strHelpText = strHelpText .. pLeague:GetProjectDetails(GameInfo.LeagueProjects[tProject.Type].ID, Game.GetActivePlayer());
-	end
-	
+
 	return strHelpText;
 end
 
@@ -643,9 +648,7 @@ function GetCultureTooltip(pCity)
 		end
 
 		-- Culture from Traits
-		--local iCultureFromTraits = pCity:GetJONSCulturePerTurnFromTraits();
-		local iCultureFromTraits = pCity:GetYieldPerTurnFromTraits(YieldTypes.YIELD_CULTURE);
-		-- END Revamped yields
+		local iCultureFromTraits = pCity:GetJONSCulturePerTurnFromTraits();
 		if (iCultureFromTraits ~= 0) then
 			
 			-- Spacing

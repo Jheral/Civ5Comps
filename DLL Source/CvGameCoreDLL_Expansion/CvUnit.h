@@ -276,6 +276,10 @@ public:
 	bool canChangeTradeUnitHomeCityAt(const CvPlot* pPlot, int iX, int iY) const;
 	bool changeTradeUnitHomeCity(int iX, int iY);
 
+	bool canChangeAdmiralPort(const CvPlot* pPlot) const;
+	bool canChangeAdmiralPortAt(const CvPlot* pPlot, int iX, int iY) const;
+	bool changeAdmiralPort(int iX, int iY);
+
 	bool canPlunderTradeRoute(const CvPlot* pPlot, bool bOnlyTestVisibility = false) const;
 	bool plunderTradeRoute();
 
@@ -381,9 +385,21 @@ public:
 
 	bool isReadyForUpgrade() const;
 	bool CanUpgradeRightNow(bool bOnlyTestVisible) const;
+	// Multiple Unit Upgrades - v0.1, Snarko
+	/* Original code
 	UnitTypes GetUpgradeUnitType() const;
+	*/
+	bool CanUpgrade(UnitTypes eUpgradeUnitType, bool bOnlyTestVisible) const;
+	// Returns the unittype we can upgrade to for the unitclass provided, or NO_UNIT if we can never upgrade to that class.
+	UnitTypes HasUpgrade(UnitClassTypes eUpgradeUnitClass) const;
+	// END Multiple Unit Upgrades
 	int upgradePrice(UnitTypes eUnit) const;
+	// Multiple Unit Upgrades - v0.1, Snarko
+	/* Original code
 	CvUnit* DoUpgrade();
+	*/
+	CvUnit* DoUpgrade(UnitTypes eUnitType);
+	// END Multiple Unit Upgrades
 
 	HandicapTypes getHandicapType() const;
 	CvCivilizationInfo& getCivilizationInfo() const;
@@ -474,7 +490,8 @@ public:
 
 	int GetAirStrikeDefenseDamage(const CvUnit* pAttacker, bool bIncludeRand = true) const;
 
-	CvUnit* GetBestInterceptor(const CvPlot& pPlot, CvUnit* pkDefender = NULL) const;
+	CvUnit* GetBestInterceptor(const CvPlot& pPlot, CvUnit* pkDefender = NULL, bool bLandInterceptorsOnly=false, bool bVisibleInterceptorsOnly=false) const;
+	int GetInterceptorCount(const CvPlot& pPlot, CvUnit* pkDefender = NULL, bool bLandInterceptorsOnly=false, bool bVisibleInterceptorsOnly=false) const;
 	int GetInterceptionDamage(const CvUnit* pAttacker, bool bIncludeRand = true) const;
 
 	int GetCombatLimit() const;

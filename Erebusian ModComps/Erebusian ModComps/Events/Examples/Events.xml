@@ -17,7 +17,7 @@
 	</Table>
 	<Table name="Event_Requirements">
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
-		<Column name="ID_Set" type="integer" default="9999"/>
+		<Column name="SetID" type="integer" default="9999"/>
 		<Column name="Type" type="text" notnull="true" unique="true"/>
 		<Column name="EventType" type="text" reference="Events(Type)"/>
 		<Column name="EventModifierType" type="text" notnull="true"/>
@@ -29,7 +29,7 @@
 	</Table>
 	<Table name="Event_Modifiers">
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
-		<Column name="ID_Set" type="integer" default="9999"/>
+		<Column name="SetID" type="integer" default="9999"/>
 		<Column name="Type" type="text" notnull="true" unique="true"/>
 		<Column name="EventType" type="text" reference="Events(Type)"/>
 		<Column name="EventModifierType" type="text" notnull="true"/>
@@ -41,7 +41,7 @@
 	</Table>
 	<Table name="Event_Options">
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
-		<Column name="ID_Set" type="integer" default="9999"/>
+		<Column name="SetID" type="integer" default="9999"/>
 		<Column name="Type" type="text" notnull="true" unique="true"/>
 		<Column name="EventType" type="text" reference="Events(Type)"/>
 		<Column name="Description" type="text" reference="Language_en_US(Tag)"/>
@@ -50,7 +50,7 @@
 	</Table>
 	<Table name="Event_Actions">
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
-		<Column name="ID_Set" type="integer" default="9999"/>
+		<Column name="SetID" type="integer" default="9999"/>
 		<Column name="Type" type="text" notnull="true" unique="true"/>
 		<Column name="EventOptionType" type="text" reference="Event_Options(Type)"/>
 		<Column name="EventActionType" type="integer" notnull="true"/>
@@ -77,13 +77,20 @@
 			<Type>EventTest</Type>
 			<Description>TXT_KEY_EVENTTEST_DESC</Description>
 			<Civilopedia>TXT_KEY_EVENTTEST</Civilopedia>
-			<MeanTimeToHappen>50</MeanTimeToHappen>
+			<MeanTimeToHappen>1</MeanTimeToHappen>
 		</Row>
 		<Row>
 			<Type>EVENT_TESTING_JHERAL</Type>
 			<Description>TXT_KEY_EVENT_TESTING_JHERAL_DESC</Description>
 			<Civilopedia>TXT_KEY_EVENT_TESTING_JHERAL_PEDIA</Civilopedia>
 			<Image>testImage_290x120.dds</Image>
+			<MeanTimeToHappen>10</MeanTimeToHappen>
+		</Row>
+		<Row>
+			<Type>EVENT_BUILDINGTEST</Type>
+			<EventType>EVENT_CITY</EventType>
+			<Description>TEST</Description>
+			<Civilopedia>TEST</Civilopedia>
 		</Row>
 	</Events>
 	<Event_Requirements>
@@ -96,6 +103,30 @@
 			<iNumberToCompare>1</iNumberToCompare>
 		</Row>
 		<Row>
+			<Type>EVENT_BUILDINGTEST_REQ1</Type>
+			<EventType>EVENT_BUILDINGTEST</EventType>
+			<EventModifierType>EVENTMOD_BUILDINGCLASS</EventModifierType>
+			<EventCompareType>COMPARE_MORETHAN</EventCompareType>
+			<iNumberToCompare>2</iNumberToCompare>
+			<SetName>SET_BUILDINGTEST</SetName>
+		</Row>
+		<Row>
+			<Type>EVENT_BUILDINGTEST_REQ2</Type>
+			<EventType>EVENT_BUILDINGTEST</EventType>
+			<EventModifierType>EVENTMOD_CITY_BUILDINGCLASS</EventModifierType>
+			<EventCompareType>COMPARE_MORETHAN</EventCompareType>
+			<iNumberToCompare>0</iNumberToCompare>
+			<SetName>SET_BUILDINGTEST</SetName>
+		</Row>
+		<Row>
+			<Type>EVENT_BUILDINGTEST_REQ3</Type>
+			<EventType>EVENT_BUILDINGTEST</EventType>
+			<EventModifierType>EVENTMOD_CITY_NUM_FEATURE_IN_RANGE</EventModifierType>
+			<EventCompareType>COMPARE_MORETHAN</EventCompareType>
+			<iNumberToCompare>2</iNumberToCompare>
+			<CompareItem>FEATURE_FOREST</CompareItem>
+		</Row>
+		<Row>
 			<Type>EventTestReq1</Type>
 			<EventType>EventTest</EventType>
 			<EventModifierType>EVENTMOD_RESOURCE_AVAILABLE</EventModifierType>
@@ -104,7 +135,7 @@
 			<SetName>Set_EventTest_1</SetName>
 		</Row>
 		<Row>
-			<ID_Set>0</ID_Set>
+			<SetID>0</SetID>
 			<Type>EventTestReq2</Type>
 			<EventType>EventTest</EventType>
 			<EventModifierType>EVENTMOD_RESOURCE_CLASS</EventModifierType>
@@ -117,6 +148,15 @@
 	<Event_Modifiers>
 		<Row>
 			<ID>0</ID>
+			<Type>EVENT_BUILDINGTEST_MOD1</Type>
+			<EventType>EVENT_BUILDINGTEST</EventType>
+			<EventModifierType>EVENTMOD_CITY_BUILDING</EventModifierType>
+			<EventCompareType>COMPARE_LESSTHAN</EventCompareType>
+			<iNumberToCompare>1</iNumberToCompare>
+			<fFactor>0.1</fFactor>
+			<CompareItem>BUILDING_GRANARY</CompareItem>
+		</Row>
+		<Row>
 			<Type>EventTestMod1</Type>
 			<EventType>EventTest</EventType>
 			<EventModifierType>EVENTMOD_RESOURCE_AVAILABLE</EventModifierType>
@@ -132,6 +172,12 @@
 			<Type>Test_Event_Option1</Type>
 			<EventType>Test_Event</EventType>
 			<Description>TXT_KEY_TEST_EVENT_OPTION1</Description>
+		</Row>
+		<Row>
+			<Type>EVENT_BUILDINGTEST_OPTION1</Type>
+			<EventType>EVENT_BUILDINGTEST</EventType>
+			<Description>TXT_KEY_TEST_EVENT_1_DESC</Description>
+			<Help>TXT_KEY_TEST_EVENT_1_HELP</Help>
 		</Row>
 		<Row>
 			<Type>EventTestOption1</Type>
@@ -186,7 +232,7 @@
 			<EventOptionType>Test_Event_Option1</EventOptionType>
 			<EventActionType>EVENTACTION_YIELD</EventActionType>
 			<ActionItem>YIELD_SCIENCE</ActionItem>
-			<iValue>10</iValue>
+			<iValue>1</iValue>
 		</Row>
 		<Row>
 			<Type>Test_Event_Action4</Type>
@@ -210,6 +256,13 @@
 			<EventActionType>EVENTACTION_CITY_ADD_BUILDING</EventActionType>
 			<ActionItem>BUILDING_LIBRARY</ActionItem>
 			<iValue>3</iValue>
+		</Row>
+		<Row>
+			<Type>EVENT_BUILDINGTEST_ACTION1</Type>
+			<EventOptionType>EVENT_BUILDINGTEST_OPTION1</EventOptionType>
+			<EventActionType>EVENTACTION_CITY_ADD_BUILDING</EventActionType>
+			<iValue>-1</iValue>
+			<SetName>SET_BUILDINGTEST</SetName>
 		</Row>
 		<Row>
 			<Type>EventTestAction1</Type>

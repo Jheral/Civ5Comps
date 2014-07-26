@@ -6971,7 +6971,7 @@ bool CvEventInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 		Database::Results* pResults = kUtility.GetResults(strKey);
 		if(pResults == NULL)
 		{
-			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Requirements where EventType = ? order by ID_Set");
+			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Requirements where EventType = ? order by SetID");
 		}
 		if(pResults != NULL)
 		{
@@ -6994,7 +6994,7 @@ bool CvEventInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 		Database::Results* pResults = kUtility.GetResults(strKey);
 		if(pResults == NULL)
 		{
-			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Modifiers where EventType = ? order by ID_Set");
+			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Modifiers where EventType = ? order by SetID");
 		}
 		if(pResults != NULL)
 		{
@@ -7017,7 +7017,7 @@ bool CvEventInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 		Database::Results* pResults = kUtility.GetResults(strKey);
 		if(pResults == NULL)
 		{
-			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Options where EventType = ? order by ID_Set");
+			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Options where EventType = ? order by SetID");
 		}
 		if(pResults != NULL)
 		{
@@ -7166,7 +7166,7 @@ bool CvEventOptionInfo::CacheResults(Database::Results& kResults, CvDatabaseUtil
 		Database::Results* pResults = kUtility.GetResults(strKey);
 		if(pResults == NULL)
 		{
-			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Actions where EventOptionType = ? order by ID_Set");
+			pResults = kUtility.PrepareResults(strKey, "select ID from Event_Actions where EventOptionType = ? order by SetID");
 		}
 		if(pResults != NULL)
 		{

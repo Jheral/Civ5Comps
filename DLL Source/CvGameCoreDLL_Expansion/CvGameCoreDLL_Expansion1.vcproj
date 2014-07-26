@@ -227,6 +227,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CvCityManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CvCitySpecializationAI.cpp"
 				>
 			</File>
@@ -555,6 +559,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CvTargeting.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\CvTeam.cpp"
 				>
 				<FileConfiguration
@@ -718,6 +726,10 @@
 			</File>
 			<File
 				RelativePath=".\CvCityConnections.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CvCityManager.h"
 				>
 			</File>
 			<File
@@ -978,6 +990,10 @@
 			</File>
 			<File
 				RelativePath=".\CvTacticalAnalysisMap.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CvTargeting.h"
 				>
 			</File>
 			<File

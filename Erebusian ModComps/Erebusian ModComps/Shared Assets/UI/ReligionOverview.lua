@@ -455,7 +455,7 @@ function RefreshWorldReligions()
 	-- Pantheon and Religion info
 	for iPlayer = 0, GameDefines.MAX_CIV_PLAYERS - 1 do	
 		local pPlayer = Players[iPlayer];
---		if (pPlayer:IsAlive()) then
+		if (pPlayer:IsEverAlive()) then
 			if (pPlayer:HasCreatedReligion()) then
 				local eReligion = pPlayer:GetReligionCreatedByPlayer();
 				local religion = GameInfo.Religions[eReligion];
@@ -482,7 +482,7 @@ function RefreshWorldReligions()
 					NumCities = Game.GetNumCitiesFollowing(eReligion),
 				});
 			end
---		end
+		end
 	end
 	
 	if(#religions > 0) then
@@ -532,7 +532,7 @@ function RefreshBeliefs()
 	-- Pantheon and Religion info
 	for iPlayer = 0, GameDefines.MAX_CIV_PLAYERS - 1 do	
 		local pPlayer = Players[iPlayer];
---		if (pPlayer:IsAlive()) then
+		if (pPlayer:IsEverAlive()) then
 			if (pPlayer:HasCreatedReligion()) then
 				local eReligion = pPlayer:GetReligionCreatedByPlayer();
 				for i,v in ipairs(Game.GetBeliefsInReligion(eReligion)) do
@@ -571,7 +571,7 @@ function RefreshBeliefs()
 					ReligionIconAtlas = pantheon.IconAtlas
 				});
 			end
---		end
+		end
 	end
 	
 	if(#beliefs > 0) then

@@ -293,10 +293,16 @@ int CvTraitEntry::GetPlotCultureCostModifier() const
 	return m_iPlotCultureCostModifier;
 }
 
-/// Accessor:: increased rate of culture border expansion
+/// Accessor:: culture for kills
 int CvTraitEntry::GetCultureFromKills() const
 {
 	return m_iCultureFromKills;
+}
+
+/// Accessor:: faith for kills
+int CvTraitEntry::GetFaithFromKills() const
+{
+	return m_iFaithFromKills;
 }
 
 // Revamped yields - v0.1, Snarko
@@ -952,6 +958,7 @@ bool CvTraitEntry::CacheResults(Database::Results& kResults, CvDatabaseUtility& 
 	m_iPlotBuyCostModifier					= kResults.GetInt("PlotBuyCostModifier");
 	m_iPlotCultureCostModifier              = kResults.GetInt("PlotCultureCostModifier");
 	m_iCultureFromKills						= kResults.GetInt("CultureFromKills");
+	m_iFaithFromKills						= kResults.GetInt("FaithFromKills");
 	// Revamped yields - v0.1, Snarko
 	// No longer used, use m_paiYieldChange
 	// XML tag still kept for backwards compatibility
@@ -1647,6 +1654,7 @@ void CvPlayerTraits::InitPlayerTraits()
 			m_iPlotBuyCostModifier += trait->GetPlotBuyCostModifier();
 			m_iPlotCultureCostModifier += trait->GetPlotCultureCostModifier();
 			m_iCultureFromKills += trait->GetCultureFromKills();
+			m_iFaithFromKills += trait->GetFaithFromKills();
 			// Revamped yields - v0.1, Snarko
 			// No longer used
 			/* Original code
@@ -1848,7 +1856,6 @@ void CvPlayerTraits::InitPlayerTraits()
 					}
 				}
 			}
-
 			CvAssert(GC.getNumTerrainInfos() <= NUM_TERRAIN_TYPES);
 			for(int iTerrain = 0; iTerrain < GC.getNumTerrainInfos(); iTerrain++)
 			{
@@ -1936,6 +1943,7 @@ void CvPlayerTraits::Reset()
 	m_iPlotBuyCostModifier = 0;
 	m_iPlotCultureCostModifier = 0;
 	m_iCultureFromKills = 0;
+	m_iFaithFromKills = 0;
 	// Revamped yields - v0.1, Snarko
 	// No longer used, use m_iFreeCityYield
 	// XML tag still kept for backwards compatibility
@@ -2122,6 +2130,61 @@ bool CvPlayerTraits::HasTrait(TraitTypes eTrait) const
 	{
 		return false;
 	}
+}
+
+/// Will settling a city in this new area unlock a unique luxury?
+bool CvPlayerTraits::WillGetUniqueLuxury(CvArea *pArea) const
+{
+	// Still have more of these cities to award?
+	if (m_iUniqueLuxuryCities > m_iUniqueLuxuryCitiesPlaced)
+	{
+		int iArea = pArea->GetID();
+
+		// If we have to be in a new area, check to see if this area is okay
+		if (m_bUniqueLuxuryRequiresNewArea)
+		{
+			// Can't be the capital itself
+			if (m_pPlayer->GetNumCitiesFounded() == 0)
+			{
+				return false;
+			}
+
+			CvPlot *pOriginalCapitalPlot = GC.getMap().plot(m_pPlayer->GetOriginalCapitalX(), m_pPlayer->GetOriginalCapitalY());
+			if (pOriginalCapitalPlot)
+			{
+				if (pOriginalCapitalPlot->getArea() == iArea)
+				{
+					return false;
+				}
+			}
+
+			// Already in the list?
+			if (std::find (m_aUniqueLuxuryAreas.begin(), m_aUniqueLuxuryAreas.end(), iArea) != m_aUniqueLuxuryAreas.end())
+			{
+				return false;
+			}
+		}
+
+		int iNumUniqueResourcesGiven = m_aUniqueLuxuryAreas.size();
+
+		// Loop through all resources and see if we can find one more
+		int iNumUniquesFound = 0;
+		for(int iResourceLoop = 0; iResourceLoop < GC.getNumResourceInfos(); iResourceLoop++)
+		{
+			ResourceTypes eResource = (ResourceTypes) iResourceLoop;
+			CvResourceInfo* pkResource = GC.getResourceInfo(eResource);
+			if (pkResource != NULL && pkResource->GetRequiredCivilization() == m_pPlayer->getCivilizationType())
+			{
+				iNumUniquesFound++;
+				if (iNumUniquesFound > iNumUniqueResourcesGiven)
+				{
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
 }
 
 /// Bonus movement for this combat class
@@ -2833,6 +2896,14 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	kStream >> m_iPlotBuyCostModifier;
 	kStream >> m_iPlotCultureCostModifier;
 	kStream >> m_iCultureFromKills;
+	if (uiVersion >= 19)
+	{
+		kStream >> m_iFaithFromKills;
+	}
+	else
+	{
+		m_iFaithFromKills = 0;
+	}
 	// Revamped yields - v0.1, Snarko
 	// No longer used, use m_iFreeCityYield
 	// We do not need to make a special check for modVersion, because this was added in the first modVersion and adding modVersion itself breaks saves.
@@ -3217,7 +3288,7 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 void CvPlayerTraits::Write(FDataStream& kStream)
 {
 	// Current version number
-	uint uiVersion = 18;
+	uint uiVersion = 19;
 	kStream << uiVersion;
 	// modVersion - v1, Snarko
 	// We are using our own value here to keep backwards compatibility.
@@ -3247,6 +3318,7 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << m_iPlotBuyCostModifier;
 	kStream << m_iPlotCultureCostModifier;
 	kStream << m_iCultureFromKills;
+	kStream << m_iFaithFromKills;
 	// Revamped yields - v0.1, Snarko
 	// No longer used, use m_iFreeCityYield
 	// XML tag still kept for backwards compatibility

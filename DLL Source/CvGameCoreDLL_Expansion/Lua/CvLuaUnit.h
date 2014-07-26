@@ -133,9 +133,16 @@ protected:
 	static int lCanPromote(lua_State* L);
 	static int lPromote(lua_State* L);
 
+	// Multiple Unit Upgrades - v0.1, Snarko
+	/* Original code
 	static int lGetUpgradeUnitType(lua_State* L);
+	*/
+	// END Multiple Unit Upgrades
 	static int lUpgradePrice(lua_State* L);
 	static int lCanUpgradeRightNow(lua_State* L);
+	// Multiple Unit Upgrades - v0.1, Snarko
+	static int lCanUpgrade(lua_State* L);
+	// END Multiple Unit Upgrades
 	static int lGetNumResourceNeededToUpgrade(lua_State* L);
 
 	static int lGetHandicapType(lua_State* L);
@@ -215,7 +222,9 @@ protected:
 	static int lCanAirDefend(lua_State* L);
 	static int lGetAirCombatDamage(lua_State* L);
 	static int lGetRangeCombatDamage(lua_State* L);
+	static int lGetAirStrikeDefenseDamage(lua_State* L);
 	static int lGetBestInterceptor(lua_State* L);
+	static int lGetInterceptorCount(lua_State* L);
 	static int lGetBestSeaPillageInterceptor(lua_State* L);
 
 	static int lGetCaptureChance(lua_State* L);

@@ -280,7 +280,9 @@ end
 
 function GetPedia( void1, void2, button )
 	local searchString = pediaSearchStrings[tostring(button)];
-	Events.SearchForPediaEntry( searchString );		
+	if (searchString ~= nil) then
+		Events.SearchForPediaEntry( searchString );
+	end
 end
 
 -------------------------------------------------
@@ -475,10 +477,11 @@ function AddBuildingButton( pCity, building )
 			controlTable.BuildingFilledSpecialistSlot3:SetHide(false);
 		end
 		
+		local specialistName = nil;
 		if building.SpecialistType then
 			local iSpecialistID = GameInfoTypes[building.SpecialistType];
 			local pSpecialistInfo = GameInfo.Specialists[iSpecialistID];
-			local specialistName = Locale.ConvertTextKey(pSpecialistInfo.Description);
+			specialistName = Locale.ConvertTextKey(pSpecialistInfo.Description);
 			local ToolTipString = specialistName .. " ";						
 			-- Culture
 			local iCultureFromSpecialist = pCity:GetCultureFromSpecialist(iSpecialistID);
@@ -549,13 +552,15 @@ function AddBuildingButton( pCity, building )
 			controlTable.BuildingFilledSpecialistSlot3:RegisterCallback( Mouse.eLClick, RemoveSpecialist );
 		end
 
-		pediaSearchStrings[tostring(controlTable.BuildingFilledSpecialistSlot1)] = specialistName;
-		controlTable.BuildingFilledSpecialistSlot1:RegisterCallback( Mouse.eRClick, GetPedia );
-		pediaSearchStrings[tostring(controlTable.BuildingFilledSpecialistSlot2)] = specialistName;
-		controlTable.BuildingFilledSpecialistSlot2:RegisterCallback( Mouse.eRClick, GetPedia );
-		pediaSearchStrings[tostring(controlTable.BuildingFilledSpecialistSlot3)] = specialistName;
-		controlTable.BuildingFilledSpecialistSlot3:RegisterCallback( Mouse.eRClick, GetPedia );
-
+		if (specialistName ~= nil) then
+			pediaSearchStrings[tostring(controlTable.BuildingFilledSpecialistSlot1)] = specialistName;
+			controlTable.BuildingFilledSpecialistSlot1:RegisterCallback( Mouse.eRClick, GetPedia );
+			pediaSearchStrings[tostring(controlTable.BuildingFilledSpecialistSlot2)] = specialistName;
+			controlTable.BuildingFilledSpecialistSlot2:RegisterCallback( Mouse.eRClick, GetPedia );
+			pediaSearchStrings[tostring(controlTable.BuildingFilledSpecialistSlot3)] = specialistName;
+			controlTable.BuildingFilledSpecialistSlot3:RegisterCallback( Mouse.eRClick, GetPedia );
+		end
+		
 		controlTable.BuildingFilledSpecialistSlot1:SetVoids( buildingID, 1 );
 		controlTable.BuildingFilledSpecialistSlot2:SetVoids( buildingID, 2 );
 		controlTable.BuildingFilledSpecialistSlot3:SetVoids( buildingID, 3 );
@@ -1679,7 +1684,7 @@ function OnCityViewUpdate()
 		local iFoodDiff = pCity:FoodDifference();
 		local iCurrentFoodPlusThisTurn = iCurrentFood + iFoodDiff;
 			
-		local fGrowthProgressPercent = iCurrentFood / iFoodNeeded;
+		local fGrowthProgressPercent = iCurrentFood / iFoodNeeded;			
 		
 		-- Local Happiness Display - Shoggi
 		local iLocalHappiness = pCity:GetLocalHappiness();

@@ -220,6 +220,7 @@ public:
 	int GetTradeRouteSeaGoldBonus() const;
 	int GetTradeRouteLandDistanceModifier() const;
 	int GetTradeRouteLandGoldBonus() const;
+	int GetCityStateTradeRouteProductionModifier() const;
 	int GetGreatScientistBeakerModifier() const;
 	int GetExtraLeagueVotes() const;
 	int GetPreferredDisplayPosition() const;
@@ -472,6 +473,7 @@ private:
 	int m_iTradeRouteSeaGoldBonus;
 	int m_iTradeRouteLandDistanceModifier;
 	int m_iTradeRouteLandGoldBonus;
+	int m_iCityStateTradeRouteProductionModifier;
 	int m_iGreatScientistBeakerModifier;
 	int m_iExtraLeagueVotes;
 	int m_iPreferredDisplayPosition;
@@ -699,6 +701,8 @@ public:
 	int GetThemingBonuses(YieldTypes eYield = NO_YIELD) const;
 	// END Revamped yields
 	int GetNumBuildingsFromFaith() const;
+
+	int GetCityStateTradeRouteProductionModifier() const;
 
 	int GetBuildingProductionModifier() const;
 	void ChangeBuildingProductionModifier(int iChange);

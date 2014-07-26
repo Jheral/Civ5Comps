@@ -147,6 +147,7 @@ int CvPolicyAI::ChooseNextPolicy(CvPlayer* pPlayer)
 	fcn = MakeDelegate(&GC.getGame(), &CvGame::getJonRandNum);
 	int iRtnValue = (int)NO_POLICY;
 	int iPolicyLoop;
+	vector<int> aLevel3Tenets;
 
 	bool bMustChooseTenet = (pPlayer->GetNumFreeTenets() > 0);
 
@@ -176,6 +177,11 @@ int CvPolicyAI::ChooseNextPolicy(CvPlayer* pPlayer)
 				}
 			}
 			m_AdoptablePolicies.push_back(iPolicyLoop + GC.getNumPolicyBranchInfos(), iWeight);
+
+			if (m_pCurrentPolicies->GetPolicies()->GetPolicyEntry(iPolicyLoop)->GetLevel() == 3)
+			{
+				aLevel3Tenets.push_back(iPolicyLoop);
+			}
 		}
 	}
 
@@ -239,6 +245,53 @@ int CvPolicyAI::ChooseNextPolicy(CvPlayer* pPlayer)
 
 	m_AdoptablePolicies.SortItems();
 	LogPossiblePolicies();
+
+	// If there were any Level 3 tenets found, consider going for the one that matches our victory strategy
+	if (aLevel3Tenets.size() > 0)
+	{
+		vector<int>::const_iterator it;
+		for (it = aLevel3Tenets.begin(); it != aLevel3Tenets.end(); it++)
+		{
+			CvPolicyEntry *pEntry;
+			pEntry = m_pCurrentPolicies->GetPolicies()->GetPolicyEntry(*it);
+			if (pEntry)
+			{
+				AIGrandStrategyTypes eGrandStrategy = pPlayer->GetGrandStrategyAI()->GetActiveGrandStrategy();
+				if (eGrandStrategy == GC.getInfoTypeForString("AIGRANDSTRATEGY_CONQUEST"))
+				{
+					if (pEntry->GetFlavorValue((FlavorTypes)GC.getInfoTypeForString("FLAVOR_OFFENSE")) > 0)
+					{
+						LogPolicyChoice((PolicyTypes)*it);
+						return (*it) + GC.getNumPolicyBranchInfos();
+					}
+				}
+				else if(eGrandStrategy == GC.getInfoTypeForString("AIGRANDSTRATEGY_SPACESHIP"))
+				{
+					if (pEntry->GetFlavorValue((FlavorTypes)GC.getInfoTypeForString("FLAVOR_SPACESHIP")) > 0)
+					{
+						LogPolicyChoice((PolicyTypes)*it);
+						return (*it) + GC.getNumPolicyBranchInfos();
+					}
+				}
+				else if(eGrandStrategy == GC.getInfoTypeForString("AIGRANDSTRATEGY_UNITED_NATIONS"))
+				{
+					if (pEntry->GetFlavorValue((FlavorTypes)GC.getInfoTypeForString("FLAVOR_DIPLOMACY")) > 0)
+					{
+						LogPolicyChoice((PolicyTypes)*it);
+						return (*it) + GC.getNumPolicyBranchInfos();
+					}
+				}
+				else if(eGrandStrategy == GC.getInfoTypeForString("AIGRANDSTRATEGY_CULTURE"))
+				{
+					if (pEntry->GetFlavorValue((FlavorTypes)GC.getInfoTypeForString("FLAVOR_CULTURE")) > 0)
+					{
+						LogPolicyChoice((PolicyTypes)*it);
+						return (*it) + GC.getNumPolicyBranchInfos();
+					}
+				}
+			}
+		}
+	}
 
 	CvAssertMsg(m_AdoptablePolicies.GetTotalWeight() >= 0, "Total weights of considered policies should not be negative! Please send Anton your save file and version.");
 
@@ -480,7 +533,6 @@ void CvPolicyAI::DoChooseIdeology(CvPlayer *pPlayer)
 	{
 		gDLL->netMessageDebugLog("We may have a problem. Did not pick a valid ideology for an AI, played ID " + FSerialization::toString(pPlayer->GetID()));
 	}
-	// END AdvancementScreen
 
 	/*Original code
 	int iFreedomPriority = 0;
@@ -705,6 +757,7 @@ void CvPolicyAI::DoChooseIdeology(CvPlayer *pPlayer)
 	pPlayer->GetPlayerPolicies()->SetPolicyBranchUnlocked(eChosenBranch, true, false);
 	LogBranchChoice(eChosenBranch);
 	*/
+	// END AdvancementScreen
 }
 
 /// Should the AI look at switching ideology branches?
@@ -802,7 +855,6 @@ void CvPolicyAI::DoConsiderIdeologySwitch(CvPlayer* pPlayer)
 				}
 			}
 		}
-		// END AdvancementScreen
 		/* Original code
 		bool bDontSwitchFreedom = false;
 		bool bDontSwitchOrder = false;
@@ -860,6 +912,7 @@ void CvPolicyAI::DoConsiderIdeologySwitch(CvPlayer* pPlayer)
 			}
 		}
 		*/
+		// END AdvancementScreen
 	}
 }
 

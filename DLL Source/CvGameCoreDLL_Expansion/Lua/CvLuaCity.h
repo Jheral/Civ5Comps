@@ -230,22 +230,16 @@ protected:
 	// No longer used
 	/* Original code
 	static int lGetBaseJONSCulturePerTurn(lua_State* L);
-	
 	static int lGetJONSCulturePerTurnFromBuildings(lua_State* L);
 	static int lChangeJONSCulturePerTurnFromBuildings(lua_State* L);
-
 	static int lGetJONSCulturePerTurnFromPolicies(lua_State* L);
 	static int lChangeJONSCulturePerTurnFromPolicies(lua_State* L);
-
 	static int lGetJONSCulturePerTurnFromSpecialists(lua_State* L);
 	static int lChangeJONSCulturePerTurnFromSpecialists(lua_State* L);
-
 	static int lGetJONSCulturePerTurnFromGreatWorks(lua_State* L);
-
 	static int lGetJONSCulturePerTurnFromTraits(lua_State* L);
 	static int lGetJONSCulturePerTurnFromReligion(lua_State* L);
 	static int lChangeJONSCulturePerTurnFromReligion(lua_State* L);
-	
 	static int lGetJONSCulturePerTurnFromLeagues(lua_State* L);
 
 	static int lGetCultureRateModifier(lua_State* L);
@@ -324,7 +318,6 @@ protected:
 	static int lGetSpaceProductionModifier(lua_State* L);
 	static int lGetBuildingDefense(lua_State* L);
 	static int lGetFreeExperience(lua_State* L);
-	static int lGetAirModifier(lua_State* L);
 	static int lGetNukeModifier(lua_State* L);
 	//static int lGetFreeSpecialist(lua_State* L);
 
@@ -449,6 +442,10 @@ protected:
 	static int lGetSpecialistGreatPersonProgressTimes100(lua_State* L);
 	static int lChangeSpecialistGreatPersonProgressTimes100(lua_State* L);
 	static int lGetNumSpecialistsInBuilding(lua_State* L);
+	// EventEngine - v0.1, Snarko
+	static int lGetNumFreeSpecialist(lua_State* L);
+	static int lChangeNumFreeSpecialist(lua_State* L);
+	// END EventEngine
 	static int lDoReallocateCitizens(lua_State* L);
 	static int lDoVerifyWorkingPlots(lua_State* L);
 	static int lIsNoAutoAssignSpecialists(lua_State* L);
@@ -477,6 +474,7 @@ protected:
 	static int lHasPerformedRangedStrikeThisTurn(lua_State* L);
 	static int lRangeCombatUnitDefense(lua_State* L);
 	static int lRangeCombatDamage(lua_State* L);
+	static int lGetAirStrikeDefenseDamage(lua_State* L);
 
 	static int lIsWorkingPlot(lua_State* L);
 	static int lAlterWorkingPlot(lua_State* L);

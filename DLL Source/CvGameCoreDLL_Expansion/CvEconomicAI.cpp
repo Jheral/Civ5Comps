@@ -18,6 +18,7 @@
 #include "CvAStar.h"
 #include "CvCitySpecializationAI.h"
 #include "CvTypes.h"
+#include "cvStopWatch.h"
 
 // must be included after all other headers
 #include "LintFree.h"
@@ -536,6 +537,8 @@ void CvEconomicAI::SetTurnStrategyAdopted(EconomicAIStrategyTypes eStrategy, int
 /// Called every turn to see what Strategies this player should using (or not)
 void CvEconomicAI::DoTurn()
 {
+	AI_PERF_FORMAT("AI-perf.csv", ("CvEconomicAI::DoTurn, Turn %03d, %s", GC.getGame().getElapsedGameTurns(), GetPlayer()->getCivilizationShortDescription()) );
+
 	UpdatePlots();
 	LogMonitor();
 	LogCityMonitor();
@@ -706,6 +709,8 @@ void CvEconomicAI::DoTurn()
 					bStrategyShouldBeActive = EconomicAIHelpers::IsTestStrategy_NeedGuilds(m_pPlayer);
 				else if(strStrategyName == "ECONOMICAISTRATEGY_CONCERT_TOUR")
 					bStrategyShouldBeActive = EconomicAIHelpers::IsTestStrategy_ConcertTour(eStrategy, m_pPlayer);
+				else if(strStrategyName == "ECONOMICAISTRATEGY_STARTED_PIETY")
+					bStrategyShouldBeActive = EconomicAIHelpers::IsTestStrategy_StartedPiety(m_pPlayer);
 
 				// Never found it?  Assume it is scenario-specific and should be on unless disabled by Lua hook
 				else
@@ -815,6 +820,7 @@ void CvEconomicAI::DoTurn()
 		DoHurry();
 		DoPlotPurchases();
 		DisbandExtraWorkers();
+		DisbandExtraArchaeologists();
 		m_pPlayer->GetCulture()->DoSwapGreatWorks();
 	}
 }
@@ -1318,33 +1324,6 @@ void CvEconomicAI::LogMonitor(void)
 		}
 	}
 
-	// Gold breakdown
-	// Revamped yields - v0.1, Snarko
-	// TODO do this for other yields?
-	// No longer used
-	/*
-	int iGoldPerTurn = m_pPlayer->calculateTotalYield((YieldTypes)YIELD_GOLD) + m_pPlayer->GetTreasury()->GetCityConnectionGold();
-	*/
-	int iGoldPerTurn = m_pPlayer->calculateTotalYield((YieldTypes)YIELD_GOLD) + m_pPlayer->GetCityConnectionYield(YIELD_GOLD);
-	// END Revamped yields
-	iGoldPerTurn -= m_pPlayer->GetTreasury()->GetExpensePerTurnUnitMaintenance();
-	iGoldPerTurn -= m_pPlayer->GetTreasury()->GetBuildingGoldMaintenance();
-	iGoldPerTurn -= m_pPlayer->GetTreasury()->GetImprovementGoldMaintenance();
-	AppendToLog(strHeader, strLog, "GPT", iGoldPerTurn);
-	AppendToLog(strHeader, strLog, "Treasury", m_pPlayer->GetTreasury()->GetGold());
-	// Revamped yields - v0.1, Snarko
-	// TODO do this for other yields?
-	// No longer used
-	/*
-	AppendToLog(strHeader, strLog, "GPT - Connects", m_pPlayer->GetTreasury()->GetCityConnectionGold());
-	*/
-	AppendToLog(strHeader, strLog, "GPT - Connects", m_pPlayer->GetCityConnectionYield(YIELD_GOLD));
-	// END Revamped yields
-	AppendToLog(strHeader, strLog, "GPT - Diplo", m_pPlayer->GetTreasury()->GetGoldPerTurnFromDiplomacy());
-	AppendToLog(strHeader, strLog, "Unit Maint", m_pPlayer->GetTreasury()->GetExpensePerTurnUnitMaintenance());
-	AppendToLog(strHeader, strLog, "Build Maint", m_pPlayer->GetTreasury()->GetBuildingGoldMaintenance());
-	AppendToLog(strHeader, strLog, "Improve Maint", m_pPlayer->GetTreasury()->GetImprovementGoldMaintenance());
-
 	// Num Techs
 	AppendToLog(strHeader, strLog, "Num Techs", GET_TEAM(GetPlayer()->getTeam()).GetTeamTechs()->GetNumTechsKnown());
 
@@ -1422,6 +1401,74 @@ void CvEconomicAI::LogMonitor(void)
 	AppendToLog(strHeader, strLog, "Trade Routes established", m_pPlayer->GetTrade()->GetNumTradeRoutesUsed(false));
 	AppendToLog(strHeader, strLog, "Trade Routes available", (int)m_pPlayer->GetTrade()->GetNumTradeRoutesPossible());
 
+	CvTreasury *pTreasury = m_pPlayer->GetTreasury();
+
+	// Revamped yields - v0.1, Snarko
+	// TODO do this for other yields?
+	/* Original code
+	int iInternationalTradeGPT = pTreasury->GetGoldFromCitiesTimes100(false) - pTreasury->GetGoldFromCitiesTimes100(true);
+	AppendToLog(strHeader, strLog, "Gold From Cities", pTreasury->GetGoldFromCitiesTimes100(true) / 100);
+	*/
+	int iInternationalTradeGPT = m_pPlayer->GetYieldFromCitiesTimes100(YIELD_GOLD, false) - m_pPlayer->GetYieldFromCitiesTimes100(YIELD_GOLD, true);
+	AppendToLog(strHeader, strLog, "Gold From Cities", m_pPlayer->GetYieldFromCities(YIELD_GOLD, true));
+	// END Revamped yields
+	AppendToLog(strHeader, strLog, "Gold From Trade Routes", (int)(iInternationalTradeGPT / 100));
+	AppendToLog(strHeader, strLog, "Treasury", pTreasury->GetGold());
+	// Revamped yields - v0.1, Snarko
+	/* Original code
+	AppendToLog(strHeader, strLog, "GPT - Connects", pTreasury->GetCityConnectionGold());
+	AppendToLog(strHeader, strLog, "GPT - Diplo", pTreasury->GetGoldPerTurnFromDiplomacy());
+	AppendToLog(strHeader, strLog, "GPT - Religion", pTreasury->GetGoldPerTurnFromReligion());
+	AppendToLog(strHeader, strLog, "GPT - Traits", pTreasury->GetGoldPerTurnFromTraits());
+	*/
+	AppendToLog(strHeader, strLog, "GPT - Connects", m_pPlayer->GetCityConnectionYield(YIELD_GOLD));
+	AppendToLog(strHeader, strLog, "GPT - Diplo", pTreasury->GetGoldPerTurnFromDiplomacy());
+	AppendToLog(strHeader, strLog, "GPT - Religion", m_pPlayer->GetYieldPerTurnFromReligion(YIELD_GOLD));
+	AppendToLog(strHeader, strLog, "GPT - Traits", m_pPlayer->GetYieldPerTurnFromTraits(YIELD_GOLD));
+	AppendToLog(strHeader, strLog, "GPT - Resolutions", m_pPlayer->GetYieldFromResolutions(YIELD_GOLD));
+	AppendToLog(strHeader, strLog, "GPT - Happiness", m_pPlayer->GetYieldPerTurnFromExcessHappiness(YIELD_GOLD) + m_pPlayer->GetYieldFromHappinessTimes100(YIELD_GOLD) / 100);
+	// END Revamped yields
+	// EventEngine - v0.1, Snarko
+	AppendToLog(strHeader, strLog, "GPT - Events", m_pPlayer->getYieldFromEvents(YIELD_GOLD));
+	// END EventEngine
+
+	// Revamped yields - v0.1, Snarko
+	/* Original code
+	int iGoldFromCitiesMinusTR = pTreasury->GetGoldFromCitiesTimes100(true) / 100;
+	int iGPTFromDiplomacy = pTreasury->GetGoldPerTurnFromDiplomacy();
+	int iGoldFromCityConnect = pTreasury->GetCityConnectionGoldTimes100() / 100;
+	int iGPTFromReligion = pTreasury->GetGoldPerTurnFromReligion();
+	int iGPTFromTraits = pTreasury->GetGoldPerTurnFromTraits();
+	*/
+	int iGoldFromCitiesMinusTR = m_pPlayer->GetYieldFromCitiesTimes100(YIELD_GOLD, true) / 100;
+	int iGPTFromDiplomacy = pTreasury->GetGoldPerTurnFromDiplomacy();
+	int iGoldFromCityConnect = m_pPlayer->GetCityConnectionYield(YIELD_GOLD);
+	int iGPTFromReligion = m_pPlayer->GetYieldPerTurnFromReligion(YIELD_GOLD);
+	int iGPTFromTraits = m_pPlayer->GetYieldPerTurnFromTraits(YIELD_GOLD);
+	int iGPTFromResolutions = m_pPlayer->GetYieldFromResolutions(YIELD_GOLD);
+	int iGPTFromHappiness = m_pPlayer->GetYieldPerTurnFromExcessHappiness(YIELD_GOLD) + m_pPlayer->GetYieldFromHappinessTimes100(YIELD_GOLD) / 100;
+	// END Revamped yields
+	// EventEngine - v0.1, Snarko
+	int iGPTFromEvents = m_pPlayer->getYieldFromEvents(YIELD_GOLD);
+	// END EventEngine
+	int iTradeRouteGold = (int)(iInternationalTradeGPT / 100);
+	// Revamped yields - v0.1, Snarko
+	// EventEngine - v0.1, Snarko
+	/* Original code
+	int iTotalIncome = iGoldFromCitiesMinusTR + iGPTFromDiplomacy + iGoldFromCityConnect + iGPTFromReligion + iGPTFromTraits + iTradeRouteGold;
+	*/
+	int iTotalIncome = iGoldFromCitiesMinusTR + iGPTFromDiplomacy + iGoldFromCityConnect + iGPTFromReligion + iGPTFromTraits + iGPTFromResolutions + iGPTFromHappiness + iGPTFromEvents + iTradeRouteGold;
+	// END Revamped yields
+	// END EventEngine
+	AppendToLog(strHeader, strLog, "Total Income", iTotalIncome);
+
+	// Gold breakdown
+	int iExpenses = pTreasury->GetExpensePerTurnUnitMaintenance() + pTreasury->GetBuildingGoldMaintenance() + pTreasury->GetImprovementGoldMaintenance();
+	AppendToLog(strHeader, strLog, "Unit Maint", pTreasury->GetExpensePerTurnUnitMaintenance());
+	AppendToLog(strHeader, strLog, "Build Maint", pTreasury->GetBuildingGoldMaintenance());
+	AppendToLog(strHeader, strLog, "Improve Maint", pTreasury->GetImprovementGoldMaintenance());
+	AppendToLog(strHeader, strLog, "Total Expenses", iExpenses);
+	AppendToLog(strHeader, strLog, "Net GPT", iTotalIncome - iExpenses);
 
 	if(bBuildHeader)
 	{
@@ -2220,6 +2267,36 @@ void CvEconomicAI::DisbandExtraWorkers()
 	pUnit->scrap();
 	LogScrapUnit(pUnit, iNumWorkers, iNumCities, iNumImprovedPlots, iNumValidPlots);
 }
+void CvEconomicAI::DisbandExtraArchaeologists(){
+	int iNumSites = GC.getGame().GetNumArchaeologySites();
+	double dMaxRatio = .5; //Ratio of archaeologists to sites
+	int iNumArchaeologists = m_pPlayer->GetNumUnitsWithUnitAI(UNITAI_ARCHAEOLOGIST, true);
+	PolicyTypes eExpFinisher = (PolicyTypes) GC.getInfoTypeForString("POLICY_EXPLORATION_FINISHER", true /*bHideAssert*/);
+	if (eExpFinisher != NO_POLICY)	
+	{
+		if (m_pPlayer->GetPlayerPolicies()->HasPolicy(eExpFinisher))
+		{
+			iNumSites += GC.getGame().GetNumHiddenArchaeologySites();
+		}
+	}
+	
+	CvUnit* pUnit;
+	UnitTypes eArch = (UnitTypes) GC.getInfoTypeForString("UNIT_ARCHAEOLOGIST");
+	if(eArch == NO_UNIT){
+		return;
+	}
+	if ((double)iNumSites * dMaxRatio + 1 < iNumArchaeologists ){
+		pUnit = FindArchaeologistToScrap();
+	
+		if(!pUnit)
+		{
+			return;
+		}
+	
+		pUnit->scrap();
+		LogScrapUnit(pUnit, iNumArchaeologists, iNumSites, 0, 0);
+	}
+}
 
 /// Go through the plots for the exploration automation to evaluate
 void CvEconomicAI::UpdatePlots()
@@ -2538,15 +2615,37 @@ CvUnit* CvEconomicAI::FindWorkerToScrap()
 	CvUnit* pLoopUnit = NULL;
 	int iUnitLoop = 0;
 
-	// Look at map for loose settlers
+	// Look at map for loose workers
 	for(pLoopUnit = m_pPlayer->firstUnit(&iUnitLoop); pLoopUnit != NULL; pLoopUnit = m_pPlayer->nextUnit(&iUnitLoop))
 	{
 		if(!pLoopUnit)
 		{
 			continue;
 		}
+		UnitTypes eWorker = (UnitTypes) GC.getInfoTypeForString("UNIT_WORKER");
+		if(pLoopUnit->getDomainType() == DOMAIN_LAND && pLoopUnit->getUnitType() == eWorker && !pLoopUnit->IsCombatUnit() && pLoopUnit->getSpecialUnitType() == NO_SPECIALUNIT)
+		{
+			return pLoopUnit;
+		}
+	}
 
-		if(pLoopUnit->getDomainType() == DOMAIN_LAND && pLoopUnit->IsWork() && !pLoopUnit->IsCombatUnit() && pLoopUnit->getSpecialUnitType() == NO_SPECIALUNIT)
+	return NULL;
+}
+
+CvUnit* CvEconomicAI::FindArchaeologistToScrap()
+{
+	CvUnit* pLoopUnit = NULL;
+	int iUnitLoop = 0;
+
+	// Look at map for loose archaeologists
+	for(pLoopUnit = m_pPlayer->firstUnit(&iUnitLoop); pLoopUnit != NULL; pLoopUnit = m_pPlayer->nextUnit(&iUnitLoop))
+	{
+		if(!pLoopUnit)
+		{
+			continue;
+		}
+		UnitTypes eArch = (UnitTypes) GC.getInfoTypeForString("UNIT_ARCHAEOLOGIST", true);
+		if(pLoopUnit->getUnitType() == eArch)
 		{
 			return pLoopUnit;
 		}
@@ -3971,15 +4070,19 @@ bool EconomicAIHelpers::IsTestStrategy_NeedArchaeologists(CvPlayer* pPlayer)
 bool EconomicAIHelpers::IsTestStrategy_EnoughArchaeologists(CvPlayer* pPlayer)
 {
 	int iNumSites = GC.getGame().GetNumArchaeologySites();
+	double iMaxRatio = .5; //Ratio of archaeologists to sites
 	int iNumArchaeologists = pPlayer->GetNumUnitsWithUnitAI(UNITAI_ARCHAEOLOGIST, true);
 	PolicyTypes eExpFinisher = (PolicyTypes) GC.getInfoTypeForString("POLICY_EXPLORATION_FINISHER", true /*bHideAssert*/);
 	
-	if (pPlayer->GetPlayerPolicies()->HasPolicy(eExpFinisher))
+	if (eExpFinisher != NO_POLICY)
 	{
-		iNumSites += GC.getGame().GetNumHiddenArchaeologySites();
+		if (pPlayer->GetPlayerPolicies()->HasPolicy(eExpFinisher))
+		{
+			iNumSites += GC.getGame().GetNumHiddenArchaeologySites();
+		}
 	}
 		
-	if (iNumSites < iNumArchaeologists)
+	if ((double)iNumSites * iMaxRatio + 1 < iNumArchaeologists)
 	{
 		return true;
 	}
@@ -4047,4 +4150,21 @@ bool EconomicAIHelpers::IsTestStrategy_NeedGuilds(CvPlayer* pPlayer)
 	}
 
 	return false;
+}
+
+/// We have the tech for guilds but haven't built them yet
+bool EconomicAIHelpers::IsTestStrategy_StartedPiety(CvPlayer* pPlayer)
+{
+	bool bRtnValue = false;
+
+	PolicyBranchTypes eBranch = (PolicyBranchTypes)GC.getInfoTypeForString("POLICY_BRANCH_PIETY", true);
+	if (eBranch != NO_POLICY_BRANCH_TYPE)
+	{
+		if (pPlayer->GetPlayerPolicies()->IsPolicyBranchUnlocked(eBranch))
+		{
+			return true;
+		}
+	}
+
+	return bRtnValue;
 }

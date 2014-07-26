@@ -252,21 +252,22 @@ function UpdateGPT()
     end
     
     -- Religion
-	-- Revamped yields - v0.1, Snarko
+    -- Revamped yields - v0.1, Snarko
     --local religionGPT = pPlayer:GetGoldPerTurnFromReligion();
-	local religionGPT = pPlayer:GetYieldFromReligion(YieldTypes.YIELD_GOLD);
-	-- END Revamped yields
+    local religionGPT = pPlayer:GetYieldFromReligion(YieldTypes.YIELD_GOLD);
+    -- END Revamped yields
     if( religionGPT > 0 ) then
         Controls.ReligionIncomeValue:SetText( Locale.ToNumber( religionGPT, "#.##" ) );
     else
         Controls.ReligionIncomeValue:SetText( 0 );
     end
 
-	-- Trade income breakdown tooltip
-	-- Revamped yields - v0.1, Snarko
-	--[[ Original code
+    -- Trade income breakdown tooltip
+    -- Revamped yields - v0.1, Snarko
+    --[[ Original code
     Controls.TradeIncomeValue:SetText( Locale.ToNumber( pPlayer:GetCityConnectionGoldTimes100() / 100, "#.##" ) );
     
+    -- Trade income breakdown tooltip
     local iBaseGold = GameDefines.TRADE_ROUTE_BASE_GOLD / 100;
     local iGoldPerPop = GameDefines.TRADE_ROUTE_CITY_POP_GOLD_MULTIPLIER / 100;
     local strTooltip = Locale.ConvertTextKey("TXT_KEY_EO_INCOME_TRADE");

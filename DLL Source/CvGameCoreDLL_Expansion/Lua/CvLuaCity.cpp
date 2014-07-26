@@ -231,23 +231,17 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	// No longer used
 	/* Original code
 	Method(GetBaseJONSCulturePerTurn);
-
 	Method(GetJONSCulturePerTurnFromBuildings);
 	Method(ChangeJONSCulturePerTurnFromBuildings);
-
 	Method(GetJONSCulturePerTurnFromPolicies);
 	Method(ChangeJONSCulturePerTurnFromPolicies);
-
 	Method(GetJONSCulturePerTurnFromSpecialists);
 	Method(ChangeJONSCulturePerTurnFromSpecialists);
-
 	Method(GetJONSCulturePerTurnFromGreatWorks);
-
 	Method(GetJONSCulturePerTurnFromTraits);
 	Method(GetJONSCulturePerTurnFromReligion);
-	
 	Method(GetJONSCulturePerTurnFromLeagues);
-	
+
 	Method(GetCultureRateModifier);
 	Method(ChangeCultureRateModifier);
 	*/
@@ -324,7 +318,6 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetSpaceProductionModifier);
 	Method(GetBuildingDefense);
 	Method(GetFreeExperience);
-	Method(GetAirModifier);
 	Method(GetNukeModifier);
 	//Method(GetFreeSpecialist);
 
@@ -448,6 +441,10 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(GetSpecialistGreatPersonProgressTimes100);
 	Method(ChangeSpecialistGreatPersonProgressTimes100);
 	Method(GetNumSpecialistsInBuilding);
+	// EventEngine - v0.1, Snarko
+	Method(GetNumFreeSpecialist);
+	Method(ChangeNumFreeSpecialist);
+	// END EventEngine
 	Method(DoReallocateCitizens);
 	Method(DoVerifyWorkingPlots);
 	Method(IsNoAutoAssignSpecialists);
@@ -475,6 +472,7 @@ void CvLuaCity::PushMethods(lua_State* L, int t)
 	Method(HasPerformedRangedStrikeThisTurn);
 	Method(RangeCombatUnitDefense);
 	Method(RangeCombatDamage);
+	Method(GetAirStrikeDefenseDamage);
 
 	Method(IsWorkingPlot);
 	Method(AlterWorkingPlot);
@@ -755,7 +753,7 @@ int CvLuaCity::lCanTrainTooltip(lua_State* L)
 	return 1;
 }
 //------------------------------------------------------------------------------
-//bool canTrain( int iUnit, bool bContinue, bool bTestVisible, bool bIgnoreCost, bool bIgnoreUpgrades);
+//bool canTrain( int iUnit, bool bContinue, bool bTestVisible, bool bIgnoreCost, bool bWillPurchase);
 int CvLuaCity::lCanTrain(lua_State* L)
 {
 	CvCity* pkCity = GetInstance(L);
@@ -763,8 +761,8 @@ int CvLuaCity::lCanTrain(lua_State* L)
 	const bool bContinue = luaL_optint(L, 3, 0);
 	const bool bTestVisible = luaL_optint(L, 4, 0);
 	const bool bIgnoreCost = luaL_optint(L, 5, 0);
-	const bool bIgnoreUpgrades = luaL_optint(L, 6, 0);
-	const bool bResult = pkCity->canTrain((UnitTypes)iUnit, bContinue, bTestVisible, bIgnoreCost, bIgnoreUpgrades);
+	const bool bWillPurchase = luaL_optint(L, 6, 0);
+	const bool bResult = pkCity->canTrain((UnitTypes)iUnit, bContinue, bTestVisible, bIgnoreCost, bWillPurchase);
 
 	lua_pushboolean(L, bResult);
 	return 1;
@@ -2077,7 +2075,6 @@ int CvLuaCity::lGetBaseJONSCulturePerTurn(lua_State* L)
 	return BasicLuaMethod(L, &CvCity::GetBaseJONSCulturePerTurn);
 }
 //------------------------------------------------------------------------------
-
 //int GetJONSCulturePerTurnFromBuildings() const;
 int CvLuaCity::lGetJONSCulturePerTurnFromBuildings(lua_State* L)
 {
@@ -2089,7 +2086,6 @@ int CvLuaCity::lChangeJONSCulturePerTurnFromBuildings(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::ChangeJONSCulturePerTurnFromBuildings);
 }
-
 //------------------------------------------------------------------------------
 //int GetJONSCulturePerTurnFromPolicies() const;
 int CvLuaCity::lGetJONSCulturePerTurnFromPolicies(lua_State* L)
@@ -2103,7 +2099,6 @@ int CvLuaCity::lChangeJONSCulturePerTurnFromPolicies(lua_State* L)
 	return BasicLuaMethod(L, &CvCity::ChangeJONSCulturePerTurnFromPolicies);
 }
 //------------------------------------------------------------------------------
-
 //int GetJONSCulturePerTurnFromSpecialists() const;
 int CvLuaCity::lGetJONSCulturePerTurnFromSpecialists(lua_State* L)
 {
@@ -2115,7 +2110,6 @@ int CvLuaCity::lChangeJONSCulturePerTurnFromSpecialists(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::ChangeJONSCulturePerTurnFromSpecialists);
 }
-
 //------------------------------------------------------------------------------
 //int GetJONSCulturePerTurnFromGreatWorks() const;
 int CvLuaCity::lGetJONSCulturePerTurnFromGreatWorks(lua_State* L)
@@ -2128,7 +2122,6 @@ int CvLuaCity::lGetJONSCulturePerTurnFromTraits(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::GetJONSCulturePerTurnFromTraits);
 }
-
 //------------------------------------------------------------------------------
 //int GetJONSCulturePerTurnFromReligion() const;
 int CvLuaCity::lGetJONSCulturePerTurnFromReligion(lua_State* L)
@@ -2141,14 +2134,12 @@ int CvLuaCity::lChangeJONSCulturePerTurnFromReligion(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::ChangeJONSCulturePerTurnFromReligion);
 }
-
 //------------------------------------------------------------------------------
 //int GetJONSCulturePerTurnFromLeagues() const;
 int CvLuaCity::lGetJONSCulturePerTurnFromLeagues(lua_State* L)
 {
 	return BasicLuaMethod(L, &CvCity::GetJONSCulturePerTurnFromLeagues);
 }
-
 //------------------------------------------------------------------------------
 //int getCultureRateModifier() const;
 int CvLuaCity::lGetCultureRateModifier(lua_State* L)
@@ -2691,16 +2682,6 @@ int CvLuaCity::lGetFreeExperience(lua_State* L)
 {
 	CvCity* pkCity = GetInstance(L);
 	const int iResult = pkCity->getFreeExperience();
-
-	lua_pushinteger(L, iResult);
-	return 1;
-}
-//------------------------------------------------------------------------------
-//int getAirModifier();
-int CvLuaCity::lGetAirModifier(lua_State* L)
-{
-	CvCity* pkCity = GetInstance(L);
-	const int iResult = pkCity->getAirModifier();
 
 	lua_pushinteger(L, iResult);
 	return 1;
@@ -3476,6 +3457,27 @@ int CvLuaCity::lGetNumSpecialistsInBuilding(lua_State* L)
 	return 1;
 }
 
+// EventEngine - v0.1, Snarko
+int CvLuaCity::lGetNumFreeSpecialist(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iIndex = lua_tointeger(L, 2);
+	const int iResult = pkCity->GetCityCitizens()->GetNumFreeSpecialist(toValue<SpecialistTypes>(L, 2));
+
+	lua_pushinteger(L, iResult);
+	return 1;
+}
+int CvLuaCity::lChangeNumFreeSpecialist(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	const int iIndex = lua_tointeger(L, 2);
+	const int iChange = lua_tointeger(L, 3);
+	pkCity->GetCityCitizens()->ChangeNumFreeSpecialist(toValue<SpecialistTypes>(L, 2), iChange);
+
+	return 1;
+}
+// END EventEngine
+
 //------------------------------------------------------------------------------
 //int DoReallocateCitizens();
 int CvLuaCity::lDoReallocateCitizens(lua_State* L)
@@ -3666,6 +3668,17 @@ int CvLuaCity::lRangeCombatDamage(lua_State* L)
 	bool bIncludeRand = luaL_optbool(L, 4, false);
 
 	const int iRangedDamage = pkCity->rangeCombatDamage(pkDefendingUnit, pkDefendingCity, bIncludeRand);
+	lua_pushinteger(L, iRangedDamage);
+	return 1;
+}
+//------------------------------------------------------------------------------
+int CvLuaCity::lGetAirStrikeDefenseDamage(lua_State* L)
+{
+	CvCity* pkCity = GetInstance(L);
+	CvUnit* pkAttackingUnit = CvLuaUnit::GetInstance(L, 2, false);
+	bool bIncludeRand = luaL_optbool(L, 3, false);
+
+	const int iRangedDamage = pkCity->GetAirStrikeDefenseDamage(pkAttackingUnit, bIncludeRand);
 	lua_pushinteger(L, iRangedDamage);
 	return 1;
 }

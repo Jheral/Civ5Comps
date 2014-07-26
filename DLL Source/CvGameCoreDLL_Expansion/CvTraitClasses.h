@@ -144,6 +144,7 @@ public:
 	int GetPlotBuyCostModifier() const;
 	int GetPlotCultureCostModifier() const;
 	int GetCultureFromKills() const;
+	int GetFaithFromKills() const;
 	// Revamped yields - v0.1, Snarko
 	// No longer used, use GetYieldChange
 	// XML tag still kept for backwards compatibility
@@ -291,6 +292,7 @@ protected:
 	int m_iPlotBuyCostModifier;
 	int m_iPlotCultureCostModifier;
 	int m_iCultureFromKills;
+	int m_iFaithFromKills;
 	// Revamped yields - v0.1, Snarko
 	// No longer used, use m_paiYieldChange
 	// XML tag still kept for backwards compatibility
@@ -554,6 +556,10 @@ public:
 	int GetCultureFromKills() const
 	{
 		return m_iCultureFromKills;
+	};
+	int GetFaithFromKills() const
+	{
+		return m_iFaithFromKills;
 	};
 	// Revamped yields - v0.1, Snarko
 	// No longer used, use GetYieldChange
@@ -820,6 +826,7 @@ public:
 	{
 		return m_bUniqueLuxuryRequiresNewArea;
 	}
+	bool WillGetUniqueLuxury(CvArea *pArea) const;
 	bool IsRiverTradeRoad() const
 	{
 		return m_bRiverTradeRoad;
@@ -943,6 +950,7 @@ private:
 	int m_iPlotBuyCostModifier;
 	int m_iPlotCultureCostModifier;
 	int m_iCultureFromKills;
+	int m_iFaithFromKills;
 	// Revamped yields - v0.1, Snarko
 	// No longer used, use m_iFreeCityYield
 	// XML tag still kept for backwards compatibility

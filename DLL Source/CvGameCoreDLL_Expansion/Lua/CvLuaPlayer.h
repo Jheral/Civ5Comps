@@ -275,7 +275,6 @@ protected:
 	// No longer used
 	/* Original code
 	static int lGetCulturePerTurnFromBonusTurns(lua_State* L);
-	
 	static int lGetCultureCityModifier(lua_State* L);
 	*/
 	// END Revamped yields
@@ -295,6 +294,10 @@ protected:
 	static int lGetTurnsToInfluential(lua_State* L);
 	static int lGetNumCivsInfluentialOn(lua_State* L);
 	static int lGetNumCivsToBeInfluentialOn(lua_State* L);
+	static int lGetInfluenceTradeRouteScienceBonus(lua_State* L);
+	static int lGetInfluenceCityStateSpyRankBonus(lua_State* L);
+	static int lGetInfluenceMajorCivSpyRankBonus(lua_State* L);
+	static int lGetInfluenceSpyRankTooltip(lua_State* L);
 	static int lGetTourism(lua_State* L);
 	static int lGetTourismModifierWith(lua_State* L);
 	static int lGetTourismModifierWithTooltip(lua_State* L);
@@ -308,6 +311,7 @@ protected:
 	static int lGetCityOfClosestGreatWorkSlot(lua_State* L);
 	static int lGetBuildingOfClosestGreatWorkSlot(lua_State* L);
 	static int lGetNextDigCompletePlot(lua_State* L);
+	static int lGetWrittenArtifactCulture (lua_State* L);
 	static int lGetNumGreatWorks(lua_State *L);
 	static int lGetNumGreatWorkSlots(lua_State *L);
 
@@ -826,6 +830,7 @@ protected:
 	static int lIsAskedToStopDigging(lua_State* L);
 	static int lIsDoFMessageTooSoon(lua_State* L);
 	static int lIsDoF(lua_State* L);
+	static int lGetDoFCounter(lua_State* L);
 	static int lIsPlayerDoFwithAnyFriend(lua_State* L);
 	static int lIsPlayerDoFwithAnyEnemy(lua_State* L);
 	static int lIsPlayerDenouncedFriend(lua_State* L);
@@ -850,6 +855,7 @@ protected:
 	static int lIsPlayerStopSpyingRequestEverAsked(lua_State* L);
 	static int lIsDemandEverMade(lua_State* L);
 	static int lGetNumCiviliansReturnedToMe(lua_State* L);
+	static int lGetNumLandmarksBuiltForMe(lua_State* L);
 	static int lGetNumTimesCultureBombed(lua_State* L);
 	static int lGetNegativeReligiousConversionPoints(lua_State* L);
 	static int lGetNegativeArchaeologyPoints(lua_State* L);
@@ -877,6 +883,7 @@ protected:
 	static int lGetTurnsSincePlayerBulliedProtectedMinor(lua_State* L);
 	static int lIsHasPlayerBulliedProtectedMinor(lua_State* L);
 	static int lIsDenouncedPlayer(lua_State* L);
+	static int lGetDenouncedPlayerCounter(lua_State* L);
 	static int lIsDenouncingPlayer(lua_State* L);
 	static int lIsPlayerRecklessExpander(lua_State* L);
 	static int lGetRecentTradeValue(lua_State* L);
@@ -1034,6 +1041,7 @@ protected:
 	static int lGetInternationalTradeRouteTotal(lua_State* L);
 	static int lGetInternationalTradeRouteScience(lua_State* L);
 	static int lGetPotentialTradeUnitNewHomeCity(lua_State* L);
+	static int lGetPotentialAdmiralNewPort(lua_State* L);
 	static int lGetNumAvailableTradeUnits(lua_State* L);
 	static int lGetTradeUnitType(lua_State* L);
 	static int lGetTradeYourRoutesTTString(lua_State* L);
@@ -1064,6 +1072,10 @@ protected:
 
 
 	static int lHasUnitOfClassType(lua_State* L);
+	
+	// Warmongering
+	static int lGetWarmongerPreviewString(lua_State* L);
+	static int lGetLiberationPreviewString(lua_State* L);
 
 	// EventEngine - v0.1, Snarko
 	static int lCheckEventModifier(lua_State* L);
