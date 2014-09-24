@@ -189,6 +189,23 @@ CvResolutionEffects::CvResolutionEffects(void)
 	/* Original code
 	iGoldPerTurn = 0;
 	*/
+	m_aiOneTimeYield.clear();
+	m_aiOneTimeYield.resize(NUM_YIELD_TYPES);
+
+	m_aiYieldPerTurn.clear();
+	m_aiYieldPerTurn.resize(NUM_YIELD_TYPES);
+
+	m_aiYieldPerWonder.clear();
+	m_aiYieldPerWonder.resize(NUM_YIELD_TYPES);
+
+	m_aiYieldPerNaturalWonder.clear();
+	m_aiYieldPerNaturalWonder.resize(NUM_YIELD_TYPES);
+
+	m_aiYieldGPTileImprovement.clear();
+	m_aiYieldGPTileImprovement.resize(NUM_YIELD_TYPES);
+
+	m_aiYieldPerLandmark.clear();
+	m_aiYieldPerLandmark.resize(NUM_YIELD_TYPES);
 	// END Revamped yields
 	iResourceQuantity = 0;
 	bEmbargoCityStates = false;
@@ -7953,6 +7970,13 @@ void CvLeagueAI::Read(FDataStream& kStream)
 {
 	uint uiVersion;
 	kStream >> uiVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. 
+	// Old firaxis patch and old mod version? No problem! Except if you weren't using our mod before...
+	uint modVersion;
+	kStream >> modVersion;
+	// END modVersion
 
 	if (uiVersion >= 2)
 	{
@@ -7980,6 +8004,13 @@ void CvLeagueAI::Write(FDataStream& kStream)
 {
 	uint uiVersion = 2;
 	kStream << uiVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. 
+	// Old firaxis patch and old mod version? No problem! Except if you weren't using our mod before...
+	uint modVersion = 1;
+	kStream << modVersion;
+	// END modVersion
 
 	kStream << m_vVoteCommitmentList.size();
 	for (VoteCommitmentList::iterator it = m_vVoteCommitmentList.begin(); it != m_vVoteCommitmentList.end(); ++it)

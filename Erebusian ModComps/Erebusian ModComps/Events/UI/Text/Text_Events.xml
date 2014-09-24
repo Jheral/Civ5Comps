@@ -39,7 +39,10 @@
 			<Text>{1_Num}% {2_IconString} per turn</Text>
 		</Row>
 		<Row Tag="TXT_KEY_EVENTACTION_HAPPY">
-			<Text>{1_Num} happiness</Text>
+			<Text>{1_Num} [ICON_HAPPINESS_1]</Text>
+		</Row>
+		<Row Tag="TXT_KEY_EVENTACTION_UNHAPPY">
+			<Text>{1_Num} [ICON_HAPPINESS_3]</Text>
 		</Row>
 		<Row Tag="TXT_KEY_EVENTACTION_TECH">
 			<Text>Get the {1_TechDesc} tech for free</Text>
@@ -139,6 +142,12 @@
 		</Row>
 		<Row Tag="TXT_KEY_EVENTACTION_UNIT_SET_FLAG">
 			<Text>Set the {3_String} flag to {2_Num} for {1_UnitName}</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SUMMARY_EVENT">
+			<Text>CHOOSE EVENT OPTION</Text>
+		</Row>
+		<Row Tag="TXT_KEY_NOTIFICATION_SUMMARY_EVENT_TT">
+			<Text>An event has happened! Choose an option before you can proceed.</Text>
 		</Row>
 	</Language_en_US>
 </GameData>

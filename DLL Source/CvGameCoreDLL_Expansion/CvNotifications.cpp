@@ -263,6 +263,13 @@ void CvNotifications::Read(FDataStream& kStream)
 	// Version number to maintain backwards compatibility
 	uint uiVersion;
 	kStream >> uiVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. 
+	// Old firaxis patch and old mod version? No problem! Except if you weren't using our mod before...
+	uint modVersion;
+	kStream >> modVersion;
+	// END modVersion
 
 	kStream >> m_ePlayer;
 	kStream >> m_iCurrentLookupIndex;
@@ -288,6 +295,13 @@ void CvNotifications::Write(FDataStream& kStream) const
 	// Current version number
 	uint uiVersion = 2;
 	kStream << uiVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. 
+	// Old firaxis patch and old mod version? No problem! Except if you weren't using our mod before...
+	uint modVersion = 1;
+	kStream << modVersion;
+	// END modVersion
 
 	// need to serialize notification list
 	kStream << m_ePlayer;
@@ -549,6 +563,9 @@ bool CvNotifications::MayUserDismiss(int iLookupIndex)
 			case NOTIFICATION_CHOOSE_ARCHAEOLOGY:
 			case NOTIFICATION_LEAGUE_CALL_FOR_VOTES:
 			case NOTIFICATION_CHOOSE_IDEOLOGY:
+			// EventEngine - v0.1, Snarko
+			case NOTIFICATION_EVENT:
+			// END EventEngine
 				return false;
 				break;
 
@@ -730,6 +747,14 @@ bool CvNotifications::GetEndTurnBlockedType(EndTurnBlockingTypes& eBlockingType,
 				iNotificationIndex = m_aNotifications[iIndex].m_iLookupIndex;
 				return true;
 				break;
+
+			// EventEngine - v0.1, Snarko
+			case NOTIFICATION_EVENT:
+				eBlockingType = ENDTURN_BLOCKING_EVENT;
+				iNotificationIndex = m_aNotifications[iIndex].m_iLookupIndex;
+				return true;
+				break;
+			// END EventEngine
 
 			default:
 				// these notifications don't block, so don't return a blocking type
@@ -1836,6 +1861,9 @@ bool CvNotifications::IsNotificationEndOfTurnExpired(int iIndex)
 	case NOTIFICATION_HOST_MIGRATION:
 	case NOTIFICATION_PLAYER_CONNECTING:
 	case NOTIFICATION_PLAYER_KICKED:
+	// EventEngine - v0.1, Snarko
+	case NOTIFICATION_EVENT:
+	// END EventEngine
 		return false;
 		break;
 

@@ -12,8 +12,14 @@
 		<Column name="Strategy" type="text" reference="Language_en_US(Tag)"/>
 		<Column name="EventType" type="text" default="EVENT_PLAYER"/>
 		<Column name="MeanTimeToHappen" type="integer" default="-1"/>
+		<!-- May not perform any other actions before choosing an option -->
+		<Column name="bForcedImmediate" type="boolean" default="false"/>
+		<!-- For silent events the first option is always chosen (automatically, without notification) -->
+		<Column name="bSilent" type="boolean" default="false"/>
 		<Column name="Image" type="text" default="NULL"/>
 		<Column name="NotificationText" type="text" reference="Language_en_US(Tag)" default="TXT_KEY_EVENT_NOTIFICATION_TEXT"/>
+		<Column name="IconAtlas" type="text" default="NULL" reference="IconTextureAtlases(Atlas)"/>
+		<Column name="PortraitIndex" type="integer" default="-1"/>
 	</Table>
 	<Table name="Event_Requirements">
 		<Column name="ID" type="integer" primarykey="true" autoincrement="true"/>
@@ -22,7 +28,8 @@
 		<Column name="EventType" type="text" reference="Events(Type)"/>
 		<Column name="EventModifierType" type="text" notnull="true"/>
 		<Column name="EventCompareType" type="text"/>
-		<Column name="CompareItem" type="text" default="NULL"/>
+		<Column name="CompareFlag" type="text"/>
+		<Column name="CompareItem" type="text"/>
 		<Column name="iNumberToCompare" type="integer" default="-1"/>
 		<!-- <Column name="fFactor" type="float" default="0"/> -->
 		<Column name="SetName" type="text" default="default"/>
@@ -35,6 +42,7 @@
 		<Column name="EventModifierType" type="text" notnull="true"/>
 		<Column name="EventCompareType" type="text"/>
 		<Column name="CompareItem" type="text"/>
+		<Column name="CompareFlag" type="text"/>
 		<Column name="iNumberToCompare" type="integer" default="-1"/>
 		<Column name="fFactor" type="float" default="0"/>
 		<Column name="SetName" type="text" default="default"/>
@@ -56,22 +64,44 @@
 		<Column name="EventActionType" type="integer" notnull="true"/>
 		<Column name="iTurns" type="integer" default="-1"/>
 		<Column name="iChance" type="integer" default="-1"/>
-		<Column name="ActionItem" type="text" default=""/>
+		<Column name="YieldType" type="text" reference="Yields(Type)"/>
+		<Column name="SpecialistType" type="text" reference="Specialists(Type)"/>
+		<Column name="ItemType" type="text" default=""/>
 		<Column name="AIWeight" type="integer" default="0"/>
 		<Column name="iValue" type="integer" default="0"/>
+		<Column name="iMaxValue" type="integer" default="-1"/>
 		<Column name="iValue2" type="integer" default="0"/>
+		<Column name="iCoordX" type="integer" default="0"/>
+		<Column name="iCoordY" type="integer" default="0"/>
+		<Column name="bFreeItem" type="boolean" default="false"/>
+		<Column name="bIgnoreReq" type="boolean" default="false"/>
+		<Column name="bModifyItem" type="boolean" default="false"/>
+		<Column name="bRemoveItem" type="boolean" default="false"/>
 		<Column name="bBool" type="boolean" default="false"/>
-		<Column name="sString" type="text" default=" "/>
+		<Column name="FlagName" type="text" default=" "/>
 		<Column name="SetName" type="text" default="default"/>
 	</Table>
 	<Events>
 		<Row>
 			<ID>0</ID>
+			<Type>EVENT_IDEOLOGY_FACTORIES</Type>
+			<MeanTimeToHappen>-1</MeanTimeToHappen>
+			<bSilent>true</bSilent>
+		</Row>
+		<Row>
+			<Type>EVENT_IDEOLOGY_ERA</Type>
+			<MeanTimeToHappen>-1</MeanTimeToHappen>
+			<bSilent>true</bSilent>
+		</Row>
+		<Row>
 			<Type>Test_Event</Type>
 			<Description>TXT_KEY_TEST_EVENT_DESC</Description>
 			<Civilopedia>TXT_KEY_TEST_EVENT</Civilopedia>
 			<EventType>EVENT_CITY</EventType>
+			<bForcedImmediate>true</bForcedImmediate>
 			<NotificationText>TXT_KEY_TEST_EVENT_NOTIFICATION</NotificationText>
+			<PortraitIndex>3</PortraitIndex>
+			<IconAtlas>RESOURCE_ATLAS_EXP2</IconAtlas>
 		</Row>
 		<Row>
 			<Type>EventTest</Type>
@@ -84,7 +114,7 @@
 			<Description>TXT_KEY_EVENT_TESTING_JHERAL_DESC</Description>
 			<Civilopedia>TXT_KEY_EVENT_TESTING_JHERAL_PEDIA</Civilopedia>
 			<Image>testImage_290x120.dds</Image>
-			<MeanTimeToHappen>10</MeanTimeToHappen>
+			<MeanTimeToHappen>2</MeanTimeToHappen>
 		</Row>
 		<Row>
 			<Type>EVENT_BUILDINGTEST</Type>
@@ -96,6 +126,37 @@
 	<Event_Requirements>
 		<Row>
 			<ID>0</ID>
+			<Type>EVENT_IDEOLOGY_FACTORIES_REQ</Type>
+			<EventType>EVENT_IDEOLOGY_FACTORIES</EventType>
+			<EventModifierType>EVENTMOD_FLAG</EventModifierType>
+			<EventCompareType>COMPARE_LESSTHAN</EventCompareType>
+			<CompareFlag>FLAG_IDEOLOGY</CompareFlag>
+			<iNumberToCompare>1</iNumberToCompare>
+		</Row>
+		<Row>
+			<Type>EVENT_IDEOLOGY_FACTORIES_REQ2</Type>
+			<EventType>EVENT_IDEOLOGY_FACTORIES</EventType>
+			<EventModifierType>EVENTMOD_BUILDINGCLASS</EventModifierType>
+			<EventCompareType>COMPARE_MORETHAN</EventCompareType>
+			<CompareItem>BUILDINGCLASS_FACTORY</CompareItem>
+			<iNumberToCompare>2</iNumberToCompare>
+		</Row>
+		<Row>
+			<Type>EVENT_IDEOLOGY_ERA_REQ</Type>
+			<EventType>EVENT_IDEOLOGY_ERA</EventType>
+			<EventModifierType>EVENTMOD_FLAG</EventModifierType>
+			<EventCompareType>COMPARE_LESSTHAN</EventCompareType>
+			<CompareFlag>FLAG_IDEOLOGY</CompareFlag>
+			<iNumberToCompare>1</iNumberToCompare>
+		</Row>
+		<Row>
+			<Type>EVENT_IDEOLOGY_ERA_REQ2</Type>
+			<EventType>EVENT_IDEOLOGY_ERA</EventType>
+			<EventModifierType>EVENTMOD_ERA</EventModifierType>
+			<EventCompareType>COMPARE_MORETHAN</EventCompareType>
+			<CompareItem>ERA_INDUSTRIAL</CompareItem>
+		</Row>
+		<Row>
 			<Type>Test_Event_Req1</Type>
 			<EventType>Test_Event</EventType>
 			<EventModifierType>EVENTMOD_HAPPINESS</EventModifierType>
@@ -169,6 +230,16 @@
 	<Event_Options>
 		<Row>
 			<ID>0</ID>
+			<Type>EVENT_IDEOLOGY_FACTORIES_OPTION</Type>
+			<EventType>EVENT_IDEOLOGY_FACTORIES</EventType>
+			<Description>TXT_KEY_NOTIFICATION_SUMMARY_CHOOSE_IDEOLOGY</Description>
+		</Row>
+		<Row>
+			<Type>EVENT_IDEOLOGY_ERA_OPTION</Type>
+			<EventType>EVENT_IDEOLOGY_ERA</EventType>
+			<Description>TXT_KEY_NOTIFICATION_SUMMARY_CHOOSE_IDEOLOGY</Description>
+		</Row>
+		<Row>
 			<Type>Test_Event_Option1</Type>
 			<EventType>Test_Event</EventType>
 			<Description>TXT_KEY_TEST_EVENT_OPTION1</Description>
@@ -213,6 +284,20 @@
 	<Event_Actions>
 		<Row>
 			<ID>0</ID>
+			<Type>EVENT_IDEOLOGY_FACTORIES_ACTION</Type>
+			<EventOptionType>EVENT_IDEOLOGY_FACTORIES_OPTION</EventOptionType>
+			<EventActionType>EVENTACTION_SET_FLAG</EventActionType>
+			<iValue>1</iValue>
+			<FlagName>FLAG_IDEOLOGY</FlagName>
+		</Row>
+		<Row>
+			<Type>EVENT_IDEOLOGY_ERA_ACTION</Type>
+			<EventOptionType>EVENT_IDEOLOGY_ERA_OPTION</EventOptionType>
+			<EventActionType>EVENTACTION_SET_FLAG</EventActionType>
+			<iValue>1</iValue>
+			<FlagName>FLAG_IDEOLOGY</FlagName>
+		</Row>
+		<Row>
 			<Type>Test_Event_Action1</Type>
 			<EventOptionType>Test_Event_Option1</EventOptionType>
 			<EventActionType>EVENTACTION_HAPPY</EventActionType>
@@ -223,7 +308,7 @@
 			<Type>Test_Event_Action2</Type>
 			<EventOptionType>Test_Event_Option1</EventOptionType>
 			<EventActionType>EVENTACTION_YIELD</EventActionType>
-			<ActionItem>YIELD_GOLD</ActionItem>
+			<ItemType>YIELD_GOLD</ItemType>
 			<iValue>10</iValue>
 			<iTurns>2</iTurns>
 		</Row>
@@ -231,14 +316,14 @@
 			<Type>Test_Event_Action3</Type>
 			<EventOptionType>Test_Event_Option1</EventOptionType>
 			<EventActionType>EVENTACTION_YIELD</EventActionType>
-			<ActionItem>YIELD_SCIENCE</ActionItem>
+			<YieldType>YIELD_SCIENCE</YieldType>
 			<iValue>1</iValue>
 		</Row>
 		<Row>
 			<Type>Test_Event_Action4</Type>
 			<EventOptionType>Test_Event_Option1</EventOptionType>
 			<EventActionType>EVENTACTION_YIELD</EventActionType>
-			<ActionItem>YIELD_CULTURE</ActionItem>
+			<YieldType>YIELD_CULTURE</YieldType>
 			<iValue>-1</iValue>
 			<iTurns>2</iTurns>
 		</Row>
@@ -246,7 +331,7 @@
 			<Type>Test_Event_Action5</Type>
 			<EventOptionType>Test_Event_Option1</EventOptionType>
 			<EventActionType>EVENTACTION_YIELDMOD</EventActionType>
-			<ActionItem>YIELD_PRODUCTION</ActionItem>
+			<YieldType>YIELD_PRODUCTION</YieldType>
 			<iValue>100</iValue>
 			<iTurns>2</iTurns>
 		</Row>
@@ -254,7 +339,7 @@
 			<Type>Test_Event_Action6</Type>
 			<EventOptionType>Test_Event_Option1</EventOptionType>
 			<EventActionType>EVENTACTION_CITY_ADD_BUILDING</EventActionType>
-			<ActionItem>BUILDING_LIBRARY</ActionItem>
+			<ItemType>BUILDING_LIBRARY</ItemType>
 			<iValue>3</iValue>
 		</Row>
 		<Row>
@@ -275,7 +360,7 @@
 			<EventOptionType>EventTestOption1</EventOptionType>
 			<EventActionType>EVENTACTION_SET_FLAG</EventActionType>
 			<iValue>2</iValue>
-			<sString>FLAG_TEST</sString>
+			<FlagName>FLAG_TEST</FlagName>
 		</Row>
 	</Event_Actions>
 </GameData>

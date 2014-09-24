@@ -4297,11 +4297,6 @@ void CvPlayer::doTurn()
 
 	m_kPlayerAchievements.StartTurn();
 
-	// EventEngine - v0.1, Snarko
-	// doTempEventEffects should be before doEvents, so we do not count down an event we just triggered. The AI pick an option immediately.
-	doTempEventEffects(); 
-	doEvents();
-	// END EventEngine
 }
 
 //	--------------------------------------------------------------------------------
@@ -4335,6 +4330,11 @@ void CvPlayer::doTurnPostDiplomacy()
 			GetMinorCivAI()->DoTurn();
 		}
 	}
+	// EventEngine - v0.1, Snarko
+	// doTempEventEffects should be before doEvents, so we do not count down an event we just triggered.
+	doTempEventEffects(); 
+	doEvents();
+	// END EventEngine
 
 	// Temporary boosts
 	if(GetAttackBonusTurns() > 0)
@@ -22722,8 +22722,8 @@ void CvPlayer::Read(FDataStream& kStream)
 	kStream >> uiVersion;
 	// modVersion - v1, Snarko
 	// We are using our own value here to keep backwards compatibility.
-	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem! Well, except mod versions created before using our modcomp(s)...
-	// USEDBY: EventEngine
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. 
+	// Old firaxis patch and old mod version? No problem! Except if you weren't using our mod before...
 	uint modVersion;
 	kStream >> modVersion;
 	// END modVersion
@@ -23361,7 +23361,8 @@ void CvPlayer::Write(FDataStream& kStream) const
 	kStream << g_CurrentCvPlayerVersion;
 	// modVersion - v1, Snarko
 	// We are using our own value here to keep backwards compatibility.
-	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem!
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. 
+	// Old firaxis patch and old mod version? No problem! Except if you weren't using our mod before...
 	// USEDBY: EventEngine
 	uint modVersion = 1;
 	kStream << modVersion;
@@ -25949,6 +25950,21 @@ bool CancelActivePlayerEndTurn()
 void CvPlayer::doEvents()
 {
 	bool bValid;
+	int iLoop = 0;
+
+	// Make sure to show forced events. 
+	// If they happened before this they could have happened during another players turn.
+	if (isHuman())
+	{
+		for(CvEvent* pEvent = firstEvent(&iLoop, false); pEvent != NULL; pEvent = nextEvent(&iLoop, false))
+		{
+			if (pEvent->isQueued())
+			{
+				CvPopupInfo kPopup(BUTTONPOPUP_EVENT, GetID(), pEvent->getEventType(), pEvent->GetID());
+				GC.GetEngineUserInterface()->AddPopup(kPopup);
+			}
+		}
+	}
 
 	for (int iI = 0; iI < GC.getNumEventInfos(); iI++)
 	{
@@ -26097,10 +26113,15 @@ void CvPlayer::doEventChance(CvEventInfo& kEvent, CvCity* pCity, CvUnit* pUnit)
 	{
 		CvEvent* Event = addEvent();
 		Event->init(Event->GetID(), (EventTypes)kEvent.GetID(), asziChosenItems, GetID(), pCity, pUnit);
-		Event->trigger();
+		if (kEvent.isSilent())
+			Event->processEventOption(0);
+		else
+		{
+			Event->trigger();
 
-		if (!isHuman())
-			AI_chooseEventOption(Event->GetID());
+			if (!isHuman())
+				AI_chooseEventOption(Event->GetID());
+		}
 	}
 }
 
@@ -26188,16 +26209,21 @@ void CvPlayer::triggerEvent(EventTypes eEvent, bool bCheckRequirements, std::map
 
 	CvEvent* Event = addEvent();
 	Event->init(Event->GetID(), (EventTypes)pEvent->GetID(), Sets, GetID(), pCity, pUnit);
-	Event->trigger();
+	if (pEvent->isSilent())
+		Event->processEventOption(0);
+	else
+	{
+		Event->trigger();
 
-	if (!isHuman())
-		AI_chooseEventOption(Event->GetID());
-
+		if (!isHuman())
+			AI_chooseEventOption(Event->GetID());
+	}
 }
 
 bool CvPlayer::checkEventModifier(CvEventModifierInfo& kModifier, bool bRequirement)
 {
 	int iValue = 0;
+	bool bUseCompareItem = false;
 
 	switch(kModifier.getModifierType())
 	{
@@ -26513,6 +26539,7 @@ bool CvPlayer::checkEventModifier(CvEventModifierInfo& kModifier, bool bRequirem
 
 	case EVENTMOD_HANDICAP:
 		iValue = (int)getHandicapType();
+		bUseCompareItem = true;
 		break;
 
 	case EVENTMOD_CIVILIZATION:
@@ -26585,17 +26612,23 @@ bool CvPlayer::checkEventModifier(CvEventModifierInfo& kModifier, bool bRequirem
 
 	case EVENTMOD_ERA:
 		iValue = (int)GetCurrentEra();
+		bUseCompareItem = true;
 		break;
 
 	case EVENTMOD_GREATPEOPLECREATED:
 		iValue = GetNumGreatPeople();
 		break;
+
+	case EVENTMOD_FLAG:
+		iValue = getFlag(kModifier.getFlagToCompare());
+		break;
+
 	default:
 		CvAssertMsg(false, "Could not find EventModifierType");
 		return false; // We can't pass a test we don't understand.
 	}
 	
-	return GC.EventIntEval(iValue, kModifier);
+	return GC.EventIntEval(iValue, kModifier, bUseCompareItem);
 }
 
 //	--------------------------------------------------------------------------------
@@ -26807,7 +26840,8 @@ bool CvPlayer::isEventSetTest(CvEventModifierInfo& kModifier, int iItem, CvCity*
 	case EVENTMOD_CITY_BUILDINGCLASS:
 		if (pCity == NULL)
 			return false;
-		iValue = pCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)iItem);
+		// TODO? Support for having a building from a different civ?
+		iValue = pCity->GetCityBuildings()->GetNumBuilding((BuildingTypes)getCivilizationInfo().getCivilizationBuildings(iItem));
 		break;
 
 	case EVENTMOD_CITY_WORKING_RESOURCE:

@@ -9206,6 +9206,13 @@ void CvGame::Read(FDataStream& kStream)
 	// Version number to maintain backwards compatibility
 	uint uiVersion;
 	kStream >> uiVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. 
+	// Old firaxis patch and old mod version? No problem! Except if you weren't using our mod before...
+	uint modVersion;
+	kStream >> modVersion;
+	// END modVersion
 
 	kStream >> m_iEndTurnMessagesSent;
 	kStream >> m_iElapsedGameTurns;
@@ -9448,6 +9455,13 @@ void CvGame::Write(FDataStream& kStream) const
 {
 	// Current version number
 	kStream << g_CurrentCvGameVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. 
+	// Old firaxis patch and old mod version? No problem! Except if you weren't using our mod before...
+	uint modVersion = 1;
+	kStream << modVersion;
+	// END modVersion
 
 	kStream << m_iEndTurnMessagesSent;
 	kStream << m_iElapsedGameTurns;

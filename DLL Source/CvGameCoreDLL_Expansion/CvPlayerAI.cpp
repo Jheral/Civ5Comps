@@ -110,6 +110,15 @@ void CvPlayerAI::AI_doTurnPost()
 		return;
 	}
 
+	// EventEngine - v0.1, Snarko
+	// DO NOT pass pEvent to AI_chooseEventOption. The event is deleted when an option has been chosen.
+	int iLoop = 0;
+	for(CvEvent* pEvent = firstEvent(&iLoop, false); pEvent != NULL; pEvent = nextEvent(&iLoop, false))
+	{
+		AI_chooseEventOption(pEvent->GetID());
+	}
+	// END EventEngine
+
 	if(isBarbarian())
 	{
 		return;
@@ -641,7 +650,48 @@ void CvPlayerAI::AI_chooseEventOption(int iEvent)
 	// TODO!!!
 	CvEvent* pEvent = getEvent(iEvent);
 	int iOption = GC.getGame().getJonRandNum(pEvent->getNumOptions(), "Stupidly picking AI option choice");
+	AI_LogEvent(iEvent, iOption);
 	processEventOption(pEvent->GetID(), iOption);
+}
+
+// TODO Make this function more useful.
+void CvPlayerAI::AI_LogEvent(int iEvent, int iOption)
+{
+	if(GC.getLogging() && GC.getAILogging())
+	{
+		CvString strOutBuf;
+		CvString strBaseString;
+		CvString playerName;
+		CvString strDesc;
+		CvString strLogName;
+		CvString strTemp;
+
+		// Find the name of this civ and city
+		playerName = getCivilizationShortDescription();
+
+		// Open the log file
+		if(GC.getPlayerAndCityAILogSplit())
+		{
+			strLogName = "EventAILog_" + playerName + ".csv";
+		}
+		else
+		{
+			strLogName = "EventAILog.csv";
+		}
+
+		FILogFile* pLog;
+		pLog = LOGFILEMGR.GetLog(strLogName, FILogFile::kDontTimeStamp);
+
+		// Get the leading info for this line
+		strBaseString.Format("%03d, EVENT, ", GC.getGame().getElapsedGameTurns());
+		strBaseString += playerName;
+
+		strTemp.Format("%d, %d", iEvent, iOption);
+
+		strOutBuf = strBaseString + ", " + strTemp;
+
+		pLog->Msg(strOutBuf);
+	}
 }
 // END EventEngine
 
@@ -699,6 +749,13 @@ void CvPlayerAI::Read(FDataStream& kStream)
 	// Version number to maintain backwards compatibility
 	uint uiVersion;
 	kStream >> uiVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. 
+	// Old firaxis patch and old mod version? No problem! Except if you weren't using our mod before...
+	uint modVersion;
+	kStream >> modVersion;
+	// END modVersion
 }
 
 
@@ -713,6 +770,13 @@ void CvPlayerAI::Write(FDataStream& kStream) const
 	// Current version number
 	uint uiVersion = 1;
 	kStream << uiVersion;
+	// modVersion - v1, Snarko
+	// We are using our own value here to keep backwards compatibility.
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. 
+	// Old firaxis patch and old mod version? No problem! Except if you weren't using our mod before...
+	uint modVersion = 1;
+	kStream << modVersion;
+	// END modVersion
 }
 
 void CvPlayerAI::AI_launch(VictoryTypes eVictory)

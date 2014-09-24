@@ -3877,25 +3877,31 @@ bool CvGlobals::EventBoolEval(bool bBool, CvEventModifierInfo& kModifier) const
 	}
 	return bPass;
 }
-bool CvGlobals::EventIntEval(int iInt, CvEventModifierInfo& kModifier) const
+bool CvGlobals::EventIntEval(int iInt, CvEventModifierInfo& kModifier, bool bUseCompareItem) const
 {
 	bool bPass = false;
+	int iValue;
+	if (bUseCompareItem)
+		iValue = kModifier.getTypeToCompare();
+	else
+		iValue = kModifier.getNumberToCompare();
+
 	switch(kModifier.getCompareType())
 	{
 	case COMPARE_EQUAL:
-		bPass = (iInt == kModifier.getNumberToCompare());
+		bPass = (iInt == iValue);
 		break;
 
 	case COMPARE_NOTEQUAL:
-		bPass = !(iInt == kModifier.getNumberToCompare());
+		bPass = !(iInt == iValue);
 		break;
 
 	case COMPARE_MORETHAN:
-		bPass = (iInt > kModifier.getNumberToCompare());
+		bPass = (iInt > iValue);
 		break;
 
 	case COMPARE_LESSTHAN:
-		bPass = (iInt < kModifier.getNumberToCompare());
+		bPass = (iInt < iValue);
 		break;
 
 	default:

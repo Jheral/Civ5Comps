@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created by ModBuddy on 8/17/2014 11:36:04 AM -->
+<GameData>
+	<PolicyBranchClass_PrereqFlags>
+		<Row>
+			<PolicyBranchClassType>BRANCHCLASS_IDEOLOGY</PolicyBranchClassType>
+			<Flag>FLAG_IDEOLOGY</Flag>
+			<MinimumValue>1</MinimumValue>
+		</Row>
+	</PolicyBranchClass_PrereqFlags>  
+</GameData>

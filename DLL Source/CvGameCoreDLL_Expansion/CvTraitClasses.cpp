@@ -1497,6 +1497,8 @@ TraitYieldFromFeatures& CvTraitYieldFromFeatures::GetYieldChange(int i)
 /// Serialization write
 void CvTraitYieldFromFeatures::Write(FDataStream& kStream)
 {
+	// Current version number
+	// Because this is not Firaxis made we don't need a (seperate) mod version number
 	uint uiVersion = 1;
 	kStream << uiVersion;
 
@@ -1521,6 +1523,7 @@ void CvTraitYieldFromFeatures::Write(FDataStream& kStream)
 void CvTraitYieldFromFeatures::Read(FDataStream& kStream)
 {
 	// Version number to maintain backwards compatibility
+	// Because this is not Firaxis made we don't need a (seperate) mod version number
 	uint uiVersion;
 	kStream >> uiVersion;
 
@@ -2868,7 +2871,8 @@ void CvPlayerTraits::Read(FDataStream& kStream)
 	kStream >> uiVersion;
 	// modVersion - v1, Snarko
 	// We are using our own value here to keep backwards compatibility.
-	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem! Well, except mod versions created before using our modcomp(s)...
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. 
+	// Old firaxis patch and old mod version? No problem! Except if you weren't using our mod before...
 	uint modVersion;
 	kStream >> modVersion;
 	// END modVersion
@@ -3292,7 +3296,8 @@ void CvPlayerTraits::Write(FDataStream& kStream)
 	kStream << uiVersion;
 	// modVersion - v1, Snarko
 	// We are using our own value here to keep backwards compatibility.
-	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem! Well, except mod versions created before using our modcomp(s)...
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. 
+	// Old firaxis patch and old mod version? No problem! Except if you weren't using our mod before...
 	uint modVersion = 1;
 	kStream << modVersion;
 	// END modVersion

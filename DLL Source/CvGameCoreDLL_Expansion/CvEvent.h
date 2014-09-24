@@ -45,6 +45,8 @@ public:
 
 	int getNotificationID() const;
 
+	bool isQueued() const;
+
 	void trigger();
 	void processEventOption(int iOption);
 	void processEventAction(EventActionTypes eAction, EventOptionTypes eOption);
@@ -60,6 +62,7 @@ private:
 	std::map<std::string, int > m_asziSets;
 	int m_iID;
 	int m_iNotificationIndex;
+	bool m_bQueued;
 };
 
 FDataStream& operator<<(FDataStream&, const CvEvent&);

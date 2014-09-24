@@ -35,6 +35,7 @@ void CvEvent::init(int iID, EventTypes eEvent, std::map<std::string, int >& aszi
 	m_pUnit = pUnit;
 	m_asziSets = asziSets;
 	m_iNotificationIndex = -1;
+	m_bQueued = false;
 }
 
 void CvEvent::SetID(int iID)
@@ -90,6 +91,7 @@ void CvEvent::write(FDataStream& kStream) const
 		kStream << (uint)0;
 
 	kStream << m_iNotificationIndex;
+	kStream << m_bQueued;
 }
 
 void CvEvent::WriteSetInfo(FDataStream& kStream) const
@@ -224,6 +226,7 @@ void CvEvent::read(FDataStream& kStream)
 	}
 
 	kStream >> m_iNotificationIndex;
+	kStream >> m_bQueued;
 }
 
 EventTypes CvEvent::getEventType() const
@@ -251,28 +254,47 @@ int CvEvent::getNotificationID() const
 	return m_iNotificationIndex;
 }
 
+bool CvEvent::isQueued() const
+{
+	return m_bQueued;
+}
+
 void CvEvent::trigger()
 {
 	// CvEventInfo* kEvent = GC.getEventInfo(eEvent);
 
 	if (GET_PLAYER(m_ePlayer).isHuman())
 	{
-		CvNotifications* pNotifications = GET_PLAYER(m_ePlayer).GetNotifications();
-		if(pNotifications)
+		if (GC.getEventInfo(m_eEventType)->isForced() && GC.getGame().getActivePlayer() == m_ePlayer)
 		{
-			int iX = -1;
-			int iY = -1;
-			if (m_pCity != NULL)
+			CvPopupInfo kPopup(BUTTONPOPUP_EVENT, m_ePlayer, m_eEventType, GetID());
+			GC.GetEngineUserInterface()->AddPopup(kPopup);
+		}
+		// It is forced, but we are not the active player.
+		// Add the popup to a queue and we'll deal with it later.
+		else if (GC.getEventInfo(m_eEventType)->isForced())
+		{
+			m_bQueued = true;
+		}
+		else
+		{
+			CvNotifications* pNotifications = GET_PLAYER(m_ePlayer).GetNotifications();
+			if(pNotifications)
 			{
-				iX = m_pCity->getX();
-				iY = m_pCity->getY();
+				int iX = -1;
+				int iY = -1;
+				if (m_pCity != NULL)
+				{
+					iX = m_pCity->getX();
+					iY = m_pCity->getY();
+				}
+				else if (m_pUnit != NULL)
+				{
+					iX = m_pUnit->getX();
+					iY = m_pUnit->getY();
+				}
+				m_iNotificationIndex = pNotifications->Add(NOTIFICATION_EVENT, GC.getEventInfo(m_eEventType)->getNotificationText(), "Event", iX, iY, (int)m_eEventType, GetID());
 			}
-			else if (m_pUnit != NULL)
-			{
-				iX = m_pUnit->getX();
-				iY = m_pUnit->getY();
-			}
-			m_iNotificationIndex = pNotifications->Add(NOTIFICATION_EVENT, GC.getEventInfo(m_eEventType)->getNotificationText(), "Event", iX, iY, (int)m_eEventType, GetID());
 		}
 	}
 	// TODO?
@@ -342,13 +364,13 @@ void CvEvent::processEventAction(EventActionTypes eAction, EventOptionTypes eOpt
 
 		case EVENTACTION_TECH:
 			FAssertMsg(iTypeToAction != -1, "iTypeToAction was -1 when proccessing an EventAction that expected otherwise");
-			if (kAction.getTypeToAction() != NO_TECH)
+			if (iTypeToAction != NO_TECH)
 				GET_TEAM(kPlayer.getTeam()).setHasTech((TechTypes)iTypeToAction, kAction.getBool1(), m_ePlayer, true, true);
 			break;
 
 		case EVENTACTION_POLICY:
 			FAssertMsg(iTypeToAction != -1, "iTypeToAction was -1 when proccessing an EventAction that expected otherwise");
-			if (kAction.getTypeToAction() != NO_POLICY)
+			if (iTypeToAction != NO_POLICY)
 				kPlayer.setHasPolicy((PolicyTypes)iTypeToAction, kAction.getBool1());
 			break;
 
@@ -524,10 +546,7 @@ void CvEvent::processEventAction(EventActionTypes eAction, EventOptionTypes eOpt
 					FAssertMsg(false, "Expected m_pUnit to be a valid unit, got NULL instead in CvEvent::processEventAction, EVENTACTION_UNIT_EXPERIENCE");
 					return;
 				}
-				int iMax = kAction.getValue2();
-				if (iMax == 0) // A max of 0 makes no sense, but is the default value. So make the default be -1 instead.
-					iMax = -1;
-				m_pUnit->changeExperience(kAction.getValue1(), iMax);
+				m_pUnit->changeExperience(kAction.getValue1(), kAction.getValue2());
 			}
 			break;
 
@@ -650,7 +669,10 @@ void CvEvent::buildActionTooltip(EventActionTypes eAction, CvString* toolTipSink
 		break;
 
 	case EVENTACTION_HAPPY:
-		tmpString = GetLocalizedText("TXT_KEY_EVENTACTION_HAPPY", pkAction->getValue1());
+		if (pkAction->getValue1() > 0)
+			tmpString = GetLocalizedText("TXT_KEY_EVENTACTION_HAPPY", pkAction->getValue1());
+		else if (pkAction->getValue1() < 0)
+			tmpString = GetLocalizedText("TXT_KEY_EVENTACTION_UNHAPPY", abs(pkAction->getValue1()));
 		break;
 
 	case EVENTACTION_TECH:
@@ -825,10 +847,7 @@ void CvEvent::buildActionTooltip(EventActionTypes eAction, CvString* toolTipSink
 				FAssertMsg(false, "Expected m_pUnit to be a valid unit, got NULL instead in CvEvent::buildActionTooltip, EVENTACTION_UNIT_EXPERIENCE");
 				return;
 			}
-			int iMax = pkAction->getValue2();
-			if (iMax == 0) // A max of 0 makes no sense, but is the default value. So make the default be -1 instead.
-				iMax = -1;
-			int iExperience = std::min(iMax, m_pUnit->getExperience() + pkAction->getValue1());
+			int iExperience = std::min(pkAction->getValue2(), m_pUnit->getExperience() + pkAction->getValue1());
 			if (iExperience != 0)
 				tmpString = GetLocalizedText("TXT_KEY_EVENTACTION_UNIT_EXPERIENCE", m_pUnit->getName().c_str(), iExperience);
 		}
@@ -986,6 +1005,9 @@ void CvEventEffect::changeNumTurns(int iChange)
 
 void CvEventEffect::Read(FDataStream& kStream)
 {
+	uint uiVersion;
+	kStream >> uiVersion;
+
 	kStream >> m_eEventAction;
 
 	{
@@ -1027,6 +1049,11 @@ void CvEventEffect::Read(FDataStream& kStream)
 
 void CvEventEffect::Write(FDataStream& kStream) const
 {
+	// Current version number
+	// Because this file is not Firaxis made we don't need a (seperate) mod version number
+	uint uiVersion = 1;
+	kStream << uiVersion;
+
 	kStream << m_eEventAction;
 
 	// Write out a hash for the event type, instead of storing ID, which can change.

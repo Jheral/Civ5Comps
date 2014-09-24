@@ -6937,6 +6937,8 @@ bool CvVoteSourceInfo::CacheResults(Database::Results& kResults, CvDatabaseUtili
 CvEventInfo::CvEventInfo() : 
 	m_iMeanTimeToHappen(0),
 	m_eEventType(NO_EVENTTYPE),
+	m_bForced(false),
+	m_bSilent(false),
 	m_aeEventRequirements(NULL),
 	m_aeEventModifiers(NULL),
 	m_aeEventOptions(NULL)
@@ -6962,6 +6964,9 @@ bool CvEventInfo::CacheResults(Database::Results& kResults, CvDatabaseUtility& k
 	{
 		m_szNotificationText = "ERROR";
 	}
+
+	m_bForced = kResults.GetBool("bForcedImmediate");
+	m_bSilent = kResults.GetBool("bSilent");
 
 	// Requirements
 	{
@@ -7039,6 +7044,16 @@ int CvEventInfo::getMTTH() const
 	return m_iMeanTimeToHappen;
 }
 
+bool CvEventInfo::isForced() const
+{
+	return m_bForced;
+}
+
+bool CvEventInfo::isSilent() const
+{
+	return m_bSilent;
+}
+
 int CvEventInfo::getNumRequirements() const
 {
 	return m_aeEventRequirements.size();
@@ -7105,6 +7120,7 @@ bool CvEventModifierInfo::CacheResults(Database::Results& kResults, CvDatabaseUt
 	m_eModifier = GC.getEventModifierType(kResults.GetText("EventModifierType"));
 	m_eCompare = GC.getCompareType(kResults.GetText("EventCompareType"));
 	m_iTypeToCompare = GC.getInfoTypeForString(kResults.GetText("CompareItem"));
+	m_strFlagToCompare = kResults.GetText("CompareFlag");
 	m_iNumberToCompare = kResults.GetInt("iNumberToCompare");
 	m_iFactor = (int)(kResults.GetFloat("fFactor") * 100); //We divide with 100 later on. The final chance is an int, 1 in X chance, so floats don't really make sense.
 	m_szSet = kResults.GetText("SetName");
@@ -7130,6 +7146,11 @@ std::string CvEventModifierInfo::getSet() const
 int CvEventModifierInfo::getTypeToCompare() const
 {
 	return m_iTypeToCompare;
+}
+
+CvString CvEventModifierInfo::getFlagToCompare() const
+{
+	return m_strFlagToCompare;
 }
 
 int CvEventModifierInfo::getNumberToCompare() const
@@ -7221,19 +7242,77 @@ bool CvEventActionInfo::CacheResults(Database::Results& kResults, CvDatabaseUtil
 
 	m_eAction = GC.getEventActionType(kResults.GetText("EventActionType"));
 
-	//ints
+	// ints
 	m_iTurns = kResults.GetInt("iTurns");
 	m_iChance = kResults.GetInt("iChance");
-	m_iTypeToAction = GC.getInfoTypeForString(kResults.GetText("ActionItem"));
 	m_AIWeight = kResults.GetInt("AIWeight");
-	m_iValue1 = kResults.GetInt("iValue");
-	m_iValue2 = kResults.GetInt("iValue2");
 
-	//bools
-	m_bBool1 = kResults.GetBool("bBool");
+	// m_iValue1
+	// m_iValue2
+	switch(m_eAction)
+	{
+	case EVENTACTION_SPECIALIST_YIELD:
+	case EVENTACTION_CITY_SPECIALIST_YIELD:
+		m_iTypeToAction = GC.getInfoTypeForString(kResults.GetText("SpecialistType"));
+		m_iValue1 = GC.getInfoTypeForString(kResults.GetText("YieldType"));
+		m_iValue2 = kResults.GetInt("iValue");
+		break;
 
-	//strings
-	m_szString1 = kResults.GetText("sString");
+	case EVENTACTION_UNIT_EXPERIENCE:
+		m_iTypeToAction = GC.getInfoTypeForString(kResults.GetText("ItemType")); // Irrelevant but kept so the variable has a value.
+		m_iValue1 = kResults.GetInt("iValue");
+		m_iValue2 = kResults.GetInt("iMaxValue");
+		break;
+
+	case EVENTACTION_REVEAL_TILE:
+		m_iTypeToAction = GC.getInfoTypeForString(kResults.GetText("ItemType")); // Irrelevant but kept so the variable has a value.
+		m_iValue1 = kResults.GetInt("iCoordX");
+		m_iValue2 = kResults.GetInt("iCoordY");
+		break;
+
+	case EVENTACTION_YIELD:
+	case EVENTACTION_YIELDMOD:
+	case EVENTACTION_CITY_YIELD:
+	case EVENTACTION_CITY_YIELDMOD:
+		m_iTypeToAction = GC.getInfoTypeForString(kResults.GetText("YieldType"));
+		m_iValue1 = kResults.GetInt("iValue");
+		m_iValue2 = kResults.GetInt("iValue2");
+		break;
+
+
+	default:
+		m_iTypeToAction = GC.getInfoTypeForString(kResults.GetText("ItemType"));
+		m_iValue1 = kResults.GetInt("iValue");
+		m_iValue2 = kResults.GetInt("iValue2");
+		break;
+	}
+
+	// bools
+	// m_bBool1
+	switch(m_eAction)
+	{
+	case EVENTACTION_CITY_ADD_BUILDING:
+		m_bBool1 = kResults.GetBool("bFreeItem");
+		break;
+
+	case EVENTACTION_SET_FLAG:
+	case EVENTACTION_CITY_SET_FLAG:
+	case EVENTACTION_UNIT_SET_FLAG:
+		m_bBool1 = kResults.GetBool("bModifyItem");
+		break;
+
+	case EVENTACTION_UNIT_PROMOTION:
+		m_bBool1 = kResults.GetBool("bRemoveItem");
+		break;
+
+	default: 
+		// EVENTACTION_TECH, EVENTACTION_POLICY, EVENTACTION_EVENT_FOR_CAPITAL, EVENTACTION_EVENT_FOR_ALL_CITIES, EVENTACTION_EVENT_FOR_ALL_UNITS, EVENTACTION_EVENT
+		m_bBool1 = kResults.GetBool("bBool");
+		break;
+	}
+
+	// strings
+	m_szString1 = kResults.GetText("FlagName");
 	m_szSet = kResults.GetText("SetName");
 
 	return true;

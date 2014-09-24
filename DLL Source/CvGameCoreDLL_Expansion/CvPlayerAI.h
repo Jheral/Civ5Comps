@@ -63,7 +63,9 @@ public:
 	void AI_considerAnnex();
 
 	// EventEngine - v0.1, Snarko
+	// DO NOT pass an event pointer to AI_chooseEventOption. The event is deleted when an option has been chosen.
 	void AI_chooseEventOption(int iEvent);
+	void AI_LogEvent(int iEvent, int iOption);
 	// END EventEngine
 
 	int AI_plotTargetMissionAIs(CvPlot* pPlot, MissionAITypes eMissionAI, int iRange = 0);

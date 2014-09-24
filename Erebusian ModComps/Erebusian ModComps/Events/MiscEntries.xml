@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Created by ModBuddy on 8/9/2014 6:46:56 PM -->
+<GameData>
+	<Notifications>
+		<Row>
+			<NotificationType>NOTIFICATION_EVENT</NotificationType>
+		</Row>
+	</Notifications>
+</GameData>

@@ -2562,6 +2562,10 @@ enum EndTurnBlockingTypes
 	ENDTURN_BLOCKING_LEAGUE_CALL_FOR_VOTES,
 	ENDTURN_BLOCKING_CHOOSE_IDEOLOGY,
 
+	// EventEngine - v0.1, Snarko
+	ENDTURN_BLOCKING_EVENT,
+	// END EventEngine
+
 	NUM_ENDTURN_BLOCKING_TYPES
 };
 
@@ -3341,6 +3345,8 @@ enum EventModifierTypeTypes
 
 	EVENTMOD_TILES_BOUGHT, // TODO
 
+	EVENTMOD_FLAG,
+
 	EVENTMOD_PLAYER_END,
 
 	//City modifiers/requirements
@@ -3388,6 +3394,8 @@ enum EventModifierTypeTypes
 	EVENTMOD_CITY_ORIGINAL_OWNER,
 
 	EVENTMOD_CITY_EVENT,
+
+	EVENTMOD_CITY_FLAG,
 
 	// WARNING!!!
 	// Be careful when using these.
@@ -3438,6 +3446,8 @@ enum EventModifierTypeTypes
 	EVENTMOD_UNIT_INTERCEPT_RANGE,
 	
 	EVENTMOD_UNIT_PROMOTION,
+
+	EVENTMOD_UNIT_FLAG,
 
 	// WARNING!!!
 	// Be careful when using these.

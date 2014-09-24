@@ -213,6 +213,9 @@
 			<Name>EVENTMOD_TILES_BOUGHT</Name>
 		</Row>
 		<Row>
+			<Name>EVENTMOD_FLAG</Name>
+		</Row>
+		<Row>
 			<Name>EVENTMOD_PLAYER_END</Name>
 		</Row>
 		<Row>
@@ -303,6 +306,9 @@
 			<Name>EVENTMOD_CITY_EVENT</Name>
 		</Row>
 		<Row>
+			<Name>EVENTMOD_CITY_FLAG</Name>
+		</Row>
+		<Row>
 			<Name>EVENTMOD_CITY_NUM_FEATURE_IN_RANGE</Name>
 		</Row>
 		<Row>
@@ -391,6 +397,9 @@
 		</Row>
 		<Row>
 			<Name>EVENTMOD_UNIT_PROMOTION</Name>
+		</Row>
+		<Row>
+			<Name>EVENTMOD_UNIT_FLAG</Name>
 		</Row>
 		<Row>
 			<Name>EVENTMOD_UNIT_NUM_FEATURE_IN_RANGE</Name>

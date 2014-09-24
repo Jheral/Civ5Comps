@@ -2338,6 +2338,8 @@ public:
 
 	int getFactor() const;
 
+	CvString getFlagToCompare() const;
+
 private:
 	EventModifierTypeTypes m_eModifier;
 	CompareTypes m_eCompare;
@@ -2345,6 +2347,7 @@ private:
 	int m_iTypeToCompare;
 	int m_iNumberToCompare;
 	int m_iFactor;
+	CvString m_strFlagToCompare;
 	std::string m_szSet;
 };
 
@@ -2419,6 +2422,9 @@ public:
 
 	int getMTTH() const;
 
+	bool isForced() const;
+	bool isSilent() const;
+
 	EventTypeTypes getEventType() const;
 
 	const char* getNotificationText() const;
@@ -2436,6 +2442,9 @@ private:
 	int m_iMeanTimeToHappen;
 	EventTypeTypes m_eEventType;
 	CvString m_szNotificationText;
+
+	bool m_bForced;
+	bool m_bSilent;
 
 	std::vector<EventModifierTypes> m_aeEventModifiers;
 	std::vector<EventRequirementTypes> m_aeEventRequirements;

@@ -595,7 +595,7 @@ public:
 	EventActionTypeTypes getEventActionType(std::string szEventActionType);
 
 	bool EventBoolEval(bool bBool, CvEventModifierInfo& kModifier) const;
-	bool EventIntEval(int iInt, CvEventModifierInfo& kModifier) const;
+	bool EventIntEval(int iInt, CvEventModifierInfo& kModifier, bool bUseCompareItem = false) const;
 	// END EventEngine
 	// Revamped yields - v0.1, Snarko
 	int getNumGreatWorkClassInfos();

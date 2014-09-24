@@ -777,6 +777,9 @@ int CvLuaEnums::pRegister(lua_State* L)
 	RegisterEnum(ENDTURN_BLOCKING_CHOOSE_ARCHAEOLOGY);
 	RegisterEnum(ENDTURN_BLOCKING_LEAGUE_CALL_FOR_VOTES);
 	RegisterEnum(ENDTURN_BLOCKING_CHOOSE_IDEOLOGY);
+	// EventEngine - v0.1, Snarko
+	RegisterEnum(ENDTURN_BLOCKING_EVENT);
+	// END EventEngine
 	RegisterEnum(NUM_ENDTURN_BLOCKING_TYPES);
 	EnumEnd(L);
 

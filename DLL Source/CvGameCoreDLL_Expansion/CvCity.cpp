@@ -13838,7 +13838,8 @@ void CvCity::read(FDataStream& kStream)
 	kStream >> uiVersion;
 	// modVersion - v1, Snarko
 	// We are using our own value here to keep backwards compatibility.
-	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem! Well, except mod versions created before using our modcomp(s)...
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. 
+	// Old firaxis patch and old mod version? No problem! Except if you weren't using our mod before...
 	uint modVersion;
 	kStream >> modVersion;
 	// END modVersion
@@ -14216,7 +14217,8 @@ void CvCity::write(FDataStream& kStream) const
 	kStream << uiVersion;
 	// modVersion - v1, Snarko
 	// We are using our own value here to keep backwards compatibility.
-	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. Old firaxis patch and old mod version? No problem!
+	// While we could use the Firaxis value that would cause issues when they update it, so we use our own for maximum backward compatibility. 
+	// Old firaxis patch and old mod version? No problem! Except if you weren't using our mod before...
 	uint modVersion = 1;
 	kStream << modVersion;
 	// END modVersion
@@ -16383,6 +16385,10 @@ bool CvCity::checkEventModifier(CvEventModifierInfo& kModifier, bool bRequiremen
 		// So don't test for it.
 		else
 			return false;
+		break;
+
+	case EVENTMOD_CITY_FLAG:
+		iValue = getFlag(kModifier.getFlagToCompare());
 		break;
 
 	// These share code so much we make one case for them.
